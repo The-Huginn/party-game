@@ -89,15 +89,12 @@ class Game:
             for x in range(task.frequency):
                 self.currentTasks.append(task)
 
-    def randomPlayers(self, count):
-        """
-        returns list of length max(count, totalPlayers) of random players without the current player
-        """
+    def randomPlayers(self):
 
         available = [i for i in self.players if i.name != self.getCurrentPlayer().name]
         random.shuffle(available)
 
-        return available if count >= len(self.players) - 1 else available[0:count]
+        return available
 
     def getPlayers(self):
         return self.players
@@ -172,9 +169,7 @@ class Task:
     def resolveTask(self, game):
 
         self.task = self.unresolvedTask
-
-        randoms = self.data.get('players', 0)
-        players = game.randomPlayers(randoms)
+        players = game.randomPlayers()
 
         # Replace place holders for random players
         while self.task.find('<') != -1:
