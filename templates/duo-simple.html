@@ -1,0 +1,26 @@
+{% extends 'task-simple.html' %}
+
+{% block header %}
+    Hraci su rozdeleny do dvojic nasledovne
+{% endblock %}
+
+{% block table %}
+<table class="child" id="table">
+
+    {% for player1, player2 in pairs %}
+
+    <tr>
+        <td>{{player1}}</td>
+        <td>&</td>
+        <td>{{player2}}</td>
+
+        {%endfor%}
+
+    </tr>
+
+</table>
+{% endblock %}
+
+{% block body %}
+    {{task}}
+{% endblock %}

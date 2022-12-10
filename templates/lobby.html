@@ -1,0 +1,102 @@
+{% extends 'warning.html' %}
+
+{% block content %}
+
+<form id="submit_form">
+    Add Player:<br>
+    <input type="text" id="playerName"></input>
+    <button id="addPlayer">Add</button>
+</form>
+
+<table class="child" id="table">
+
+    {%for i in range(0, len)%}
+
+    <tr>
+        <td>{{i}}</td>
+        <td>{{players[i].name}}</td>
+        <td><button class="removeButton", id="{{i}}">Remove</button></td>
+
+        {%endfor%}
+
+    </tr>
+
+</table>
+
+<form id="startGame">
+    <button id="startButton">Start</button>
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script>
+    $("#submit_form").submit(function (e) {
+        e.preventDefault();
+
+        var name = $("#playerName").val();
+
+        $.ajax({
+            url: "/addPlayer",
+            type: "post",
+            data: { name: name },
+            success: function (response) {
+                $("#content_placeholder").html(response);
+            },
+            error: function (xhr) {
+                //Do Something to handle error
+                console.log("error")
+            }
+        });
+    });
+
+    $("#startGame").submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/start",
+            type: "post",
+
+            success: function (response) {
+                $("#content_placeholder").html(response);
+                $.ajax({
+                    url: "/css",
+                    type: "get",
+
+                    success: function (response) {
+                        $("#background").attr("href", response);
+                    },
+                    error: function(xhr) {
+                        console.log("error" + xhr.responseType);
+                    }
+                });
+            },
+            error: function (xhr) {
+                //Do Something to handle error
+                console.log("error")
+            }
+        });
+    });
+
+    $(".removeButton").on('click', function (e) {
+        console.log("clicled")
+        e.preventDefault();
+
+        var obj = $(this);
+        var id = $(this).attr('id');
+        
+        $.ajax({
+            url: "/removePlayer",
+            type: "delete",
+            data: { id: id },
+            success: function (response) {
+                $("#content_placeholder").html(response);
+            },
+            error: function (xhr) {
+                //Do Something to handle error
+                console.log("error")
+            }
+        });
+    });
+</script>
+
+{% endblock %}
