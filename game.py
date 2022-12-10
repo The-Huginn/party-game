@@ -124,9 +124,9 @@ class Game:
                 break
         
         self.cachedTasks.append(task)
-        # We will allow same tasks after 1/10 of others tasks were done
+        # We will allow same tasks after 1/5 of others tasks were done
         # Note not exactly true as some tasks are removed
-        if len(self.cachedTasks) >= len(self.initialTasks) / 10:
+        if len(self.cachedTasks) >= len(self.initialTasks) / 5:
             self.cachedTasks.pop(0)
 
         self.css = "/static/css/" + task.getCSS() + ".css"
@@ -148,6 +148,7 @@ class Task:
         self.frequency = data.get('frequency', 1)
         self.repeat = data.get('repeat', False)
         self.price = data.get('price', 1)
+        self.message = data.get('message', 'Inak pijes')
         self.data = data
     
     def checkJSON(data) -> bool:
@@ -157,7 +158,7 @@ class Task:
         # Resolve task
         self.resolveTask(game)
 
-        aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer().name}
+        aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer().name, "message": self.message}
 
         if 'timer' in self.data:
             aux["timer"] = self.data.get('timer')

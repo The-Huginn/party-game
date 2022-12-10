@@ -1,7 +1,13 @@
 {% extends 'base-game.html' %}
 
 {% block price %}
-<p>Inak pijes {% for i in range(price) %}<img src="{{url_for('static', filename='image/shot.png')}}" width="60px" height="60px">{% endfor %}</p>
+
+{% if price > 0 %}
+<p>
+{{message}}{% for i in range(price) %}<img src="{{url_for('static', filename='image/shot.png')}}" width="60px" height="60px">{% endfor %}
+</p>
+{% endif %}
+
 {% endblock %}
 
 {% block timer %}
