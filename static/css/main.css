@@ -53,6 +53,10 @@ button:active {
     /* change the direction of the change here */
 }
 
+img {
+    vertical-align:middle;
+}
+
 input {
     padding: 5px;
     background: rgba(0, 0, 0, 0.2);
@@ -67,7 +71,6 @@ input {
 #myprogressBar {
     width: 0%;
     height: 35px;
-    background-color: rgba(209, 111, 255, 0.911);
     line-height: 32px;
     border-radius: 10px;
 }
