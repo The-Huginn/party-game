@@ -11,12 +11,15 @@ body {
     height: 100vh;
 }
 
-input, div {
+input,
+div {
     font-family: 'Merienda', monospace;
     font-size: 45px;
 }
 
-button, table, input {
+button,
+table,
+input {
     font-family: 'Merienda', monospace;
     flex: 1 1 auto;
     margin: 10px;
@@ -33,16 +36,18 @@ button, table, input {
     background-image: linear-gradient(to right, #fbc2eb 0%, #a6c1ee 51%, #fbc2eb 100%);
 }
 
-th, td {
+th,
+td {
     padding-left: 20px;
 }
 
-button:hover, button:active {
+button:hover,
+button:active {
     background-image: -moz-none;
     background-image: -webkit-none;
     background-image: -webkit-none;
     background-image: -o-none;
-    background-image:none;
+    background-image: none;
     background-color: #E2AD27;
     box-shadow: 5px 5px 5px #888888;
     /* change the direction of the change here */
@@ -50,7 +55,21 @@ button:hover, button:active {
 
 input {
     padding: 5px;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#Progress_Status {
+    width: 80%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+#myprogressBar {
+    width: 0%;
+    height: 35px;
+    background-color: rgba(209, 111, 255, 0.911);
+    line-height: 32px;
+    border-radius: 10px;
 }
 
 .content {
