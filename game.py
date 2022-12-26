@@ -39,6 +39,7 @@ class Game:
         self.currentTasks = []
         self.cachedTasks = []
         self.css = "/static/css/default.css"
+        self.selected = {"common", "cloathes", "genders"}
 
     def __eq__(self, other) -> bool:
         return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
@@ -68,8 +69,8 @@ class Game:
     def getCurrentPlayer(self):
         return self.players[self.currentPlayer]
 
-    def addTasks(self, selected):
-        for filename in selected:
+    def loadTasks(self):
+        for filename in self.selected:
             f = open("tasks/" + filename + ".json", "r")
             data = json.loads(f.read())
 

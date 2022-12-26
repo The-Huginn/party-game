@@ -14,15 +14,15 @@ app.secret_key = secret
 games = {}
 @app.route('/login', methods=['POST'])
 def login():
-    game = request.form['gameID']
-    if game not in games.keys():
-        games[game] = Game(game)
+    gameID = request.form['gameID']
+    if gameID not in games.keys():
+        games[gameID] = Game(gameID)
 
         # flash("Game already exists")
         # return render_template('login.html')
 
-    resp = make_response(render_template('lobby.html', players=games[game].getPlayers(), len=len(games[game].getPlayers())))
-    resp.set_cookie('gameID', game)
+    resp = make_response(render_template('lobby.html', players=games[gameID].getPlayers(), len=len(games[gameID].getPlayers())))
+    resp.set_cookie('gameID', gameID)
 
     return resp
 
@@ -52,7 +52,7 @@ def removePlayer():
 @app.route('/start', methods=['POST'])
 def start():
     game = games[request.cookies.get('gameID')]
-    game.addTasks(["common", "cloathes", "genders"])
+    game.loadTasks()
     game.newGame()
 
     if len(game.getPlayers()) < 2:
