@@ -26,13 +26,17 @@ def login():
 
     return resp
 
+@app.route('/home', methods=['GET'])
+def home():
+    return render_template('home-page.html')
+
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
     name = request.form['name']
     game = games[request.cookies.get('gameID')]
     
     if not game.addPlayer(name):
-        flash("Pridanie sa nepodarilo, pouzivatul uz existuje alebo zadane meno je kratke")
+        flash("Pridanie sa nepodarilo, pouzivatel uz existuje alebo zadane meno je kratke")
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
 
@@ -48,7 +52,7 @@ def removePlayer():
 @app.route('/start', methods=['POST'])
 def start():
     game = games[request.cookies.get('gameID')]
-    game.addTasks(["all"])
+    game.addTasks(["common", "cloathes", "genders"])
     game.newGame()
 
     if len(game.getPlayers()) < 2:
@@ -59,11 +63,17 @@ def start():
 
 @app.route('/')
 def hello_world():
-    return render_template('index.html')
+    return render_template('about.html')
 
 @app.route('/css', methods=['GET'])
 def getCSS():
+    default = request.args.get('defaultCss')
+    
+    if default == 'true' or 'gameID' not in request.cookies:
+        return "/static/css/default.css"
+
     game = games[request.cookies.get('gameID')]
+        
     return game.getCSS()
 
 @app.route('/favicon.ico')
