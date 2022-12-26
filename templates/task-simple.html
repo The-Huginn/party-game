@@ -54,41 +54,33 @@
         e.preventDefault();
         restCall();
     });
-
+    
     function restCall() {
         $.ajax({
             url: "/nextMove",
             type: "get",
-
+            
             success: function (response) {
+    
                 {% if timer is defined %}
                 clearInterval(timer);
                 {% endif %}
+                
                 $("#content_placeholder").html(response);
-
+                
                 if ($("#startTimer").length > 0) {
                     $("#startTimer").focus();
                 } else {
                     $("#nextMove").focus();
                 }
-                
-                $.ajax({
-                    url: "/css",
-                    type: "get",
-
-                    success: function (response) {
-                        $("#background").attr("href", response);
-                    },
-                    error: function (xhr) {
-                        console.log("error" + xhr.responseType);
-                    }
-                });
             },
             error: function (xhr) {
                 //Do Something to handle error
                 console.log("error")
             }
         });
+
+        updateCss(false);
     }
 </script>
 {% endblock %}
