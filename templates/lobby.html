@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form id="submit_form">
+<form id="player_form">
     Add Player:<br>
     <input type="text" id="playerName"></input>
     <button id="addPlayer">Add</button>
@@ -30,7 +30,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
 <script>
-    $("#submit_form").submit(function (e) {
+    $("#player_form").submit(function (e) {
         e.preventDefault();
 
         var name = $("#playerName").val();
@@ -64,18 +64,6 @@
                 } else {
                     $("#nextMove").focus();
                 }
-                
-                $.ajax({
-                    url: "/css",
-                    type: "get",
-
-                    success: function (response) {
-                        $("#background").attr("href", response);
-                    },
-                    error: function(xhr) {
-                        console.log("error" + xhr.responseType);
-                    }
-                });
             },
             error: function (xhr) {
                 //Do Something to handle error
