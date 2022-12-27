@@ -1,5 +1,5 @@
-import random
-import json
+import glob, json, random
+from pathlib import Path
 from flask import render_template
 
 # Currently we do not support statistics
@@ -49,6 +49,13 @@ class Game:
 
     def __repr__(self) -> str:
         return self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
+
+    def getCategories():
+        categories = [Path(x).stem for x in glob.glob('tasks/*.json')]
+        return categories
+
+    def setCategories(self, categories):
+        self.selected = set(categories)
 
     def addPlayer(self, name) -> bool:
 

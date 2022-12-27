@@ -52,6 +52,7 @@ def removePlayer():
 @app.route('/start', methods=['POST'])
 def start():
     game = games[request.cookies.get('gameID')]
+    game.setCategories(Game.getCategories())
     game.loadTasks()
     game.newGame()
 
