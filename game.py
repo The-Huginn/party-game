@@ -39,7 +39,7 @@ class Game:
         self.currentTasks = []
         self.cachedTasks = []
         self.css = "/static/css/default.css"
-        self.selected = {"common", "cloathes", "genders"}
+        self.selected = set()
 
     def __eq__(self, other) -> bool:
         return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
@@ -50,11 +50,15 @@ class Game:
     def __repr__(self) -> str:
         return self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
 
-    def getCategories():
+    def getAllCategories():
         categories = [Path(x).stem for x in glob.glob('tasks/*.json')]
         return categories
 
+    def getCategories(self):
+        return self.selected
+
     def setCategories(self, categories):
+        self.selected.clear()
         self.selected = set(categories)
 
     def addPlayer(self, name) -> bool:

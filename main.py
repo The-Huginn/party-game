@@ -20,8 +20,9 @@ def login():
 
         # flash("Game already exists")
         # return render_template('login.html')
+    game = games[gameID]
 
-    resp = make_response(render_template('lobby.html', players=games[gameID].getPlayers(), len=len(games[gameID].getPlayers())))
+    resp = make_response(render_template('categories.html', categories=Game.getAllCategories(), selected=game.getCategories()))
     resp.set_cookie('gameID', gameID)
 
     return resp
@@ -29,6 +30,14 @@ def login():
 @app.route('/home', methods=['GET'])
 def home():
     return render_template('home-page.html')
+
+@app.route('/categories', methods=['POST'])
+def categories():
+    game = games[request.cookies.get('gameID')]
+    categories = request.form.getlist('categories[]')
+    game.setCategories(categories)
+
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
 
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
@@ -52,7 +61,6 @@ def removePlayer():
 @app.route('/start', methods=['POST'])
 def start():
     game = games[request.cookies.get('gameID')]
-    game.setCategories(Game.getCategories())
     game.loadTasks()
     game.newGame()
 
