@@ -1,0 +1,11 @@
+<div class="categories-div">
+    <form id="categories_form">
+        {% for category in categories %}
+        <div style="text-align: left;">
+            <input type="checkbox" class="checkbox" id="{{ category }}" name="{{ category }}" value="{{ category }}" {% if category in selected %} checked {% endif %}>
+            <label for="{{ category }}">{{ category }}</label><br>
+        </div>
+        {% endfor %}
+        <button id="button">Next</button>
+    </form>
+</div>
