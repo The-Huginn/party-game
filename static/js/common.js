@@ -1,11 +1,39 @@
 // Home button
-function home() {
+function homeAction() {
     loadHomePage($(".home-btn"));
 }
 
 // Confirm about page
-function confirm() {
+function confirmAction() {
     loadHomePage($("#confirm"));
+}
+
+function categoriesAction() {
+    $("#categories_form").submit(function (e) {
+        e.preventDefault();
+
+        var array = [];
+        $("input:checkbox:checked").each(function() {
+            array.push($(this).val());
+        });
+        if (array.length < 1) {
+            alert("Please select at least one category.")
+            return false;
+        }
+
+        $.ajax({
+            url: "/categories",
+            type: "post",
+            data: {categories: array},
+            success: function (response) {
+                $("#content_placeholder").html(response);
+                updateListeners();
+            },
+            error: function (xhr) {
+                console.log(xhr);
+            }
+        })
+    })
 }
 
 function loadHomePage(button) {
@@ -51,9 +79,10 @@ function gameStart() {
 }
 
 function updateListeners() {
-    home();
+    homeAction();
     gameStart();
-    confirm();
+    categoriesAction();
+    confirmAction();
 }
 
 function updateCss(defaultCss=true) {
@@ -74,7 +103,6 @@ function updateCss(defaultCss=true) {
 }
 
 $(document).ready(function() {
-    console.log("gere");
     updateListeners();
     updateCss();
 });
