@@ -81,6 +81,10 @@ class Game:
         return self.players[self.currentPlayer]
 
     def loadTasks(self):
+        self.initialTasks.clear()
+        self.currentTasks.clear()
+        self.cachedTasks.clear()
+        
         for filename in self.selected:
             f = open("tasks/" + filename + ".json", "r")
             data = json.loads(f.read())
