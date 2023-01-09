@@ -16,10 +16,6 @@ function categoriesAction() {
         $("input:checkbox:checked").each(function() {
             array.push($(this).val());
         });
-        if (array.length < 1) {
-            alert("Please select at least one category.")
-            return false;
-        }
 
         $.ajax({
             url: "/categories",

@@ -35,6 +35,11 @@ def home():
 def categories():
     game = games[request.cookies.get('gameID')]
     categories = request.form.getlist('categories[]')
+
+    if (len(categories) == 0):
+        flash("Zvolte aspon jednu kategoriu")
+        return render_template('categories.html', categories=Game.getAllCategories(), selected=game.getCategories())
+
     game.setCategories(categories)
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
@@ -65,7 +70,7 @@ def start():
     game.newGame()
 
     if len(game.getPlayers()) < 2:
-        flash("Aspon 2 hraci pre start hry")
+        flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
         return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
 
     return nextMove()

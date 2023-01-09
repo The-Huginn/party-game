@@ -1,3 +1,7 @@
+{% extends 'warning.html' %}
+
+{% block content %}
+
 <div class="categories-div">
     <form id="categories_form">
         {% for category in categories %}
@@ -9,3 +13,5 @@
         <button id="button">Next</button>
     </form>
 </div>
+
+{% endblock %}

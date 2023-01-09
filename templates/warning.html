@@ -1,8 +1,8 @@
 <div>
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert" onclick="removeDiv(this);">&times;</button>
         {{ message }}
+        <button type="button" class="close" data-dismiss="alert" onclick="removeDiv(this);">&times;</button>
     </div>
     {% endfor %}
     <script type="text/javascript">
