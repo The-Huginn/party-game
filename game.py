@@ -84,7 +84,7 @@ class Game:
         self.initialTasks.clear()
         self.currentTasks.clear()
         self.cachedTasks.clear()
-        
+
         for filename in self.selected:
             f = open("tasks/" + filename + ".json", "r")
             data = json.loads(f.read())
@@ -133,7 +133,7 @@ class Game:
         while True:
             taskIndex = random.randrange(0, len(self.currentTasks))
             task = self.currentTasks[taskIndex]
-            if task not in self.cachedTasks:
+            if task not in self.cachedTasks and task.resolveTask(self) == True:
                 break
         
         self.cachedTasks.append(task)
@@ -183,6 +183,9 @@ class Task:
         return aux
 
     def resolveTask(self, game):
+        """
+        Tries to resolve task and returns success of this operation
+        """
 
         self.task = self.unresolvedTask
         players = game.randomPlayers()
@@ -194,9 +197,12 @@ class Task:
             if placeholder == 'timer':
                 value = str(self.data.get('timer'))
             elif placeholder[0].isdigit():
+                if int(placeholder) >= len(players):
+                    return False
                 value = players[int(placeholder)].name
 
             self.task = self.task[0:self.task.find('<')] + value + self.task[self.task.find('>') + 1:]
+        return True
 
     def getCSS(self):
         """
