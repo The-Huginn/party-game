@@ -154,7 +154,7 @@ class Game:
 
 
 class Task:
-    DEFAULT_TIMER = 31
+    DEFAULT_TIMER = 30
 
     def __init__(self, data) -> None:
         self.unresolvedTask = data['task']
