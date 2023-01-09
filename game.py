@@ -154,6 +154,7 @@ class Game:
 
 
 class Task:
+    DEFAULT_TIMER = 31
 
     def __init__(self, data) -> None:
         self.unresolvedTask = data['task']
@@ -173,8 +174,8 @@ class Task:
 
         aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer().name, "message": self.message}
 
-        if 'timer' in self.data:
-            aux["timer"] = self.data.get('timer')
+        if 'timer' in self.data or '<timer>' in self.unresolvedTask:
+            aux["timer"] = self.data.get('timer', Task.DEFAULT_TIMER)
 
         if self.template[0:self.template.find('-')] == 'duo':
             aux["pairs"] = game.randomTeams()
@@ -195,7 +196,7 @@ class Task:
             placeholder = self.task[self.task.find('<') + 1:self.task.find('>')]
             value = "\"foo you should not see :)\""
             if placeholder == 'timer':
-                value = str(self.data.get('timer'))
+                value = str(self.data.get('timer', Task.DEFAULT_TIMER))
             elif placeholder[0].isdigit():
                 if int(placeholder) >= len(players):
                     return False

@@ -3,7 +3,7 @@
 ## Required parameters
 * "task" - String description of task what to do. Can contain special values, which are processed before posting with following format: \<parameter>, few current options\
   
-  *  \<timer> - requires parameter "timer". Displays the number representation of parameter
+  *  \<timer> - Displays the number representation of parameter "timer".
   *  \<n> - where n is an integer from total number of players - 1. This randomly selects another player, who is not on turn.
 
 ## Optional parameters
@@ -14,7 +14,7 @@
 | frequency | You can set how many times it should occur per repeat. If **repeat** is set to false after the specified amount the task will no longer occur | 1 |
 | price | The punishment for not completing the task | 1 |
 | message | Allows you to override the default message used in template for punishment message | - |
-| timer | When present a timer is added to the template. You specify the number of seconds for execution | - |
+| timer | When present a timer is added to the template. You specify the number of seconds for execution | 30 |
 
 
 ## Example file
