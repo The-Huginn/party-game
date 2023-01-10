@@ -17,15 +17,13 @@ games = {}
 # Importing subrouting
 import TaskGameEndpoints
 
-@app.route('/login', methods=['POST'])
+@app.route('/gameMode', methods=['POST'])
 def login():
     gameID = request.form['gameID']
     if gameID not in games.keys():
         games[gameID] = TaskGame(gameID)
         
-    game = games[gameID]
-    # Change to select mode
-    resp = make_response(render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories()))
+    resp = make_response(render_template('mode-selection.html'))
     resp.set_cookie('gameID', gameID)
 
     return resp

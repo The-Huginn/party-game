@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, make_response, url_for, flash
-import TaskGame
+from TaskGame import TaskGame
 from __main__ import app, games
 
 @app.route('/categories', methods=['POST'])
@@ -33,3 +33,9 @@ def removePlayer():
     game.removePlayer(index)
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
+
+@app.route('/TaskMode', methods=['POST'])
+def taskMode():
+    game = games[request.cookies.get('gameID')]
+    
+    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories())

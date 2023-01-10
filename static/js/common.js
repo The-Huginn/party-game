@@ -60,7 +60,7 @@ function gameStart() {
         var name = $("#gameName").val();
     
         $.ajax({
-            url: "/login",
+            url: "/gameMode",
             type: "post",
             data: { gameID: name },
             success: function (response) {
@@ -79,6 +79,21 @@ function updateListeners() {
     gameStart();
     categoriesAction();
     confirmAction();
+}
+
+function modeSelection(selected) {
+
+    $.ajax({
+        url: "/" + selected + "Mode",
+        type: "post",
+        success: function (response) {
+            $("#content_placeholder").html(response);
+            updateListeners();
+        },
+        error: function (xhr) {
+            console.log("error")
+        }
+    });
 }
 
 function updateCss(defaultCss=true) {
