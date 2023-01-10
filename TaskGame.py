@@ -1,4 +1,5 @@
 import glob, json, random
+from Game import Game
 from pathlib import Path
 from flask import render_template
 
@@ -29,7 +30,7 @@ class Player:
         self.shots = self.shots + shots
 
 
-class Game:
+class TaskGame(Game):
 
     def __init__(self, name) -> None:
         self.name = name
@@ -80,7 +81,7 @@ class Game:
     def getCurrentPlayer(self):
         return self.players[self.currentPlayer]
 
-    def loadTasks(self):
+    def loadGame(self):
         self.initialTasks.clear()
         self.currentTasks.clear()
         self.cachedTasks.clear()
@@ -215,9 +216,3 @@ class Task:
     # # Immutable instances
     # def __setattr__(self, key, value):
     #     raise TypeError('Task cannot be modified after instantiation')
-
-
-Players = [Player("first"), Player("second"), Player("third"), Player("second")]
-test = Game("name")
-
-
