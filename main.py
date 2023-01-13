@@ -20,7 +20,7 @@ import TaskGameEndpoints
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():
     if request.method == 'GET':
-        return render_template('mode-selection.html')
+        return render_template('mode-selection.html', title="Vyberte si mod hry")
 
     gameID = request.form['gameID']
     if gameID not in games.keys():
@@ -32,14 +32,14 @@ def gameMode():
        resp.set_cookie('gameID', gameID)
        return resp
         
-    resp = make_response(render_template('mode-selection.html'))
+    resp = make_response(render_template('mode-selection.html', title="Vyberte si mod hry"))
     resp.set_cookie('gameID', gameID)
 
     return resp
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home-page.html')
+    return render_template('home-page.html', title="Zvolte unikatne meno hry")
 
 @app.route('/')
 def hello_world():
@@ -61,7 +61,7 @@ def start():
 
     if len(game.getPlayers()) < 2:
         flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
-        return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
+        return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
     return nextMove()
 

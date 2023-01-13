@@ -9,11 +9,11 @@ def categories():
 
     if (len(categories) == 0):
         flash("Zvolte aspon jednu kategoriu")
-        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories())
+        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Lobby pre pripravu hracov")
 
     game.setCategories(categories)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
 @app.route('/addPlayer', methods=['POST'])
 def addPlayer():
@@ -23,7 +23,7 @@ def addPlayer():
     if not game.addPlayer(name):
         flash("Pridanie sa nepodarilo, pouzivatel uz existuje alebo zadane meno je kratke")
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
 @app.route('/removePlayer', methods=['DELETE'])
 def removePlayer():
@@ -32,10 +32,10 @@ def removePlayer():
 
     game.removePlayer(index)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
 @app.route('/TaskMode', methods=['POST'])
 def taskMode():
     game = games[request.cookies.get('gameID')]
     
-    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories())
+    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Vyberte si kategorie")

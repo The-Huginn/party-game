@@ -1,3 +1,6 @@
+{% extends 'title.html' %}
+
+{% block content_placeholder %}
 <div>
     {% for message in get_flashed_messages() %}
     <div class="alert alert-warning">
@@ -13,3 +16,4 @@
     {% block content %}
     {% endblock %}
 </div>
+{% endblock %}

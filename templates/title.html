@@ -1,0 +1,9 @@
+<script>
+    {% if title is defined %}
+        $("#title").html("{{ title }}");
+    {% else %}
+        $("#title").html("  ");
+    {% endif %}
+</script>
+{% block content_placeholder %}
+{% endblock %}
