@@ -59,18 +59,55 @@ function gameStart() {
     
         var name = $("#gameName").val();
     
-        $.ajax({
-            url: "/gameMode",
-            type: "post",
-            data: { gameID: name },
-            success: function (response) {
-                $("#content_placeholder").html(response);
-                updateListeners();
-            },
-            error: function (xhr) {
-                console.log("error")
+        gameModeSelection("post", name);
+    });
+}
+
+function continueGame() {
+    nextMove();
+}
+
+function nextMove() {
+    $.ajax({
+        url: "/nextMove",
+        type: "get",
+        
+        success: function (response) {
+
+            
+            $("#content_placeholder").html(response);
+            
+            if ($("#startTimer").length > 0) {
+                $("#startTimer").focus();
+            } else {
+                $("#nextMove").focus();
             }
-        });
+        },
+        error: function (xhr) {
+            //Do Something to handle error
+            console.log("error")
+        }
+    });
+
+    updateCss(false);
+}
+
+function discardOldGame() {
+    gameModeSelection("get", getCookie('gameID'));
+}
+
+function gameModeSelection(method, gameID) {
+    $.ajax({
+        url: "/gameMode",
+        type: method,
+        data: { gameID: gameID },
+        success: function (response) {
+            $("#content_placeholder").html(response);
+            updateListeners();
+        },
+        error: function (xhr) {
+            console.log("error")
+        }
     });
 }
 
@@ -112,6 +149,22 @@ function updateCss(defaultCss=true) {
     });
 
 }
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
 
 $(document).ready(function() {
     updateListeners();

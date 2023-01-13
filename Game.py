@@ -1,14 +1,20 @@
 # This file contains base abtract class for general game mode
 from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
 
 class Game(ABC):
+    DELTA = timedelta(days=1)
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.lastAccess = datetime.utcnow() - Game.DELTA
 
     @abstractmethod
     def newGame(self):
         """
         Creates new instance
         """
-        pass
+        self.lastAccess = datetime.utcnow()
 
     @abstractmethod
     def loadGame(self):
@@ -22,7 +28,7 @@ class Game(ABC):
         """
         Returns tuple of (template, args)
         """
-        pass
+        self.lastAccess = datetime.utcnow()
 
     @abstractmethod
     def getCSS(self):
@@ -30,3 +36,6 @@ class Game(ABC):
         Returns css file path
         """
         pass
+
+    def continueGame(self):
+        return datetime.utcnow() - self.lastAccess < Game.DELTA

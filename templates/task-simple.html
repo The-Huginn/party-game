@@ -52,35 +52,12 @@
 <script>
     $("#nextMove").on('click', function (e) {
         e.preventDefault();
-        restCall();
+        {% if timer is defined %}
+        clearInterval(timer);
+        {% endif %}
+        nextMove()();
     });
     
-    function restCall() {
-        $.ajax({
-            url: "/nextMove",
-            type: "get",
-            
-            success: function (response) {
     
-                {% if timer is defined %}
-                clearInterval(timer);
-                {% endif %}
-                
-                $("#content_placeholder").html(response);
-                
-                if ($("#startTimer").length > 0) {
-                    $("#startTimer").focus();
-                } else {
-                    $("#nextMove").focus();
-                }
-            },
-            error: function (xhr) {
-                //Do Something to handle error
-                console.log("error")
-            }
-        });
-
-        updateCss(false);
-    }
 </script>
 {% endblock %}

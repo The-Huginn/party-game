@@ -17,11 +17,20 @@ games = {}
 # Importing subrouting
 import TaskGameEndpoints
 
-@app.route('/gameMode', methods=['POST'])
-def login():
+@app.route('/gameMode', methods=['POST', 'GET'])
+def gameMode():
+    if request.method == 'GET':
+        return render_template('mode-selection.html')
+
     gameID = request.form['gameID']
     if gameID not in games.keys():
         games[gameID] = TaskGame(gameID)
+    elif games[gameID].continueGame():
+        # We can continue previously played game
+
+       resp = make_response(render_template('continue.html'))
+       resp.set_cookie('gameID', gameID)
+       return resp
         
     resp = make_response(render_template('mode-selection.html'))
     resp.set_cookie('gameID', gameID)

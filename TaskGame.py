@@ -33,6 +33,7 @@ class Player:
 class TaskGame(Game):
 
     def __init__(self, name) -> None:
+        super().__init__()
         self.name = name
         self.players = []
         self.currentPlayer = 0
@@ -82,6 +83,7 @@ class TaskGame(Game):
         return self.players[self.currentPlayer]
 
     def loadGame(self):
+        super().loadGame()
         self.initialTasks.clear()
         self.currentTasks.clear()
         self.cachedTasks.clear()
@@ -102,6 +104,7 @@ class TaskGame(Game):
             f.close()
 
     def newGame(self):
+        super().newGame()
         for task in self.initialTasks:
             for x in range(task.frequency):
                 self.currentTasks.append(task)
@@ -127,6 +130,7 @@ class TaskGame(Game):
         return list(zip(*[iter(available)]*2))
 
     def nextMove(self):
+        super().newGame()
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
             self.currentPlayer = 0
@@ -151,6 +155,7 @@ class TaskGame(Game):
         return task.template, task.args(self)
 
     def getCSS(self):
+        super().getCSS()
         return self.css
 
 
