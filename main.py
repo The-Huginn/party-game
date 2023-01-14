@@ -56,14 +56,9 @@ def favicon():
 @app.route('/start', methods=['POST'])
 def start():
     game = games[request.cookies.get('gameID')]
-    game.loadGame()
-    game.newGame()
 
-    if len(game.getPlayers()) < 2:
-        flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
-        return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
-
-    return nextMove()
+    template, args = game.startGame()
+    return make_response(render_template(template, **args))
 
 @app.route('/nextMove', methods=['GET'])
 def nextMove():

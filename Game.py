@@ -24,6 +24,13 @@ class Game(ABC):
         pass
 
     @abstractmethod
+    def startGame(self):
+        """
+        Prepares and starts the game
+        """
+        pass
+
+    @abstractmethod
     def nextMove(self):
         """
         Returns tuple of (template, args)

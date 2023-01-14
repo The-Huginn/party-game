@@ -1,7 +1,7 @@
 import glob, json, random
 from Game import Game
 from pathlib import Path
-from flask import render_template
+from flask import render_template, flash
 
 # Currently we do not support statistics
 class Player:
@@ -82,6 +82,12 @@ class TaskGame(Game):
     def getCurrentPlayer(self):
         return self.players[self.currentPlayer]
 
+    def newGame(self):
+        super().newGame()
+        for task in self.initialTasks:
+            for x in range(task.frequency):
+                self.currentTasks.append(task)
+
     def loadGame(self):
         super().loadGame()
         self.initialTasks.clear()
@@ -103,11 +109,15 @@ class TaskGame(Game):
 
             f.close()
 
-    def newGame(self):
-        super().newGame()
-        for task in self.initialTasks:
-            for x in range(task.frequency):
-                self.currentTasks.append(task)
+    def startGame(self):
+        self.loadGame()
+        self.newGame()
+
+        if len(self.getPlayers()) < 2:
+            flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
+            return render_template('lobby.html', players=self.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
+
+        return self.nextMove()
 
     def randomPlayers(self):
 
