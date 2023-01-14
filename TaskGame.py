@@ -2,6 +2,7 @@ import glob, json, random
 from Game import Game
 from pathlib import Path
 from flask import render_template, flash
+import copy
 
 # Currently we do not support statistics
 class Player:
@@ -86,7 +87,7 @@ class TaskGame(Game):
         super().newGame()
         for task in self.initialTasks:
             for x in range(task.frequency):
-                self.currentTasks.append(task)
+                self.currentTasks.append(copy.deepcopy(task))
 
     def loadGame(self):
         super().loadGame()
@@ -105,7 +106,7 @@ class TaskGame(Game):
                     if not Task.checkJSON(task):
                         print("Corrupted task")
                     else:
-                        self.initialTasks.add(Task(task))
+                        self.initialTasks.add(Task(task, self.getPlayers()))
 
             f.close()
 
@@ -159,10 +160,13 @@ class TaskGame(Game):
 
         self.css = "/static/css/" + task.getCSS() + ".css"
 
-        if self.currentTasks[taskIndex].repeat == False:
+        template = task.template
+        args = task.args(self)
+
+        if self.currentTasks[taskIndex].canRemove():
             self.currentTasks.pop(taskIndex)
 
-        return task.template, task.args(self)
+        return template, args
 
     def getCSS(self):
         super().getCSS()
@@ -171,12 +175,19 @@ class TaskGame(Game):
 
 class Task:
     DEFAULT_TIMER = 30
+    NEVER = "Never"
+    ALWAYS = "Always"
+    PER_PLAYER = "Once Per Player"
 
-    def __init__(self, data) -> None:
+    def __init__(self, data, players) -> None:
         self.unresolvedTask = data['task']
         self.template = data.get('template', 'single-simple.html')
         self.frequency = data.get('frequency', 1)
-        self.repeat = data.get('repeat', False)
+        self.repeat = data.get('repeat', "Never")
+        if self.repeat == Task.PER_PLAYER:
+            self.players = players.copy()
+        else:
+            self.players = list()
         self.price = data.get('price', 1)
         self.message = data.get('message', 'Inak pijes')
         self.data = data
@@ -188,6 +199,11 @@ class Task:
         # Resolve task
         self.resolveTask(game)
 
+        print(self.players)
+        if self.repeat == Task.PER_PLAYER:
+            self.players.remove(game.getCurrentPlayer())
+        print(self.players)
+
         aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer().name, "message": self.message}
 
         if 'timer' in self.data or '<timer>' in self.unresolvedTask:
@@ -196,13 +212,15 @@ class Task:
         if self.template[0:self.template.find('-')] == 'duo':
             aux["pairs"] = game.randomTeams()
         
-
         return aux
 
     def resolveTask(self, game):
         """
         Tries to resolve task and returns success of this operation
         """
+
+        if self.repeat == Task.PER_PLAYER and game.getCurrentPlayer() not in self.players:
+            return False
 
         self.task = self.unresolvedTask
         players = game.randomPlayers()
@@ -220,6 +238,9 @@ class Task:
 
             self.task = self.task[0:self.task.find('<')] + value + self.task[self.task.find('>') + 1:]
         return True
+
+    def canRemove(self):
+        return self.repeat == "Never" or (self.repeat == Task.PER_PLAYER and len(self.players) == 0)
 
     def getCSS(self):
         """
