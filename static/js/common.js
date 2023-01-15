@@ -82,6 +82,7 @@ function nextMove() {
             } else {
                 $("#nextMove").focus();
             }
+            updateCss(false);
         },
         error: function (xhr) {
             //Do Something to handle error
@@ -89,7 +90,6 @@ function nextMove() {
         }
     });
 
-    updateCss(false);
 }
 
 function discardOldGame() {
