@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 class Game(ABC):
     DELTA = timedelta(days=1)
 
-    def __init__(self) -> None:
+    def __init__(self, timestamp) -> None:
         super().__init__()
-        self.lastAccess = datetime.utcnow() - Game.DELTA
+        self.lastAccess = datetime.utcnow() - Game.DELTA if timestamp == None else timestamp
 
     @abstractmethod
     def newGame(self):
@@ -56,14 +56,14 @@ class Game(ABC):
         """
         Returns dictionary representation of detached data from db after nextMove
         """
-        pass
+        return self.lastAccess
 
     @abstractmethod
     def serialize(self):
         """
         Returns dictionary representation of game instance
         """
-        pass
+        return self.lastAccess
 
     @abstractmethod
     def deserialize(data):

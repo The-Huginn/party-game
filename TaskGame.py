@@ -8,13 +8,14 @@ class TaskGame(Game):
 
     def __init__(self,
                 name,
+                timestamp = None,
                 players = [],
                 currentPlayer = 0,
                 initialTasks = set(),
                 currentTasks = [],
                 cachedTasks = [],
                 selected = set()):
-        super().__init__()
+        super().__init__(timestamp)
         self.name = name
         self.players = players
         self.currentPlayer = currentPlayer
@@ -154,7 +155,9 @@ class TaskGame(Game):
         return self.name
 
     def serializeNextMove(self):
+        timestamp = super().serializeNextMove()
         return {
+            "timestamp" : timestamp,
             "currentPlayer" : self.currentPlayer,
             "currentTasks" : [task.serialize() for task in self.currentTasks],
             "cachecTasks" : [task.serialize() for task in self.cachedTasks]
@@ -167,8 +170,10 @@ class TaskGame(Game):
         return {"players" : self.players}
 
     def serialize(self):
+        timestamp = super().serialize()
         return {
             "_id" : self.name,
+            "timestamp" : timestamp,
             "mode" : "TaskMode",
             "players" : self.players,
             "currentPlayer" : self.currentPlayer,
@@ -181,6 +186,7 @@ class TaskGame(Game):
     def deserialize(data):
         return TaskGame(
             data['_id'],
+            data['timestamp'],
             data['players'],
             data['currentPlayer'],
             set([Task.deserialize(task) for task in data['initialTasks']]),
