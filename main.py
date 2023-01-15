@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, make_response, url_for, flash
 from Game import Game
 from TaskGame import TaskGame
+from services.GameService import GameService
 # from PubGame import PubGame
 import secrets
 
@@ -12,7 +13,7 @@ app.config['TESTING'] = False
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
 
-games = {}
+service = GameService()
 
 # Importing subrouting
 import TaskGameEndpoints
@@ -23,9 +24,9 @@ def gameMode():
         return render_template('mode-selection.html', title="Vyberte si mod hry")
 
     gameID = request.form['gameID']
-    if gameID not in games.keys():
-        games[gameID] = TaskGame(gameID)
-    elif games[gameID].continueGame():
+    if not service.gameExists(gameID):
+        service.saveGame(TaskGame(gameID))
+    elif service.getGame(gameID).continueGame():
         # We can continue previously played game
 
        resp = make_response(render_template('continue.html'))
@@ -55,16 +56,16 @@ def favicon():
 
 @app.route('/start', methods=['POST'])
 def start():
-    game = games[request.cookies.get('gameID')]
+    game = service.getGame(request.cookies.get('gameID'))
 
-    template, args = game.startGame()
+    template, args = service.startGame(game)
     return make_response(render_template(template, **args))
 
 @app.route('/nextMove', methods=['GET'])
 def nextMove():
-    game = games[request.cookies.get('gameID')]
+    game = service.getGame(request.cookies.get('gameID'))
 
-    template, args = game.nextMove()
+    template, args = service.nextMove(game)
     return make_response(render_template(template, **args))
 
 @app.route('/css', methods=['GET'])
@@ -74,7 +75,7 @@ def getCSS():
     if default == 'true' or 'gameID' not in request.cookies:
         return "/static/css/default.css"
 
-    game = games[request.cookies.get('gameID')]
+    game = service.getGame(request.cookies.get('gameID'))
         
     return game.getCSS()
 
