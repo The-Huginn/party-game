@@ -150,6 +150,44 @@ class TaskGame(Game):
         super().getCSS()
         return self.css
 
+    def getID(self):
+        return self.name
+
+    def serializeNextMove(self):
+        return {
+            "currentPlayer" : self.currentPlayer,
+            "currentTasks" : [task.serialize() for task in self.currentTasks],
+            "cachecTasks" : [task.serialize() for task in self.cachedTasks]
+        }
+
+    def serializeSelected(self):
+        return {"selected" : list(self.selected)}
+
+    def serializePlayers(self):
+        return {"players" : self.players}
+
+    def serialize(self):
+        return {
+            "_id" : self.name,
+            "mode" : "TaskMode",
+            "players" : self.players,
+            "currentPlayer" : self.currentPlayer,
+            "initialTasks" : [task.serialize() for task in self.initialTasks],
+            "currentTasks" : [task.serialize() for task in self.currentTasks],
+            "cachedTasks" : [task.serialize() for task in self.cachedTasks],
+            "selected" : list(self.selected)
+        }
+
+    def deserialize(data):
+        return TaskGame(
+            data['_id'],
+            data['players'],
+            data['currentPlayer'],
+            set([Task.deserialize(task) for task in data['initialTasks']]),
+            [Task.deserialize(task) for task in data['currentTasks']],
+            [Task.deserialize(task) for task in data['cachedTasks']],
+            set(data['selected'])
+        )
 
 class Task:
     DEFAULT_TIMER = 30
@@ -169,6 +207,7 @@ class Task:
         self.price = data.get('price', 1)
         self.message = data.get('message', 'Inak pijes')
         self.data = data
+        self.data['players'] = self.players
     
     def checkJSON(data) -> bool:
         return 'task' in data
@@ -217,6 +256,13 @@ class Task:
 
     def canRemove(self):
         return self.repeat == "Never" or (self.repeat == Task.PER_PLAYER and len(self.players) == 0)
+
+    def serialize(self):
+        self.data['players'] = self.players
+        return self.data
+
+    def deserialize(data):
+        return Task(data, data.get('players', list()))
 
     def getCSS(self):
         """

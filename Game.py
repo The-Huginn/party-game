@@ -44,5 +44,36 @@ class Game(ABC):
         """
         pass
 
+    @abstractmethod
+    def getID(self):
+        """
+        Returns ID of the game
+        """
+        pass
+
+    @abstractmethod
+    def serializeNextMove(self):
+        """
+        Returns dictionary representation of detached data from db after nextMove
+        """
+        pass
+
+    @abstractmethod
+    def serialize(self):
+        """
+        Returns dictionary representation of game instance
+        """
+        pass
+
+    @abstractmethod
+    def deserialize(data):
+        from TaskGame import TaskGame
+        """
+        Returns new instance from dictionary
+        """
+        if data['mode'] == "TaskMode":
+            return TaskGame.deserialize(data)
+        
+
     def continueGame(self):
         return datetime.utcnow() - self.lastAccess < Game.DELTA
