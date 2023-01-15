@@ -16,7 +16,9 @@ app.secret_key = secret
 service = GameService()
 
 # Importing subrouting
-import TaskGameEndpoints
+from TaskGameEndpoints import task_page
+
+app.register_blueprint(task_page)
 
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():

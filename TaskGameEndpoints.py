@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, make_response, url_for, flash
+from flask import Blueprint, request, render_template, flash
 from services.TaskService import TaskService
 from TaskGame import TaskGame
-from __main__ import app
 
 service = TaskService()
+task_page = Blueprint('task_page', __name__)
 
-@app.route('/categories', methods=['POST'])
+@task_page.route('/categories', methods=['POST'])
 def categories():
     game = service.getGame(request.cookies.get('gameID'))
     categories = request.form.getlist('categories[]')
@@ -18,7 +18,7 @@ def categories():
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
-@app.route('/addPlayer', methods=['POST'])
+@task_page.route('/addPlayer', methods=['POST'])
 def addPlayer():
     name = request.form['name']
     game = service.getGame(request.cookies.get('gameID'))
@@ -28,7 +28,7 @@ def addPlayer():
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
-@app.route('/removePlayer', methods=['DELETE'])
+@task_page.route('/removePlayer', methods=['DELETE'])
 def removePlayer():
     index = int(request.form['id'])
     game = service.getGame(request.cookies.get('gameID'))
@@ -37,7 +37,7 @@ def removePlayer():
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
 
-@app.route('/TaskMode', methods=['POST'])
+@task_page.route('/TaskMode', methods=['POST'])
 def taskMode():
     game = service.getGame(request.cookies.get('gameID'))
     
