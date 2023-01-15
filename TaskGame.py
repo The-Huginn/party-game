@@ -14,7 +14,8 @@ class TaskGame(Game):
                 initialTasks = set(),
                 currentTasks = [],
                 cachedTasks = [],
-                selected = set()):
+                selected = set(),
+                css = "/static/css/default.css"):
         super().__init__(timestamp)
         self.name = name
         self.players = players
@@ -22,7 +23,7 @@ class TaskGame(Game):
         self.initialTasks = initialTasks
         self.currentTasks = currentTasks
         self.cachedTasks = cachedTasks
-        self.css = "/static/css/default.css"
+        self.css = css
         self.selected = selected
 
     def __eq__(self, other) -> bool:
@@ -120,7 +121,7 @@ class TaskGame(Game):
         return list(zip(*[iter(available)]*2))
 
     def nextMove(self):
-        super().newGame()
+        super().nextMove()
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
             self.currentPlayer = 0
@@ -148,7 +149,6 @@ class TaskGame(Game):
         return template, args
 
     def getCSS(self):
-        super().getCSS()
         return self.css
 
     def getID(self):
@@ -159,8 +159,9 @@ class TaskGame(Game):
         return {
             "timestamp" : timestamp,
             "currentPlayer" : self.currentPlayer,
+            "css" : self.css,
             "currentTasks" : [task.serialize() for task in self.currentTasks],
-            "cachecTasks" : [task.serialize() for task in self.cachedTasks]
+            "cachedTasks" : [task.serialize() for task in self.cachedTasks]
         }
 
     def serializeSelected(self):
@@ -177,6 +178,7 @@ class TaskGame(Game):
             "mode" : "TaskMode",
             "players" : self.players,
             "currentPlayer" : self.currentPlayer,
+            "css" : self.css,
             "initialTasks" : [task.serialize() for task in self.initialTasks],
             "currentTasks" : [task.serialize() for task in self.currentTasks],
             "cachedTasks" : [task.serialize() for task in self.cachedTasks],
@@ -192,7 +194,8 @@ class TaskGame(Game):
             set([Task.deserialize(task) for task in data['initialTasks']]),
             [Task.deserialize(task) for task in data['currentTasks']],
             [Task.deserialize(task) for task in data['cachedTasks']],
-            set(data['selected'])
+            set(data['selected']),
+            data['css']
         )
 
 class Task:
