@@ -4,45 +4,25 @@ from pathlib import Path
 from flask import render_template, flash
 import copy
 
-# Currently we do not support statistics
-class Player:
-
-    def __init__(self, name) -> None:
-        self.name = name
-        self.shots = 0
-        self.done = 0
-        self.failed = 0
-
-    def __eq__(self, other) -> bool:
-        return isinstance(self, Player) and isinstance(other, Player) and self.name == other.name
-
-    def __hash__(self) -> int:
-        return self.name.__hash__()
-
-    def __repr__(self) -> str:
-        return self.name + " {" + str(self.done) + "," + str(self.failed) + "," + str(self.shots) + "}"
-
-    def failed(self, shots):
-        self.failed = self.failed + 1
-        self.shots = self.shots + shots
-
-    def done(self, shots):
-        self.done = self.done + 1
-        self.shots = self.shots + shots
-
-
 class TaskGame(Game):
 
-    def __init__(self, name) -> None:
+    def __init__(self,
+                name,
+                players = [],
+                currentPlayer = 0,
+                initialTasks = set(),
+                currentTasks = [],
+                cachedTasks = [],
+                selected = set()):
         super().__init__()
         self.name = name
-        self.players = []
-        self.currentPlayer = 0
-        self.initialTasks = set()
-        self.currentTasks = []
-        self.cachedTasks = []
+        self.players = players
+        self.currentPlayer = currentPlayer
+        self.initialTasks = initialTasks
+        self.currentTasks = currentTasks
+        self.cachedTasks = cachedTasks
         self.css = "/static/css/default.css"
-        self.selected = set()
+        self.selected = selected
 
     def __eq__(self, other) -> bool:
         return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
@@ -69,12 +49,10 @@ class TaskGame(Game):
         if (len(name) < 3):
             return False
 
-        player = Player(name)
-
-        if player in self.players:
+        if name in self.players:
             return False
 
-        self.players.append(player)
+        self.players.append(name)
         return True
 
     def removePlayer(self, index):
@@ -116,13 +94,13 @@ class TaskGame(Game):
 
         if len(self.getPlayers()) < 2:
             flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
-            return render_template('lobby.html', players=self.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
+            return render_template('lobby.html', players=self.getPlayers(), len=len(self.getPlayers()), title="Lobby pre pripravu hracov")
 
         return self.nextMove()
 
     def randomPlayers(self):
 
-        available = [i for i in self.players if i.name != self.getCurrentPlayer().name]
+        available = [name for name in self.players if name != self.getCurrentPlayer()]
         random.shuffle(available)
 
         return available
@@ -135,7 +113,7 @@ class TaskGame(Game):
         returns list of randomly paired players' names
         """
 
-        available = [i.name for i in self.players]
+        available = [name for name in self.players]
         random.shuffle(available)
 
         return list(zip(*[iter(available)]*2))
@@ -183,7 +161,7 @@ class Task:
         self.unresolvedTask = data['task']
         self.template = data.get('template', 'single-simple.html')
         self.frequency = data.get('frequency', 1)
-        self.repeat = data.get('repeat', "Never")
+        self.repeat = data.get('repeat', Task.NEVER)
         if self.repeat == Task.PER_PLAYER:
             self.players = players.copy()
         else:
@@ -199,12 +177,10 @@ class Task:
         # Resolve task
         self.resolveTask(game)
 
-        print(self.players)
         if self.repeat == Task.PER_PLAYER:
             self.players.remove(game.getCurrentPlayer())
-        print(self.players)
 
-        aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer().name, "message": self.message}
+        aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer(), "message": self.message}
 
         if 'timer' in self.data or '<timer>' in self.unresolvedTask:
             aux["timer"] = self.data.get('timer', Task.DEFAULT_TIMER)
@@ -234,7 +210,7 @@ class Task:
             elif placeholder[0].isdigit():
                 if int(placeholder) >= len(players):
                     return False
-                value = players[int(placeholder)].name
+                value = players[int(placeholder)]
 
             self.task = self.task[0:self.task.find('<')] + value + self.task[self.task.find('>') + 1:]
         return True
