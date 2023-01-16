@@ -112,7 +112,6 @@ function gameModeSelection(method, gameID) {
 }
 
 function updateListeners() {
-    homeAction();
     gameStart();
     categoriesAction();
     confirmAction();
@@ -167,6 +166,7 @@ function getCookie(cname) {
   }
 
 $(document).ready(function() {
+    homeAction();
     updateListeners();
     updateCss();
 });
