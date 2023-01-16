@@ -65,6 +65,7 @@ class TaskGame(Game):
         super().newGame()
         self.tasks.clear()
 
+        perPlayerTasks = list()
         for filename in self.selected:
             f = open("tasks/" + filename + ".json", "r")
             data = json.loads(f.read())
@@ -76,20 +77,45 @@ class TaskGame(Game):
                     if not Task.checkJSON(task):
                         print("Corrupted task")
                     else:
-                        loadedTask = Task(task, self.getPlayers())
+                        loadedTask = Task(task)
                         for x in range(loadedTask.frequency):
-                            self.tasks.append(copy.deepcopy(loadedTask))
+                            if loadedTask.repeat == Task.PER_PLAYER:
+                                perPlayerTasks.append(loadedTask)
+                            else:
+                                self.tasks.append(copy.deepcopy(loadedTask))
 
             f.close()
 
         random.shuffle(self.tasks)
 
-    def startGame(self):
-        self.newGame()
+        print("Before insert:" + str([task.unresolvedTask for task in self.tasks]))
+        playerTasks = list()
+        for i in range(len(self.players)):
+            random.shuffle(perPlayerTasks)
+            playerTasks.append(copy.deepcopy(perPlayerTasks))
 
+        # Every batch we seed every player one task
+        batch = len(self.tasks) // len(perPlayerTasks)
+        # Max step we can make to cycle and overlap for new player (len(players) + 1) - mod
+        step = (batch + len(self.players)) // (len(self.players) + 1) - 1
+        # size of batch with PER_PLAYER tasks in
+        batch = batch + len(self.players)
+        for batchNum in range(len(perPlayerTasks)):
+            index = batch * batchNum
+            for player in range(len(self.players)):
+                task = playerTasks[player][batchNum]
+                self.tasks.insert(index, task)
+                index = step + 1
+
+        print("After insert:" + str([task.unresolvedTask for task in self.tasks]))
+            
+
+    def startGame(self):
         if len(self.getPlayers()) < 2:
             flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
             return render_template('lobby.html', players=self.getPlayers(), len=len(self.getPlayers()), title="Lobby pre pripravu hracov")
+
+        self.newGame()
 
         return self.nextMove()
 
@@ -120,6 +146,7 @@ class TaskGame(Game):
 
     # We do not delete unresolvable / removable task. This is done in service
     def nextMove(self):
+        print(str([task.unresolvedTask for task in self.tasks]))
         super().nextMove()
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
@@ -129,7 +156,7 @@ class TaskGame(Game):
 
         while True:
             task = self.tasks[self.currentTask]
-            if task.resolveTask(self):
+            if task.canResolve(self):
                 break
 
             # If we overflow we should have only resolvable tasks
@@ -140,9 +167,10 @@ class TaskGame(Game):
         self.css = "/static/css/" + task.getCSS() + ".css"
 
         template = task.template
-        args = task.args(self)
+        args = task.templateArgs(self)
 
         if self.tasks[self.currentTask].canRemove():
+            print("delete")
             toDelete = toDelete + 1
 
         update = super().serializeNextMove()
@@ -151,10 +179,8 @@ class TaskGame(Game):
         update_set['currentPlayer'] = self.currentPlayer
         if toDelete > 0:
             while toDelete > 0:
-                update['$unset'] = {f"tasks.{self.currentTask - toDelete}" : 1}
+                update['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
                 toDelete = toDelete - 1
-
-            # update['$pull'] = {"tasks": None}
         else:
             self.nextTask()
             update_set['currentTask'] = self.currentTask
@@ -203,38 +229,47 @@ class TaskGame(Game):
 
 class Task:
     DEFAULT_TIMER = 30
-    NEVER = "Never"
-    ALWAYS = "Always"
-    PER_PLAYER = "Once Per Player"
+    NEVER = "NEVER"
+    ALWAYS = "ALWAYS"
+    PER_PLAYER = "ONCE PER PLAYER"
 
-    def __init__(self, data, players) -> None:
+    def __init__(self, data) -> None:
         self.unresolvedTask = data['task']
         self.template = data.get('template', 'single-simple.html')
         self.frequency = data.get('frequency', 1)
-        self.repeat = data.get('repeat', Task.NEVER)
-        if self.repeat == Task.PER_PLAYER:
-            self.players = players.copy()
-        else:
-            self.players = list()
+        self.repeat = data.get('repeat', Task.NEVER).upper()
         self.price = data.get('price', 1)
         self.message = data.get('message', 'Inak pijes')
-        self.data = data
-        self.data['players'] = self.players
+        self.timer = data.get('timer', None)
     
     def checkJSON(data) -> bool:
         return 'task' in data
 
-    def args(self, game):
+    def canResolve(self, game):
+        """
+        Checks, whether a task is resolvable
+        """
+        maxLen = len(game.randomPlayers())
+        while self.unresolvedTask.find('<') != -1:
+            placeholder = self.unresolvedTask[self.unresolvedTask.find('<') + 1:self.unresolvedTask.find('>')]
+            if placeholder[0].isdigit() and int(placeholder) >= maxLen:
+                return False
+
+        return True
+
+    def templateArgs(self, game):
+        """
+        Resolves task and returns tuple(args, changed)
+        `args` should be used to resolve template
+        `changed` True if Task was changed and needs to be saved in DB
+        """
         # Resolve task
         self.resolveTask(game)
 
-        if self.repeat == Task.PER_PLAYER:
-            self.players.remove(game.getCurrentPlayer())
-
         aux = {"task" : self.task, "price": self.price, "currentPlayer": game.getCurrentPlayer(), "message": self.message}
 
-        if 'timer' in self.data or '<timer>' in self.unresolvedTask:
-            aux["timer"] = self.data.get('timer', Task.DEFAULT_TIMER)
+        if self.timer != None or '<timer>' in self.unresolvedTask:
+            aux["timer"] = self.timer if self.timer != None else Task.DEFAULT_TIMER
 
         if self.template[0:self.template.find('-')] == 'duo':
             aux["pairs"] = game.randomTeams()
@@ -242,13 +277,6 @@ class Task:
         return aux
 
     def resolveTask(self, game):
-        """
-        Tries to resolve task and returns success of this operation
-        """
-
-        if self.repeat == Task.PER_PLAYER and game.getCurrentPlayer() not in self.players:
-            return False
-
         self.task = self.unresolvedTask
         players = game.randomPlayers()
 
@@ -267,14 +295,23 @@ class Task:
         return True
 
     def canRemove(self):
-        return self.repeat == "Never" or (self.repeat == Task.PER_PLAYER and len(self.players) == 0)
+        return self.repeat != Task.ALWAYS
 
     def serialize(self):
-        self.data['players'] = self.players
-        return self.data
+        serialized = {
+            "task" : self.unresolvedTask,
+            "template" : self.template,
+            "frequency" : self.frequency,
+            "repeat" : self.repeat,
+            "price" : self.price,
+            "message" : self.message
+        }
+        if self.timer != None:
+            serialized['timer'] = self.timer
+        return serialized
 
     def deserialize(data):
-        return Task(data, data.get('players', list()))
+        return Task(data)
 
     def getCSS(self):
         """
