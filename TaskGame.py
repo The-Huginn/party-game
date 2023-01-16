@@ -11,18 +11,16 @@ class TaskGame(Game):
                 timestamp = None,
                 players = [],
                 currentPlayer = 0,
-                initialTasks = set(),
-                currentTasks = [],
-                cachedTasks = [],
+                tasks = [],
+                currentTask = 0,
                 selected = set(),
                 css = "/static/css/default.css"):
         super().__init__(timestamp)
         self.name = name
         self.players = players
         self.currentPlayer = currentPlayer
-        self.initialTasks = initialTasks
-        self.currentTasks = currentTasks
-        self.cachedTasks = cachedTasks
+        self.tasks = tasks
+        self.currentTask = currentTask
         self.css = css
         self.selected = selected
 
@@ -65,15 +63,7 @@ class TaskGame(Game):
 
     def newGame(self):
         super().newGame()
-        for task in self.initialTasks:
-            for x in range(task.frequency):
-                self.currentTasks.append(copy.deepcopy(task))
-
-    def loadGame(self):
-        super().loadGame()
-        self.initialTasks.clear()
-        self.currentTasks.clear()
-        self.cachedTasks.clear()
+        self.tasks.clear()
 
         for filename in self.selected:
             f = open("tasks/" + filename + ".json", "r")
@@ -86,12 +76,15 @@ class TaskGame(Game):
                     if not Task.checkJSON(task):
                         print("Corrupted task")
                     else:
-                        self.initialTasks.add(Task(task, self.getPlayers()))
+                        loadedTask = Task(task, self.getPlayers())
+                        for x in range(loadedTask.frequency):
+                            self.tasks.append(copy.deepcopy(loadedTask))
 
             f.close()
 
+        random.shuffle(self.tasks)
+
     def startGame(self):
-        self.loadGame()
         self.newGame()
 
         if len(self.getPlayers()) < 2:
@@ -120,49 +113,61 @@ class TaskGame(Game):
 
         return list(zip(*[iter(available)]*2))
 
+    def nextTask(self):
+        self.currentTask = self.currentTask + 1
+        if (self.currentTask >= len(self.tasks)):
+            self.currentTask = 0
+
+    # We do not delete unresolvable / removable task. This is done in service
     def nextMove(self):
         super().nextMove()
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
             self.currentPlayer = 0
 
+        toDelete = 0
+
         while True:
-            taskIndex = random.randrange(0, len(self.currentTasks))
-            task = self.currentTasks[taskIndex]
-            if task not in self.cachedTasks and task.resolveTask(self) == True:
+            task = self.tasks[self.currentTask]
+            if task.resolveTask(self):
                 break
-        
-        self.cachedTasks.append(task)
-        # We will allow same tasks after 1/5 of others tasks were done
-        # Note not exactly true as some tasks are removed
-        if len(self.cachedTasks) >= len(self.initialTasks) / 5:
-            self.cachedTasks.pop(0)
+
+            # If we overflow we should have only resolvable tasks
+            # Note in case this does no hold true service has to be updated
+            toDelete = toDelete + 1
+            self.nextTask()
 
         self.css = "/static/css/" + task.getCSS() + ".css"
 
         template = task.template
         args = task.args(self)
 
-        if self.currentTasks[taskIndex].canRemove():
-            self.currentTasks.pop(taskIndex)
+        if self.tasks[self.currentTask].canRemove():
+            toDelete = toDelete + 1
 
-        return template, args
+        update = super().serializeNextMove()
+        update_set = update['$set']
+        update_set['css'] = self.css
+        update_set['currentPlayer'] = self.currentPlayer
+        if toDelete > 0:
+            while toDelete > 0:
+                update['$unset'] = {f"tasks.{self.currentTask - toDelete}" : 1}
+                toDelete = toDelete - 1
+
+            # update['$pull'] = {"tasks": None}
+        else:
+            self.nextTask()
+            update_set['currentTask'] = self.currentTask
+
+        update['$set'] = update_set
+            
+        return template, args, update
 
     def getCSS(self):
         return self.css
 
     def getID(self):
         return self.name
-
-    def serializeNextMove(self):
-        timestamp = super().serializeNextMove()
-        return {
-            "timestamp" : timestamp,
-            "currentPlayer" : self.currentPlayer,
-            "css" : self.css,
-            "currentTasks" : [task.serialize() for task in self.currentTasks],
-            "cachedTasks" : [task.serialize() for task in self.cachedTasks]
-        }
 
     def serializeSelected(self):
         return {"selected" : list(self.selected)}
@@ -179,9 +184,8 @@ class TaskGame(Game):
             "players" : self.players,
             "currentPlayer" : self.currentPlayer,
             "css" : self.css,
-            "initialTasks" : [task.serialize() for task in self.initialTasks],
-            "currentTasks" : [task.serialize() for task in self.currentTasks],
-            "cachedTasks" : [task.serialize() for task in self.cachedTasks],
+            "currentTask" : self.currentTask,
+            "tasks" : [task.serialize() for task in self.tasks],
             "selected" : list(self.selected)
         }
 
@@ -191,9 +195,8 @@ class TaskGame(Game):
             data['timestamp'],
             data['players'],
             data['currentPlayer'],
-            set([Task.deserialize(task) for task in data['initialTasks']]),
-            [Task.deserialize(task) for task in data['currentTasks']],
-            [Task.deserialize(task) for task in data['cachedTasks']],
+            [Task.deserialize(task) for task in data['tasks']],
+            data['currentTask'],
             set(data['selected']),
             data['css']
         )

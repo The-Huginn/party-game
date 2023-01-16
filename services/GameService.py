@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateMany, UpdateOne
 from Game import Game
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -25,15 +25,17 @@ class GameService():
         return self.db.find_one({"_id" : _id}) != None
 
     def startGame(self, game: Game):
-        template, args = game.startGame()
+        template, args, update = game.startGame()
         self.saveGame(game)
 
         return template, args
 
     def nextMove(self, game: Game):
-        template, args = game.nextMove()
-        self.db.update_one({"_id" : game.getID()},
-                            {"$set" : game.serializeNextMove()})
+        template, args, update = game.nextMove()
+        self.db.bulk_write([
+            UpdateMany({"_id" : game.getID()}, update),
+            UpdateOne({"_id" : game.getID()}, {"$pull" : {"tasks" : None}})
+        ], ordered=True)
 
         return template, args
 

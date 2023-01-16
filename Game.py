@@ -17,13 +17,6 @@ class Game(ABC):
         self.lastAccess = datetime.utcnow()
 
     @abstractmethod
-    def loadGame(self):
-        """
-        Loads the selected setup
-        """
-        pass
-
-    @abstractmethod
     def startGame(self):
         """
         Prepares and starts the game
@@ -51,12 +44,11 @@ class Game(ABC):
         """
         pass
 
-    @abstractmethod
     def serializeNextMove(self):
         """
         Returns dictionary representation of detached data from db after nextMove
         """
-        return self.lastAccess
+        return {"$set" : {"timestamp" : self.lastAccess}}
 
     @abstractmethod
     def serialize(self):
