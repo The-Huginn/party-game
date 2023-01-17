@@ -33,7 +33,7 @@ class TaskGame(Game):
         return "Task Mode: " + self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
 
     def getAllCategories():
-        categories = [Path(x).stem for x in glob.glob('tasks/*.json')]
+        categories = [Path(x).stem for x in glob.glob('tasks/TaskMode/*.json')]
         return categories
 
     def getCategories(self):
@@ -66,7 +66,7 @@ class TaskGame(Game):
 
         perPlayerTasks = list()
         for filename in self.selected:
-            f = open("tasks/" + filename + ".json", "r")
+            f = open("tasks/TaskMode/" + filename + ".json", "r")
             data = json.loads(f.read())
 
             if 'tasks' not in data:
