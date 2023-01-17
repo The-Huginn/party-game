@@ -25,7 +25,7 @@ class GameService():
         return self.db.find_one({"_id" : _id}) != None
 
     def startGame(self, game: Game):
-        template, args, update = game.startGame()
+        template, args = game.startGame()
         self.saveGame(game)
 
         return template, args

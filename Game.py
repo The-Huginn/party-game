@@ -64,8 +64,7 @@ class Game(ABC):
         """
         return {
             "_id" : self.name,
-            "timestamp" : self.lastAccess,
-            "mode" : self.mode
+            "timestamp" : self.lastAccess
         }
 
     @abstractmethod

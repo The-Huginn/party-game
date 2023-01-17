@@ -87,7 +87,9 @@ class TaskGame(Game):
 
         random.shuffle(self.tasks)
 
-        print("Before insert:" + str([task.unresolvedTask for task in self.tasks]))
+        if len(perPlayerTasks) == 0:
+            return
+
         playerTasks = list()
         for i in range(len(self.players)):
             random.shuffle(perPlayerTasks)
@@ -105,9 +107,6 @@ class TaskGame(Game):
                 task = playerTasks[player][batchNum]
                 self.tasks.insert(index, task)
                 index = step + 1
-
-        print("After insert:" + str([task.unresolvedTask for task in self.tasks]))
-            
 
     def startGame(self):
         if len(self.getPlayers()) < 2:
@@ -145,7 +144,6 @@ class TaskGame(Game):
 
     # We do not delete unresolvable / removable task. This is done in service
     def nextMove(self):
-        print(str([task.unresolvedTask for task in self.tasks]))
         super().nextMove()
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
@@ -169,7 +167,6 @@ class TaskGame(Game):
         args = task.templateArgs(self)
 
         if self.tasks[self.currentTask].canRemove():
-            print("delete")
             toDelete = toDelete + 1
 
         self.nextSerialize = super().serializeNextMove()
@@ -181,9 +178,10 @@ class TaskGame(Game):
         })
         if toDelete > 0:
             while toDelete > 0:
-                self.nextSerialize['$unset'].update({
-                    f"tasks.{self.currentTask - toDelete + 1}" : 1
-                })
+                if '$unset' not in self.nextSerialize:
+                    self.nextSerialize['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
+                else:
+                    self.nextSerialize['$unset'].update({f"tasks.{self.currentTask - toDelete + 1}" : 1})
                 toDelete = toDelete - 1
         else:
             self.nextTask()
