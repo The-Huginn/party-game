@@ -5,9 +5,22 @@ from datetime import datetime, timedelta
 class Game(ABC):
     DELTA = timedelta(days=1)
 
-    def __init__(self, timestamp) -> None:
+    def __init__(self, name, timestamp) -> None:
         super().__init__()
+        self.name = name
         self.lastAccess = datetime.utcnow() - Game.DELTA if timestamp == None else timestamp
+
+    def __eq__(self, other) -> bool:
+        return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
+
+    def __hash__(self) -> int:
+        return self.name.__hash__()
+
+    def getID(self):
+        """
+        Returns ID of the game
+        """
+        return self.name
 
     @abstractmethod
     def newGame(self):
@@ -38,12 +51,6 @@ class Game(ABC):
         pass
 
     @abstractmethod
-    def getID(self):
-        """
-        Returns ID of the game
-        """
-        pass
-
     def serializeNextMove(self):
         """
         Returns dictionary representation of detached data from db after nextMove
@@ -55,16 +62,23 @@ class Game(ABC):
         """
         Returns dictionary representation of game instance
         """
-        return self.lastAccess
+        return {
+            "_id" : self.name,
+            "timestamp" : self.lastAccess,
+            "mode" : self.mode
+        }
 
     @abstractmethod
     def deserialize(data):
         from TaskGame import TaskGame
+        from entities.PubGame import PubGame
         """
         Returns new instance from dictionary
         """
         if data['mode'] == "TaskMode":
             return TaskGame.deserialize(data)
+        elif data['mode'] == "PubMode":
+            return PubGame.deserialize(data)
         
 
     def continueGame(self):

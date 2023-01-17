@@ -15,8 +15,7 @@ class TaskGame(Game):
                 currentTask = 0,
                 selected = set(),
                 css = "/static/css/default.css"):
-        super().__init__(timestamp)
-        self.name = name
+        super().__init__(name, timestamp)
         self.players = players
         self.currentPlayer = currentPlayer
         self.tasks = tasks
@@ -25,13 +24,13 @@ class TaskGame(Game):
         self.selected = selected
 
     def __eq__(self, other) -> bool:
-        return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
+        return super().__eq__(self, other)
 
     def __hash__(self) -> int:
-        return self.name.__hash__()
+        return super().__hash__()
 
     def __repr__(self) -> str:
-        return self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
+        return "Task Mode: " + self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
 
     def getAllCategories():
         categories = [Path(x).stem for x in glob.glob('tasks/*.json')]
@@ -173,21 +172,26 @@ class TaskGame(Game):
             print("delete")
             toDelete = toDelete + 1
 
-        update = super().serializeNextMove()
-        update_set = update['$set']
-        update_set['css'] = self.css
-        update_set['currentPlayer'] = self.currentPlayer
+        self.nextSerialize = super().serializeNextMove()
+
+        # We prepare query for updating DB
+        self.nextSerialize['$set'].update({
+            "css" : self.css,
+            "currentPlayer" : self.currentPlayer
+        })
         if toDelete > 0:
             while toDelete > 0:
-                update['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
+                self.nextSerialize['$unset'].update({
+                    f"tasks.{self.currentTask - toDelete + 1}" : 1
+                })
                 toDelete = toDelete - 1
         else:
             self.nextTask()
-            update_set['currentTask'] = self.currentTask
+            self.nextSerialize['$set'].update({
+                "currentTask": self.currentTask
+            })
 
-        update['$set'] = update_set
-            
-        return template, args, update
+        return template, args
 
     def getCSS(self):
         return self.css
@@ -201,11 +205,13 @@ class TaskGame(Game):
     def serializePlayers(self):
         return {"players" : self.players}
 
+    def serializeNextMove(self):
+        return self.nextSerialize
+
     def serialize(self):
-        timestamp = super().serialize()
-        return {
-            "_id" : self.name,
-            "timestamp" : timestamp,
+        data = super().serialize()
+        data.update(
+            {
             "mode" : "TaskMode",
             "players" : self.players,
             "currentPlayer" : self.currentPlayer,
@@ -214,6 +220,8 @@ class TaskGame(Game):
             "tasks" : [task.serialize() for task in self.tasks],
             "selected" : list(self.selected)
         }
+        )
+        return data
 
     def deserialize(data):
         return TaskGame(

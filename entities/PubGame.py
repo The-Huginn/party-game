@@ -9,17 +9,16 @@ class PubGame(Game):
             timestamp = None,
             tasks = [],
             currentTask = 0):
-        super().__init__(timestamp)
-        self.name = name
+        super().__init__(name, timestamp)
         self.tasks = tasks
         self.currentTask = currentTask
         self.template = "pub.html"
 
     def __eq__(self, other) -> bool:
-        return isinstance(self, Game) and isinstance(other, Game) and self.name == other.name
+        return super().__eq__(self, other)
 
     def __hash__(self) -> int:
-        return self.name.__hash__()
+        return super().__hash__(self)
 
     def __repr__(self) -> str:
         return "Pub Mode: " + self.name
@@ -75,14 +74,15 @@ class PubGame(Game):
         return update
 
     def serialize(self):
-        timestamp = super().serialize()
-        return {
-            "_id" : self.name,
-            "timestamp" : timestamp,
+        data = super().serialize()
+        data.update(
+            {
             "mode" : "PubMode",
             "tasks" : self.tasks,
             "currentTask" : self.currentTask
         }
+        )
+        return data
 
     def deserialize(data):
         return PubGame(

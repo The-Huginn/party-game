@@ -31,7 +31,8 @@ class GameService():
         return template, args
 
     def nextMove(self, game: Game):
-        template, args, update = game.nextMove()
+        template, args = game.nextMove()
+        update = game.serializeNextMove()
         self.db.bulk_write([
             UpdateMany({"_id" : game.getID()}, update),
             UpdateOne({"_id" : game.getID()}, {"$pull" : {"tasks" : None}})
