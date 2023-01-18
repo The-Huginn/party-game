@@ -156,12 +156,8 @@ img {
     }
 }
 
-#frozen-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+ol { counter-reset: item; list-style-type: none; }
+ol > li:before { content: counters(item, ".") ". "; counter-increment: item }
 
 .selection-button {
     border: 0;
