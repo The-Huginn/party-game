@@ -42,8 +42,3 @@ class GameService():
         ], ordered=True)
 
         return template, args
-
-    def print(self):
-        items = self.db.find()
-        for item in items:
-            print(item)

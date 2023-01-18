@@ -46,8 +46,6 @@ class PubGame(Game):
 
     def nextMove(self):
         super().nextMove()
-        print(self.tasks)
-        print(self.currentTask)
 
         args = {"task" : self.tasks[self.currentTask]}
         self.currentTask = self.currentTask + 1
