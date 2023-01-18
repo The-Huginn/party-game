@@ -15,10 +15,10 @@ class PubGame(Game):
         self.template = "pub.html"
 
     def __eq__(self, other) -> bool:
-        return super().__eq__(self, other)
+        return Game.__eq__(self, other)
 
     def __hash__(self) -> int:
-        return super().__hash__(self)
+        return Game.__hash__(self)
 
     def __repr__(self) -> str:
         return "Pub Mode: " + self.name

@@ -24,10 +24,10 @@ class TaskGame(Game):
         self.selected = selected
 
     def __eq__(self, other) -> bool:
-        return super().__eq__(self, other)
+        return Game.__eq__(self, other)
 
     def __hash__(self) -> int:
-        return super().__hash__()
+        return Game.__hash__()
 
     def __repr__(self) -> str:
         return "Task Mode: " + self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
