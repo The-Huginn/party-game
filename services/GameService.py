@@ -15,6 +15,9 @@ class GameService():
         client = MongoClient(f'mongodb://{USER}:{PASSWORD}@{HOST}:{PORT}')
         self.db = client['party-game']['games']
 
+    def deleteGame(self, _id):
+        return self.db.delete_one({"_id" : _id})
+
     def getGame(self, _id):
         return Game.deserialize(self.db.find_one({"_id" : _id}))
 
