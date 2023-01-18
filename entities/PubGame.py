@@ -45,6 +45,7 @@ class PubGame(Game):
         # Possibly window explaining game mode at first
         return self.template, {
             'title' : 'Rules',
+            'buttonName' : 'Start game',
             'task' : '''
                         <p>You should stop at each pub for one drink, preferrebly pint. You should ideally follow these steps.<br><br></p>
                         <ol>
@@ -61,9 +62,9 @@ class PubGame(Game):
         super().nextMove()
 
         if self.currentTask >= PubGame.ROUNDS:
-            return self.template, {'title' : 'Congratulations!', 'task' : 'You have finished the ' + str(PubGame.ROUNDS) + ' Pub game!'}
+            return self.template, {'title' : 'Congratulations!', 'task' : f'You have finished the {PubGame.ROUNDS} Pub game!', 'noButton' : ''}
 
-        args = {"task" : self.tasks[self.currentTask]}
+        args = {'task' : self.tasks[self.currentTask], 'title' : f'Task number {self.currentTask + 1}.'}
         self.currentTask = self.currentTask + 1
 
         return self.template, args
