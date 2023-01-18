@@ -297,7 +297,7 @@ class Task:
             placeholder = self.task[self.task.find('<') + 1:self.task.find('>')]
             value = "\"foo you should not see :)\""
             if placeholder == 'timer':
-                value = str(self.data.get('timer', Task.DEFAULT_TIMER))
+                value = str(self.timer if self.timer != None else Task.DEFAULT_TIMER)
             elif placeholder[0].isdigit():
                 if int(placeholder) >= len(players):
                     return False
