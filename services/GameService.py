@@ -1,5 +1,5 @@
 from pymongo import MongoClient, UpdateMany, UpdateOne
-from Game import Game
+from entities.Game import Game
 import os
 from dotenv import load_dotenv, find_dotenv
 

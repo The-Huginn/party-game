@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, flash
 from services.TaskService import TaskService
-from TaskGame import TaskGame
+from entities.TaskGame import TaskGame
 
 service = TaskService()
 task_page = Blueprint('task_page', __name__)

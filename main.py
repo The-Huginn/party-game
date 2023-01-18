@@ -1,9 +1,5 @@
 from flask import Flask, request, render_template, make_response, url_for, flash
-from Game import Game
-from TaskGame import TaskGame
-from entities.PubGame import PubGame
 from services.GameService import GameService
-# from PubGame import PubGame
 import secrets
 
 
@@ -17,7 +13,7 @@ app.secret_key = secret
 service = GameService()
 
 # Importing subrouting
-from TaskGameEndpoints import task_page
+from endpoints.TaskGameEndpoints import task_page
 from endpoints.PubGameEndpoints import pub_page
 
 app.register_blueprint(task_page)

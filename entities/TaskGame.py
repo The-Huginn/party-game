@@ -1,5 +1,5 @@
 import glob, json, random
-from Game import Game
+from entities.Game import Game
 from pathlib import Path
 from flask import render_template, flash
 import copy
@@ -188,7 +188,7 @@ class TaskGame(Game):
             self.nextSerialize['$set'].update({
                 "currentTask": self.currentTask
             })
-
+            
         return template, args
 
     def getCSS(self):
@@ -256,10 +256,11 @@ class Task:
         Checks, whether a task is resolvable
         """
         maxLen = len(game.randomPlayers())
-        while self.unresolvedTask.find('<') != -1:
-            placeholder = self.unresolvedTask[self.unresolvedTask.find('<') + 1:self.unresolvedTask.find('>')]
-            if placeholder[0].isdigit() and int(placeholder) >= maxLen:
-                return False
+        for index, c in enumerate(self.unresolvedTask):
+            if c == '<':
+                placeholder = self.unresolvedTask[index + 1:index + self.unresolvedTask[index:].find('>')]
+                if placeholder[0].isdigit() and int(placeholder) >= maxLen:
+                    return False
 
         return True
 

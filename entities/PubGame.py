@@ -1,5 +1,5 @@
 import json, random
-from Game import Game
+from entities.Game import Game
 
 class PubGame(Game):
     ROUNDS = 12

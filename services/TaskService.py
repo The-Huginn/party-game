@@ -1,5 +1,5 @@
 from .GameService import GameService
-from TaskGame import TaskGame
+from entities.TaskGame import TaskGame
 
 class TaskService(GameService):
     def __init__(self):

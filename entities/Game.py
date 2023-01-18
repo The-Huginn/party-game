@@ -69,7 +69,7 @@ class Game(ABC):
 
     @abstractmethod
     def deserialize(data):
-        from TaskGame import TaskGame
+        from entities.TaskGame import TaskGame
         from entities.PubGame import PubGame
         """
         Returns new instance from dictionary or None if data None
