@@ -39,6 +39,14 @@ def removePlayer():
 
 @task_page.route('/TaskMode', methods=['POST'])
 def taskMode():
-    game = service.getGame(request.cookies.get('gameID'))
+    _id = request.cookies.get('gameID')
+    game = service.getGame(_id)
+    
+    if not isinstance(game, TaskGame):
+        service.deleteGame(_id)
+        game = None
+    
+    if game == None:
+        game = service.newTaskGame(request.cookies.get('gameID'))
     
     return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Vyberte si kategorie")

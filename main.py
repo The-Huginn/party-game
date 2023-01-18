@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, make_response, url_for, flash
 from Game import Game
 from TaskGame import TaskGame
+from entities.PubGame import PubGame
 from services.GameService import GameService
 # from PubGame import PubGame
 import secrets
@@ -17,8 +18,10 @@ service = GameService()
 
 # Importing subrouting
 from TaskGameEndpoints import task_page
+from endpoints.PubGameEndpoints import pub_page
 
 app.register_blueprint(task_page)
+app.register_blueprint(pub_page)
 
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():
@@ -26,9 +29,7 @@ def gameMode():
         return render_template('mode-selection.html', title="Vyberte si mod hry")
 
     gameID = request.form['gameID']
-    if not service.gameExists(gameID):
-        service.saveGame(TaskGame(gameID))
-    elif service.getGame(gameID).continueGame():
+    if service.getGame(gameID) != None and service.getGame(gameID).continueGame():
         # We can continue previously played game
 
        resp = make_response(render_template('continue.html'))
