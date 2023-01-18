@@ -72,8 +72,11 @@ class Game(ABC):
         from TaskGame import TaskGame
         from entities.PubGame import PubGame
         """
-        Returns new instance from dictionary
+        Returns new instance from dictionary or None if data None
         """
+        if data == None:
+            return None
+
         if data['mode'] == "TaskMode":
             return TaskGame.deserialize(data)
         elif data['mode'] == "PubMode":
