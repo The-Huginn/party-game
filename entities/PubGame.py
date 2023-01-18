@@ -26,6 +26,7 @@ class PubGame(Game):
     def newGame(self):
         super().newGame()
         self.tasks.clear()
+        self.currentTask = 0
 
         f = open("tasks/PubMode/pub.json", "r")
         data = json.loads(f.read())
@@ -42,10 +43,25 @@ class PubGame(Game):
         self.newGame()
 
         # Possibly window explaining game mode at first
-        return self.nextMove()
+        return self.template, {
+            'title' : 'Rules',
+            'task' : '''
+                        <p>You should stop at each pub for one drink, preferrebly pint. You should ideally follow these steps.<br><br></p>
+                        <ol>
+                            <li>Always before leaving pick a new pub.</li>
+                            <li>Check next task on your list.</li>
+                            <li>Follow the task assigned to you</li>
+                        </ol>
+                        <p><br>When someone gets caught breaking the task-rule he should either <u>Drink an extra shot</u> or <u>Buy drink in the next pub to the one, who caught you</u> and continue to follow the task-rule<br></p>
+                        <p><br>And lastly have a lovely night out! Enjoy!</p>
+                        '''
+        }
 
     def nextMove(self):
         super().nextMove()
+
+        if self.currentTask >= PubGame.ROUNDS:
+            return self.template, {'title' : 'Congratulations!', 'task' : 'You have finished the ' + str(PubGame.ROUNDS) + ' Pub game!'}
 
         args = {"task" : self.tasks[self.currentTask]}
         self.currentTask = self.currentTask + 1

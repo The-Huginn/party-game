@@ -1,7 +1,7 @@
 {% extends 'base-game.html' %}
 
 {% block body %}
-    {{task}}
+    {{task | safe}}
 {% endblock %}
 
 {% block footer %}
