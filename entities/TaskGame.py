@@ -33,7 +33,12 @@ class TaskGame(Game):
         return "Task Mode: " + self.name + " { players: " + self.players + ", current: " + self.players[self.currentPlayer] + "}"
 
     def getAllCategories():
-        categories = [Path(x).stem for x in glob.glob('tasks/TaskMode/*.json')]
+        tasks = [Path(x).stem for x in glob.glob('tasks/TaskMode/*.json')]
+        categories = list()
+        for task in tasks:
+            f = open(f'tasks/TaskMode/{task}.json', 'r')
+            data = json.loads(f.read())
+            categories.append({'name' : task, 'title' : data['title'], 'description' : data['description']})
         return categories
 
     def getCategories(self):

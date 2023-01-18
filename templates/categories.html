@@ -6,8 +6,8 @@
     <form id="categories_form">
         {% for category in categories %}
         <div style="text-align: left;">
-            <input type="checkbox" class="checkbox" id="{{ category }}" name="{{ category }}" value="{{ category }}" {% if category in selected %} checked {% endif %}>
-            <label for="{{ category }}">{{ category }}</label><br>
+            <input type="checkbox" class="checkbox" id="{{ category['name'] }}" name="{{ category['name'] }}" value="{{ category['name'] }}" {% if category['name'] in selected %} checked {% endif %}>
+            <label for="{{ category['name'] }}">{{ category['title'] }}</label><br>
         </div>
         {% endfor %}
         <button id="button">Next</button>
