@@ -28,7 +28,7 @@ class PubGame(Game):
         self.tasks.clear()
         self.currentTask = 0
 
-        f = open("tasks/PubMode/pub.json", "r")
+        f = open(f'{Game.TASK_PATH}tasks/PubMode/pub.json', "r")
         data = json.loads(f.read())
 
         for task in data['tasks']:

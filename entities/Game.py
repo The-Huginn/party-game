@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
 class Game(ABC):
+    TASK_PATH = "/etc/backend/"
     DELTA = timedelta(days=1)
 
     def __init__(self, name, timestamp) -> None:
