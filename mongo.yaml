@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  mongo-pv
+spec:
+  storageClassName:  mongo-manual
+  capacity:
+    storage: "2Gi"
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/huginn-server/k3s-volumes/ mongo"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name:  mongo-pvc
+spec:
+  storageClassName:  mongo-manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "2Gi"
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name:  mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  mongo
+  template:
+    metadata:
+      labels:
+        app:  mongo
+    spec:
+      volumes:
+        - name:  mongo-pv-storage
+          persistentVolumeClaim:
+            claimName:  mongo-pvc
+      containers:
+      - name:  mongo
+        image: mongo
+        imagePullPolicy: Always
+        
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - mountPath: "/data/db"
+          name:  mongo-pv-storage
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name:  mongo-svc
+spec:
+  selector:
+    app:  mongo
+  ports:
+  - port: 27017
+    targetPort: 27017
+

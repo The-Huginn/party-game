@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backend-pv
+spec:
+  storageClassName: backend-manual
+  capacity:
+    storage: "128Mi"
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/huginn-server/k3s-volumes/backend"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-pvc
+spec:
+  storageClassName: backend-manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "128Mi"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      volumes:
+        - name: backend-pv-storage
+          persistentVolumeClaim:
+            claimName: backend-pvc
+      containers:
+      - name: backend
+        image: localhost/game
+
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: DB_HOST
+          value: $(MONGO_SVC_SERVICE_HOST)
+        - name: DB_PORT
+          value: $(MONGO_SVC_SERVICE_PORT)
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: "/etc/backend"
+          name: backend-pv-storage
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: backend-svc
+            port: 
+              number: 5000
+
