@@ -5,11 +5,11 @@ metadata:
 spec:
   storageClassName:  mongo-manual
   capacity:
-    storage: "2Gi"
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/home/huginn-server/k3s-volumes/mongo"
+    path: /home/huginn-server/k3s-volumes/mongo
 
 ---
 
@@ -23,7 +23,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "2Gi"
+      storage: 2Gi
 
 ---
 
@@ -64,12 +64,16 @@ spec:
 
         resources:
           limits:
-            memory: "256Mi"
-            cpu: "1000m"
+            memory: 1024Mi
+            cpu: 750m
+          requests:
+            memory: 256Mi
+            cpu: 250m
+
         ports:
         - containerPort: 27017
         volumeMounts:
-        - mountPath: "/data/db"
+        - mountPath: /data/db
           name:  mongo-pv-storage
 
 ---

@@ -5,11 +5,11 @@ metadata:
 spec:
   storageClassName: backend-manual
   capacity:
-    storage: "128Mi"
+    storage: 128Mi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/home/huginn-server/k3s-volumes/backend"
+    path: /home/huginn-server/k3s-volumes/backend
 
 ---
 
@@ -23,7 +23,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "128Mi"
+      storage: 128Mi
 
 ---
 
@@ -68,8 +68,11 @@ spec:
         
         resources:
           limits:
-            memory: "256Mi"
-            cpu: "1000m"
+            memory: 1024Mi
+            cpu: 1000m
+          requests:
+            memory: 256Mi
+            cpu: 250m
         
         livenessProbe:
           httpGet:
@@ -89,7 +92,7 @@ spec:
         - containerPort: 5000
         
         volumeMounts:
-        - mountPath: "/etc/backend"
+        - mountPath: /etc/backend
           name: backend-pv-storage
 
 ---
@@ -116,7 +119,7 @@ spec:
   - http:
       paths:
       - pathType: Prefix
-        path: "/"
+        path: /
         backend:
           service:
             name: backend-svc
