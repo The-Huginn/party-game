@@ -48,6 +48,7 @@ spec:
       containers:
       - name: backend
         image: localhost/game
+        imagePullPolicy: Always
 
         env:
         - name: DB_USER
@@ -64,12 +65,29 @@ spec:
           value: $(MONGO_SVC_SERVICE_HOST)
         - name: DB_PORT
           value: $(MONGO_SVC_SERVICE_PORT)
+        
         resources:
           limits:
             memory: "256Mi"
             cpu: "1000m"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+
         ports:
         - containerPort: 5000
+        
         volumeMounts:
         - mountPath: "/etc/backend"
           name: backend-pv-storage

@@ -49,6 +49,14 @@ def hello_world():
 def favicon():
     return url_for('static', filename='image/favicon.ico')
 
+@app.route('/health', methods=['GET'])
+def health():
+    return 'OK', 200
+
+@app.route('/ready', methods=['GET'])
+def ready():
+    return 'OK', 200
+
 ######################
 # General game moves #
 ######################
