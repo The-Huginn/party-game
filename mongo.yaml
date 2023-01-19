@@ -9,7 +9,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/home/huginn-server/k3s-volumes/ mongo"
+    path: "/home/huginn-server/k3s-volumes/mongo"
 
 ---
 
