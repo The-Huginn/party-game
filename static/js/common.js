@@ -140,7 +140,7 @@ function updateCss(defaultCss=true) {
         data: {defaultCss: defaultCss},
 
         success: function (response) {
-            $("#background").attr("href", response);
+            $('#area').css(JSON.parse(response))
         },
         error: function (xhr) {
             console.log("error" + xhr.responseType);

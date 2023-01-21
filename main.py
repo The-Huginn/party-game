@@ -80,11 +80,16 @@ def getCSS():
     default = request.args.get('defaultCss')
     
     if default == 'true' or 'gameID' not in request.cookies:
-        return "/static/css/default.css"
-
-    game = service.getGame(request.cookies.get('gameID'))
+        filename = "/static/css/default.css"
+    else:
+        game = service.getGame(request.cookies.get('gameID'))
+        filename = game.getCSS()
         
-    return game.getCSS()
+    filename = filename[1:]
+    with open(filename, 'r') as file:
+        data = file.read().replace('\n', ' ')
+
+    return data
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
