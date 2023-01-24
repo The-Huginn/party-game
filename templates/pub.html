@@ -14,9 +14,6 @@
 <script>
     $("#nextMove").on('click', function (e) {
         e.preventDefault();
-        {% if timer is defined %}
-        clearInterval(timer);
-        {% endif %}
         nextMove();
     });
     
