@@ -31,6 +31,13 @@ class GameService():
         template, args = game.startGame()
         self.saveGame(game)
 
+        # Internally nextMove is called, fixes problem with first task in TaskMode
+        update = game.serializeNextMove()
+        self.db.bulk_write([
+            UpdateMany({"_id" : game.getID()}, update),
+            UpdateOne({"_id" : game.getID()}, {"$pull" : {"tasks" : None}})
+        ])
+
         return template, args
 
     def nextMove(self, game: Game):
