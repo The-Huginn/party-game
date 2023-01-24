@@ -154,6 +154,14 @@ class TaskGame(Game):
         if (self.currentPlayer >= len(self.players)):
             self.currentPlayer = 0
 
+        self.nextSerialize = super().serializeNextMove()
+        if len(self.tasks) == 0:
+            args = {
+                "task" : "No more tasks remain.",
+                "noButton" : True
+            }
+            return "single-simple.html", args
+
         toDelete = 0
 
         while True:
@@ -174,7 +182,6 @@ class TaskGame(Game):
         if self.tasks[self.currentTask].canRemove():
             toDelete = toDelete + 1
 
-        self.nextSerialize = super().serializeNextMove()
 
         # We prepare query for updating DB
         self.nextSerialize['$set'].update({

@@ -1,7 +1,9 @@
 {% extends 'task-simple.html' %}
 
 {% block header %}
+    {% if currentPlayer is defined %}
     Hrac na rade {{currentPlayer}}
+    {% endif %}
 {% endblock %}
 
 {% block body %}
