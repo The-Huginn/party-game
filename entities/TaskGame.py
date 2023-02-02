@@ -164,6 +164,7 @@ class TaskGame(Game):
 
         toDelete = 0
 
+        beforeTask = self.currentTask
         while True:
             task = self.tasks[self.currentTask]
             if task.canResolve(self):
@@ -197,6 +198,13 @@ class TaskGame(Game):
                 toDelete = toDelete - 1
         else:
             self.nextTask()
+
+            # Check for reshuffle
+            if beforeTask > self.currentTask:
+                print("reshuffling")
+                random.shuffle(self.tasks)
+                self.nextSerialize['$set'].update({"tasks" : [task.serialize() for task in self.tasks]})
+                
             self.nextSerialize['$set'].update({
                 "currentTask": self.currentTask
             })
