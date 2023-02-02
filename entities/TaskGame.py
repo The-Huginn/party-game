@@ -147,6 +147,11 @@ class TaskGame(Game):
         if (self.currentTask >= len(self.tasks)):
             self.currentTask = 0
 
+    def reshuffle(self):
+        print("reshuffling")
+        random.shuffle(self.tasks)
+        self.nextSerialize['$set'].update({"tasks" : [task.serialize() for task in self.tasks]})
+
     # We do not delete unresolvable / removable task. This is done in service
     def nextMove(self):
         super().nextMove()
@@ -190,21 +195,26 @@ class TaskGame(Game):
             "currentPlayer" : self.currentPlayer
         })
         if toDelete > 0:
-            while toDelete > 0:
-                if '$unset' not in self.nextSerialize:
-                    self.nextSerialize['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
-                else:
-                    self.nextSerialize['$unset'].update({f"tasks.{self.currentTask - toDelete + 1}" : 1})
-                toDelete = toDelete - 1
+
+            if self.currentTask >= len(self.tasks) - toDelete:
+                self.tasks = self.tasks[:len(self.tasks) - toDelete]
+                self.reshuffle()
+                self.nextSerialize['$set'].update({"currentTask" : 0})
+            else:
+                while toDelete > 0:
+                    if '$unset' not in self.nextSerialize:
+                        self.nextSerialize['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
+                    else:
+                        self.nextSerialize['$unset'].update({f"tasks.{self.currentTask - toDelete + 1}" : 1})
+                    toDelete = toDelete - 1
+            
         else:
             self.nextTask()
 
             # Check for reshuffle
             if beforeTask > self.currentTask:
-                print("reshuffling")
-                random.shuffle(self.tasks)
-                self.nextSerialize['$set'].update({"tasks" : [task.serialize() for task in self.tasks]})
-                
+                self.reshuffle()
+
             self.nextSerialize['$set'].update({
                 "currentTask": self.currentTask
             })
