@@ -12,11 +12,8 @@ def pubMode():
     
     if not isinstance(game, PubGame):
         service.deleteGame(_id)
-        game = None
-        
-    if game == None:
-        game = service.newPubGame(_id)
+    
+    game = service.newPubGame(_id)
 
-    game.newGame()
     template, args = service.startGame(game)
     return render_template(template, **args)
