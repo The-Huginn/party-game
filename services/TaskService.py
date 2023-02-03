@@ -10,6 +10,11 @@ class TaskService(GameService):
         self.saveGame(game)
         return game
 
+    def resetTaskGame(self, game):
+        game.newGame()
+        self.saveGame(game)
+        return game
+
     def setCategories(self, game: TaskGame, categories):
         game.setCategories(categories)
         self.db.update_one({"_id" : game.getID()},

@@ -68,6 +68,8 @@ class TaskGame(Game):
     def newGame(self):
         super().newGame()
         self.tasks.clear()
+        self.currentPlayer = 0
+        self.currentTask = 0
 
         perPlayerTasks = list()
         for filename in self.selected:
@@ -148,7 +150,6 @@ class TaskGame(Game):
             self.currentTask = 0
 
     def reshuffle(self):
-        print("reshuffling")
         random.shuffle(self.tasks)
         self.nextSerialize['$set'].update({"tasks" : [task.serialize() for task in self.tasks]})
 

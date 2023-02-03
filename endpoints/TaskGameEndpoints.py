@@ -48,5 +48,7 @@ def taskMode():
     
     if game == None:
         game = service.newTaskGame(request.cookies.get('gameID'))
+    else:
+        game = service.resetTaskGame(game)
     
     return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Vyberte si kategorie")
