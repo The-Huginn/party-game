@@ -7,6 +7,5 @@ class PubService(GameService):
 
     def newPubGame(self, _id):
         game = PubGame(_id)
-        game.newGame()
         self.saveGame(game)
         return game

@@ -8,7 +8,15 @@ pub_page = Blueprint('pub_page', __name__)
 @pub_page.route('/PubMode', methods=['POST'])
 def pubMode():
     _id = request.cookies.get('gameID')
-    game = service.newPubGame(_id)
+    game = service.getGame(_id)
+    
+    if not isinstance(game, PubGame):
+        service.deleteGame(_id)
+        game = None
+        
+    if game == None:
+        game = service.newPubGame(_id)
 
+    game.newGame()
     template, args = service.startGame(game)
     return render_template(template, **args)
