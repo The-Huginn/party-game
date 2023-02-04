@@ -2,6 +2,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: backend-pv
+  labels:
+    app: drinking-game
 spec:
   storageClassName: backend-manual
   capacity:
@@ -9,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/huginn-server/k3s-volumes/backend
+    path: /home/bifrost/k3s-volumes/backend
 
 ---
 
@@ -17,6 +19,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backend-pvc
+  labels:
+    app: drinking-game
 spec:
   storageClassName: backend-manual
   accessModes:
@@ -31,6 +35,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
+  labels:
+    app: drinking-game
 spec:
   replicas: 1
   selector:
@@ -101,28 +107,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-svc
+  labels:
+    app: drinking-game
 spec:
   selector:
     app: backend
   ports:
   - port: 5000
     targetPort: 5000
-
----
-
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: backend-ingress
-spec:
-  rules:
-  - http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: backend-svc
-            port: 
-              number: 5000
-

@@ -2,6 +2,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name:  mongo-pv
+  labels:
+    app: drinking-game
 spec:
   storageClassName:  mongo-manual
   capacity:
@@ -9,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/huginn-server/k3s-volumes/mongo
+    path: /home/bifrost/k3s-volumes/mongo
 
 ---
 
@@ -17,6 +19,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name:  mongo-pvc
+  labels:
+    app: drinking-game
 spec:
   storageClassName:  mongo-manual
   accessModes:
@@ -31,6 +35,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name:  mongo
+  labels:
+    app: drinking-game
 spec:
   replicas: 1
   selector:
@@ -82,6 +88,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name:  mongo-svc
+  labels:
+    app: drinking-game
 spec:
   selector:
     app:  mongo
