@@ -3,6 +3,8 @@ function homeAction() {
     loadHomePage($(".home-btn"));
 }
 
+const myAudioContext = new AudioContext();
+
 // Confirm about page
 function confirmAction() {
     loadHomePage($("#confirm"));
