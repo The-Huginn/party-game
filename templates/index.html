@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="sk">
 
 <head>
     <title>Party game</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contains customizable multi-mode drinking game for when you want to have fun with friends.">
 </head>
 
 <link rel="shortcut icon" href="{{ url_for('static', filename='image/favicon.ico') }}">
@@ -12,14 +13,14 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/task.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pub.css') }}">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" defer></script>
+<script src="{{ url_for('static', filename='js/common.js') }}" defer></script>
 
 
 <body>
     <div class="area", id="area">
         <div class="home">
-            <button class="home-btn"><img style="z-index: -1;" src="{{url_for('static', filename='image/home-button.png')}}"></button>
+            <button class="home-btn"><img alt="Home" style="z-index: -1;" src="{{url_for('static', filename='image/home-button.png')}}"></button>
             <p id="title"></p>
         </div>
 

@@ -5,7 +5,7 @@
 {% if price is defined %}
 {% if price > 0 %}
 <p>
-    {{message}}{% for i in range(price) %}<img src="{{url_for('static', filename='image/shot.png')}}">{% endfor %}
+    {{message}}{% for i in range(price) %}<img alt="One shot to drink" src="{{url_for('static', filename='image/shot.png')}}">{% endfor %}
 </p>
 {% endif %}
 {% endif %}
