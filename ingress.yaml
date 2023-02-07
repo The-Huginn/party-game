@@ -1,9 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: backend-ingress
-  labels:
-    app: drinking-game
+  name: bifrost-ingress
   annotations:
     # ssl certificate
     cert-manager.io/issuer: prod-issuer
@@ -12,9 +10,10 @@ metadata:
     # dns record
     # external-dns.alpha.kubernetes.io/hostname: thehuginn.com
     # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    
 spec:
   rules:
-  - host: thehuginn.com
+  - host: game.thehuginn.com
     http:
       paths:
       - pathType: Prefix
@@ -24,6 +23,7 @@ spec:
             name: backend-svc
             port: 
               number: 5000
+              
   - host: registry.thehuginn.com
     http:
       paths:
@@ -34,9 +34,22 @@ spec:
             name: registry-svc
             port: 
               number: 5000
-
+              
+  - host: ergo.thehuginn.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: ergo-svc
+            port: 
+              number: 9053
+          
   tls:
     - hosts:
         - thehuginn.com
         - registry.thehuginn.com
+        - ergo.thehuginn.com
+        - game.thehuginn.com
       secretName: thehuginn-com-tls
