@@ -20,9 +20,9 @@ spec:
         path: /
         backend:
           service:
-            name: backend-svc
+            name: nginx-svc
             port: 
-              number: 5000
+              number: 80
               
   - host: registry.thehuginn.com
     http:

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  default.conf.template: |
+      upstream backend {
+          server ${BACKEND_SVC_SERVICE_HOST}:${BACKEND_SVC_SERVICE_PORT};
+      }
+
+      server {
+          listen       80;
+          # server_name  game.thehuginn.com;
+
+          location / {
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header Host $http_host;
+              proxy_redirect off;
+              proxy_pass http://backend;
+          }
+      }
+      
+---
+              
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+          items:
+            - key: default.conf.template
+              path: default.conf.template
+
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/templates
+          readOnly: true
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  labels:
+    app: drinking-game
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
