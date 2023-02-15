@@ -50,7 +50,7 @@ class TaskGame(Game):
 
     def addPlayer(self, name) -> bool:
 
-        if (len(name) < 3):
+        if (len(name) < 2):
             return False
 
         if name in self.players:
