@@ -64,7 +64,10 @@
                 } else {
                     $("#nextMove").focus();
                 }
-                updateCss(false);
+
+                // We moved from lobby to game
+                if ($("#nextMove").length > 0)
+                    updateCss(false);
             },
             error: function (xhr) {
                 //Do Something to handle error

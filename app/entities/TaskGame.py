@@ -118,7 +118,11 @@ class TaskGame(Game):
     def startGame(self):
         if len(self.getPlayers()) < 2:
             flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
-            return render_template('lobby.html', players=self.getPlayers(), len=len(self.getPlayers()), title="Lobby pre pripravu hracov")
+            return 'lobby.html', {
+                'players': self.getPlayers(),
+                'len': len(self.getPlayers()),
+                'title': 'Lobby pre pripravu hracov'
+            }
 
         self.newGame()
 
@@ -235,7 +239,8 @@ class TaskGame(Game):
         return {"players" : self.players}
 
     def serializeNextMove(self):
-        return self.nextSerialize
+        # Update mode just as mock to not have emptyUpdate error
+        return getattr(self, 'nextSerialize', {'$set': {'mode': 'TaskMode'}})
 
     def serialize(self):
         data = super().serialize()
