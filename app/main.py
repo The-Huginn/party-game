@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, make_response, url_for, flash
+from flask import Flask, request, render_template, make_response, url_for, send_from_directory
 from services.GameService import GameService
 import secrets
 
@@ -18,6 +18,11 @@ from endpoints.PubGameEndpoints import pub_page
 
 app.register_blueprint(task_page)
 app.register_blueprint(pub_page)
+
+@app.route('/robots.txt')
+@app.route('/sitemap.xml')
+def static_seo():
+    return send_from_directory(app.static_folder, request.path[1:])
 
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():

@@ -1,0 +1,6 @@
+
+User-agent: *
+Allow: /
+
+Sitemap: https://game.thehuginn.com.sitemap.xml
+Host: game.thehuginn.com
