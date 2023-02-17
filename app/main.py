@@ -62,6 +62,10 @@ def health():
 def ready():
     return 'OK', 200
 
+@app.errorhandler(404)
+def defaultHandler(e):
+    return render_template('404.html'), 404
+
 ######################
 # General game moves #
 ######################
