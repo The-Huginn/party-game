@@ -1,5 +1,9 @@
 {% extends 'base-game.html' %}
 
+{% block body %}
+    {{ task | safe }}
+{% endblock %}
+
 {% block price %}
 
 {% if price is defined %}
