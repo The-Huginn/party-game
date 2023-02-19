@@ -1,12 +1,18 @@
 from flask import Flask, request, render_template, make_response, url_for, send_from_directory
+from flask_babel import Babel, gettext
 from services.GameService import GameService
 import secrets
 
 
 app = Flask(__name__)
+babel = Babel(app)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['DEBUG'] = False
 app.config['TESTING'] = False
+app.config['LANGUAGES'] = {
+    'en': 'English',
+    'sk': 'Slovenčina'
+}
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
 
@@ -24,10 +30,15 @@ app.register_blueprint(pub_page)
 def static_seo():
     return send_from_directory(app.static_folder, request.path[1:])
 
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+
+babel.init_app(app, locale_selector=get_locale)
+
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():
     if request.method == 'GET':
-        return render_template('mode-selection.html', title="Vyberte si mod hry")
+        return render_template('mode-selection.html', title=gettext('Choose game mode'))
 
     gameID = request.form['gameID']
     if service.getGame(gameID) != None and service.getGame(gameID).continueGame():
@@ -37,14 +48,14 @@ def gameMode():
        resp.set_cookie('gameID', gameID)
        return resp
         
-    resp = make_response(render_template('mode-selection.html', title="Vyberte si mod hry"))
+    resp = make_response(render_template('mode-selection.html', title=gettext('Choose game mode')))
     resp.set_cookie('gameID', gameID)
 
     return resp
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home-page.html', title="Zvolte unikatne meno hry")
+    return render_template('home-page.html', title=gettext('Choose your unique game name'))
 
 @app.route('/')
 def hello_world():

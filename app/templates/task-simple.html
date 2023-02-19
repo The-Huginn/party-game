@@ -89,10 +89,10 @@
 
 {% block footer %}
 {% if timer is defined %}
-<button id="startTimer" onclick="startTimer();">Start Casovacu</button>
+<button id="startTimer" onclick="startTimer();">{{ gettext('Start Timer') }}</button>
 {% endif %}
 {% if noButton is not defined %}
-<button id="nextMove">Dalsia Uloha</button>
+<button id="nextMove">{{ gettext('Next Task') }}</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 

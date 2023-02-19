@@ -1,11 +1,10 @@
 {% extends 'warning.html' %}
 
 {% block content %}
-
 <div>
-    Rozohrana hra za posledny den bola detekovana, chcete v nej pokracovat?<br>
-    <button onclick="continueGame()">Continue</button>
-    <button onclick="discardOldGame()">New game anyway</button>
+    {{ gettext('Started game within last day was detected, would you like to continue?') }}<br>
+    <button onclick="continueGame()">{{ gettext('Continue') }}</button>
+    <button onclick="discardOldGame()">{{ gettext('New game anyway') }}</button>
 </div>
 
 {% endblock %}

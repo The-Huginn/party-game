@@ -2,6 +2,6 @@
 
 {% block header %}
     {% if currentPlayer is defined %}
-    Hrac na rade {{currentPlayer}}
+    {{ gettext('Turn of player') }} {{currentPlayer}}
     {% endif %}
 {% endblock %}

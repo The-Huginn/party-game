@@ -3,9 +3,9 @@
 {% block content %}
 
 <form id="game_form">
-    Game name:<br>
+    {{ gettext('Game name') }}:<br>
     <input type="text" id="gameName"></input>
-    <button id="button">Start</button>
+    <button id="button">{{ gettext('Start') }}</button>
 </form>
 
 {% endblock %}

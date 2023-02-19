@@ -1,0 +1,221 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-02-19 17:55+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: main.py:40 main.py:50
+msgid "Choose game mode"
+msgstr ""
+
+#: main.py:57
+msgid "Choose your unique game name"
+msgstr ""
+
+#: endpoints/TaskGameEndpoints.py:15
+msgid "Choose at least one category"
+msgstr ""
+
+#: endpoints/TaskGameEndpoints.py:16 endpoints/TaskGameEndpoints.py:20
+#: endpoints/TaskGameEndpoints.py:30 endpoints/TaskGameEndpoints.py:39
+#: entities/TaskGame.py:125
+msgid "Lobby for players"
+msgstr ""
+
+#: endpoints/TaskGameEndpoints.py:28
+msgid ""
+"Unable to add player. Check the player does not already exist and his "
+"name is longer than 2 characters."
+msgstr ""
+
+#: endpoints/TaskGameEndpoints.py:55
+msgid "Choose categories"
+msgstr ""
+
+#: entities/PubGame.py:48
+msgid "Rules"
+msgstr ""
+
+#: entities/PubGame.py:49
+msgid "Start game"
+msgstr ""
+
+#: entities/PubGame.py:51
+msgid ""
+"You should stop at each pub for one drink, preferrebly pint. You should "
+"ideally follow these steps."
+msgstr ""
+
+#: entities/PubGame.py:53
+msgid "Always before leaving pick a new pub."
+msgstr ""
+
+#: entities/PubGame.py:54
+msgid "Check next task on your list."
+msgstr ""
+
+#: entities/PubGame.py:55
+msgid "Follow the task assigned to you."
+msgstr ""
+
+#: entities/PubGame.py:57
+msgid ""
+"When someone gets caught breaking the task-rule he should either <u>Drink"
+" an extra shot</u> or <u>Buy drink in the next pub to the one, who caught"
+" you</u> and continue to follow the task-rule"
+msgstr ""
+
+#: entities/PubGame.py:58
+msgid "And lastly have a lovely night out! Enjoy!"
+msgstr ""
+
+#: entities/PubGame.py:66
+msgid "Congratulations!"
+msgstr ""
+
+#: entities/PubGame.py:66
+msgid "You have finished the"
+msgstr ""
+
+#: entities/PubGame.py:66
+msgid "Pub game!"
+msgstr ""
+
+#: entities/PubGame.py:68
+msgid "Task number"
+msgstr ""
+
+#: entities/TaskGame.py:121
+msgid "Don't be an alcoholic, find at least one other player"
+msgstr ""
+
+#: entities/TaskGame.py:171
+msgid "No more tasks remain."
+msgstr ""
+
+#: entities/TaskGame.py:285
+msgid "Otherwise you drink"
+msgstr ""
+
+#: templates/404.html:4
+msgid "Page Not Found"
+msgstr ""
+
+#: templates/404.html:5
+msgid "If you have been playing the game please navigate back to"
+msgstr ""
+
+#: templates/404.html:5
+msgid "Game"
+msgstr ""
+
+#: templates/404.html:6
+msgid "Otherwise Please navigate to main page"
+msgstr ""
+
+#: templates/404.html:6
+msgid "Main page"
+msgstr ""
+
+#: templates/about.html:12
+msgid ""
+"Thank you for visiting my game website! But please note I do not take any"
+" responsibility for correct functionality of this website nor for what "
+"can happen to you while playing this game, if you decide to do so."
+msgstr ""
+
+#: templates/about.html:13
+msgid ""
+"Please do not search different game names and if you collide pick a new "
+"name. Do not ruin fun of others, otherwise you will have to log in"
+msgstr ""
+
+#: templates/about.html:13
+msgid "And noone wants that."
+msgstr ""
+
+#: templates/about.html:14
+msgid "Also I should let you know I am using"
+msgstr ""
+
+#: templates/about.html:14
+msgid "so by continuing you agree I am allowed to use them"
+msgstr ""
+
+#: templates/about.html:15
+msgid "Drink responsibly and think about your moms!"
+msgstr ""
+
+#: templates/about.html:19
+msgid "I agree"
+msgstr ""
+
+#: templates/all-simple.html:4
+msgid "Task for everybody!"
+msgstr ""
+
+#: templates/categories.html:13
+msgid "Next"
+msgstr ""
+
+#: templates/continue.html:6
+msgid "Started game within last day was detected, would you like to continue?"
+msgstr ""
+
+#: templates/continue.html:7
+msgid "Continue"
+msgstr ""
+
+#: templates/continue.html:8
+msgid "New game anyway"
+msgstr ""
+
+#: templates/duo-simple.html:4
+msgid "Players are divided into pairs as follows"
+msgstr ""
+
+#: templates/home-page.html:6 templates/login.html:5
+msgid "Game name"
+msgstr ""
+
+#: templates/home-page.html:8 templates/lobby.html:27 templates/login.html:8
+msgid "Start"
+msgstr ""
+
+#: templates/lobby.html:6
+msgid "Add Player"
+msgstr ""
+
+#: templates/lobby.html:8
+msgid "Add"
+msgstr ""
+
+#: templates/lobby.html:18
+msgid "Remove"
+msgstr ""
+
+#: templates/pub.html:10 templates/task-simple.html:95
+msgid "Next Task"
+msgstr ""
+
+#: templates/single-simple.html:5
+msgid "Turn of player"
+msgstr ""
+
+#: templates/task-simple.html:92
+msgid "Start Timer"
+msgstr ""
+

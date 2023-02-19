@@ -1,5 +1,6 @@
 import json, random
 from entities.Game import Game
+from flask_babel import gettext
 
 class PubGame(Game):
     ROUNDS = 12
@@ -44,17 +45,17 @@ class PubGame(Game):
 
         # Possibly window explaining game mode at first
         return self.template, {
-            'title' : 'Rules',
-            'buttonName' : 'Start game',
+            'title' : gettext('Rules'),
+            'buttonName' : gettext('Start game'),
             'task' : '''
-                        <p>You should stop at each pub for one drink, preferrebly pint. You should ideally follow these steps.<br><br></p>
+                        <p>''' + gettext('You should stop at each pub for one drink, preferrebly pint. You should ideally follow these steps.') + '''<br><br></p>
                         <ol>
-                            <li>Always before leaving pick a new pub.</li>
-                            <li>Check next task on your list.</li>
-                            <li>Follow the task assigned to you</li>
+                            <li>''' + gettext('Always before leaving pick a new pub.') + '''</li>
+                            <li>''' + gettext('Check next task on your list.') + '''</li>
+                            <li>''' + gettext('Follow the task assigned to you.') + '''</li>
                         </ol>
-                        <p><br>When someone gets caught breaking the task-rule he should either <u>Drink an extra shot</u> or <u>Buy drink in the next pub to the one, who caught you</u> and continue to follow the task-rule<br></p>
-                        <p><br>And lastly have a lovely night out! Enjoy!</p>
+                        <p><br>''' + gettext('When someone gets caught breaking the task-rule he should either <u>Drink an extra shot</u> or <u>Buy drink in the next pub to the one, who caught you</u> and continue to follow the task-rule') + '''<br></p>
+                        <p><br>''' + gettext('And lastly have a lovely night out! Enjoy!') + '''</p>
                         '''
         }
 
@@ -62,9 +63,9 @@ class PubGame(Game):
         super().nextMove()
 
         if self.currentTask >= PubGame.ROUNDS:
-            return self.template, {'title' : 'Congratulations!', 'task' : f'You have finished the {PubGame.ROUNDS} Pub game!', 'noButton' : ''}
+            return self.template, {'title' : gettext('Congratulations!'), 'task' : gettext('You have finished the') + ' ' + str(PubGame.ROUNDS) + ' ' + gettext('Pub game!'), 'noButton' : ''}
 
-        args = {'task' : self.tasks[self.currentTask], 'title' : f'Task number {self.currentTask + 1}.'}
+        args = {'task' : self.tasks[self.currentTask], 'title' : gettext('Task number') + ' ' + str(self.currentTask + 1)}
         self.currentTask = self.currentTask + 1
 
         return self.template, args

@@ -2,6 +2,7 @@ import glob, json, random
 from entities.Game import Game
 from pathlib import Path
 from flask import render_template, flash
+from flask_babel import gettext
 import copy
 
 class TaskGame(Game):
@@ -117,11 +118,11 @@ class TaskGame(Game):
 
     def startGame(self):
         if len(self.getPlayers()) < 2:
-            flash("Nebud alkoholik, najdi si aspon jedneho ineho hraca")
+            flash(gettext('Don\'t be an alcoholic, find at least one other player'))
             return 'lobby.html', {
                 'players': self.getPlayers(),
                 'len': len(self.getPlayers()),
-                'title': 'Lobby pre pripravu hracov'
+                'title': gettext('Lobby for players')
             }
 
         self.newGame()
@@ -167,7 +168,7 @@ class TaskGame(Game):
         self.nextSerialize = super().serializeNextMove()
         if len(self.tasks) == 0:
             args = {
-                "task" : "No more tasks remain.",
+                "task" : gettext('No more tasks remain.'),
                 "noButton" : True
             }
             return "single-simple.html", args
@@ -281,7 +282,7 @@ class Task:
         self.frequency = data.get('frequency', 1)
         self.repeat = data.get('repeat', Task.NEVER).upper()
         self.price = data.get('price', 1)
-        self.message = data.get('message', 'Inak pijes')
+        self.message = data.get('message', gettext('Otherwise you drink'))
         self.timer = data.get('timer', None)
     
     def checkJSON(data) -> bool:

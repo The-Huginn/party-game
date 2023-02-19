@@ -1,4 +1,5 @@
 from flask import Blueprint, request, render_template, flash
+from flask_babel import gettext
 from services.TaskService import TaskService
 from entities.TaskGame import TaskGame
 
@@ -11,12 +12,12 @@ def categories():
     categories = request.form.getlist('categories[]')
 
     if (len(categories) == 0):
-        flash("Zvolte aspon jednu kategoriu")
-        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Lobby pre pripravu hracov")
+        flash(gettext('Choose at least one category'))
+        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('Lobby for players'))
 
     service.setCategories(game, categories)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
 
 @task_page.route('/addPlayer', methods=['POST'])
 def addPlayer():
@@ -24,9 +25,9 @@ def addPlayer():
     game = service.getGame(request.cookies.get('gameID'))
     
     if not service.addPlayer(game, name):
-        flash("Pridanie sa nepodarilo, pouzivatel uz existuje alebo zadane meno je kratke")
+        flash(gettext('Unable to add player. Check the player does not already exist and his name is longer than 2 characters.'))
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
 
 @task_page.route('/removePlayer', methods=['DELETE'])
 def removePlayer():
@@ -35,7 +36,7 @@ def removePlayer():
 
     service.removePlayer(game, index)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title="Lobby pre pripravu hracov")
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
 
 @task_page.route('/TaskMode', methods=['POST'])
 def taskMode():
@@ -51,4 +52,4 @@ def taskMode():
     else:
         game = service.resetTaskGame(game)
     
-    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title="Vyberte si kategorie")
+    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('Choose categories'))
