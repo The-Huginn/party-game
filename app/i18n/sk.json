@@ -7,13 +7,13 @@
         "locale": "sk",
         "name": "Slovak"
     },
-    "title": "Stránka nebola nájdená",
+    "error-title": "Stránka nebola nájdená",
     
-    "message_1": "Pokiaľ ste hrali hru prosím vráďte sa naspäť na",
+    "error-message-1": "Pokiaľ ste hrali hru prosím vráďte sa naspäť na",
     
-    "message_2": "Inak sa vráďte na",
+    "error-message-2": "Inak sa vráďte na",
     
-    "Game": "Hru",
+    "error-game": "Hru",
     
-    "Main_Page": "Hlavnú stránku"
+    "error-main-page": "Hlavnú stránku"
 }

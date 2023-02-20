@@ -7,13 +7,17 @@
         "locale": "en",
         "name": "English"
     },
-    "title": "Page Not Found",
+    "error-title": "Page Not Found",
     
-    "message_1": "If you have been playing the game please navigate back to",
+    "error-message-1": "If you have been playing the game please navigate back to",
     
-    "message_2": "Otherwise Please navigate to ",
+    "error-message-2": "Otherwise Please navigate to ",
     
-    "Game": "Game",
+    "error-game": "Game",
     
-    "Main_Page": "Main Page"
+    "error-main-page": "Main Page",
+
+    "py-game-mode": "Choose game mode",
+
+    "py-unique-game-name": "Choose your unique game name"
 }
