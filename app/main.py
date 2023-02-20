@@ -9,10 +9,7 @@ babel = Babel(app)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['DEBUG'] = False
 app.config['TESTING'] = False
-app.config['LANGUAGES'] = {
-    'en': {'flag':'us', 'name':'English'},
-    'sk': {'flag':'sk', 'name':'Slovak'}
-}
+
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
 
@@ -31,7 +28,11 @@ def static_seo():
     return send_from_directory(app.static_folder, request.path[1:])
 
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    lang = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    resp = make_response(lang)
+    resp.set_cookie('lang', lang)
+    return resp
+    # return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
 
 babel.init_app(app, locale_selector=get_locale)
 
@@ -111,18 +112,21 @@ def getCSS():
 
     return data
 
-languages = dict()
-language_list = glob.glob("translations/*.json")
+# Set up supported languages
+def langInit():
+    app.config['LANGUAGES'] = dict()
+    languages = dict()
+    language_list = glob.glob("i18n/*.json")
 
-for lang in language_list:
+    for lang in language_list:
 
-    filename = lang.split('/')
-    print(filename)
-    lang_code = filename[1].split('.')[0]
+        filename = lang.split('/')
+        lang_code = filename[1].split('.')[0]
 
-    with open(lang, 'r', encoding='utf8') as file:
-        print(lang_code)
-        languages[lang_code] = json.loads(file.read())
+        with open(lang, 'r', encoding='utf8') as file:
+            languages[lang_code] = json.loads(file.read())
+            app.config['LANGUAGES'].update({lang_code: {'name': languages[lang_code]['@metadata']['name']}})
 
 if __name__ == "__main__":
+    langInit()
     app.run(host='0.0.0.0')

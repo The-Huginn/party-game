@@ -1,0 +1,19 @@
+{
+    "@metadata": {
+        "authors": [
+            "Huginn"
+        ],
+        "last-updated": "2023-02-20",
+        "locale": "en",
+        "name": "English"
+    },
+    "title": "Page Not Found",
+    
+    "message_1": "If you have been playing the game please navigate back to",
+    
+    "message_2": "Otherwise Please navigate to ",
+    
+    "Game": "Game",
+    
+    "Main_Page": "Main Page"
+}
