@@ -2,9 +2,9 @@
 
 {% block content %}
 <div>
-    {{ gettext('Started game within last day was detected, would you like to continue?') }}<br>
-    <button onclick="continueGame()">{{ gettext('Continue') }}</button>
-    <button onclick="discardOldGame()">{{ gettext('New game anyway') }}</button>
+    {{ gettext('game-detected') }}<br>
+    <button onclick="continueGame()">{{ gettext('continue') }}</button>
+    <button onclick="discardOldGame()">{{ gettext('new-game-anyway') }}</button>
 </div>
 
 {% endblock %}

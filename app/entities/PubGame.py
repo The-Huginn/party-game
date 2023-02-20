@@ -45,17 +45,17 @@ class PubGame(Game):
 
         # Possibly window explaining game mode at first
         return self.template, {
-            'title' : gettext('Rules'),
-            'buttonName' : gettext('Start game'),
+            'title' : gettext('py-rules'),
+            'buttonName' : gettext('py-start'),
             'task' : '''
-                        <p>''' + gettext('You should stop at each pub for one drink, preferrebly pint. You should ideally follow these steps.') + '''<br><br></p>
+                        <p>''' + gettext('py-pub-message-1') + '''<br><br></p>
                         <ol>
-                            <li>''' + gettext('Always before leaving pick a new pub.') + '''</li>
-                            <li>''' + gettext('Check next task on your list.') + '''</li>
-                            <li>''' + gettext('Follow the task assigned to you.') + '''</li>
+                            <li>''' + gettext('py-pub-message-2') + '''</li>
+                            <li>''' + gettext('py-pub-message-3') + '''</li>
+                            <li>''' + gettext('py-pub-message-4') + '''</li>
                         </ol>
-                        <p><br>''' + gettext('When someone gets caught breaking the task-rule he should either <u>Drink an extra shot</u> or <u>Buy drink in the next pub to the one, who caught you</u> and continue to follow the task-rule') + '''<br></p>
-                        <p><br>''' + gettext('And lastly have a lovely night out! Enjoy!') + '''</p>
+                        <p><br>''' + gettext('py-pub-message-5') + '''<br></p>
+                        <p><br>''' + gettext('py-pub-message-6') + '''</p>
                         '''
         }
 
@@ -63,9 +63,9 @@ class PubGame(Game):
         super().nextMove()
 
         if self.currentTask >= PubGame.ROUNDS:
-            return self.template, {'title' : gettext('Congratulations!'), 'task' : gettext('You have finished the') + ' ' + str(PubGame.ROUNDS) + ' ' + gettext('Pub game!'), 'noButton' : ''}
+            return self.template, {'title' : gettext('py-congratulations'), 'task' : gettext('py-finished') + ' ' + str(PubGame.ROUNDS) + ' ' + gettext('py-pub-game'), 'noButton' : ''}
 
-        args = {'task' : self.tasks[self.currentTask], 'title' : gettext('Task number') + ' ' + str(self.currentTask + 1)}
+        args = {'task' : self.tasks[self.currentTask], 'title' : gettext('py-task-number') + ' ' + str(self.currentTask + 1)}
         self.currentTask = self.currentTask + 1
 
         return self.template, args

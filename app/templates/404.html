@@ -1,7 +1,19 @@
 {% extends 'index.html' %}
 
 {% block content_placeholder %}
-    <h1>{{ gettext('Page Not Found') }}</h1>
-    <p>{{ gettext('If you have been playing the game please navigate back to') }} <a href="https://game.thehuginn.com">{{ gettext('Game') }}</a>
-    <p>{{ gettext('Otherwise Please navigate to main page') }} <a href="https://thehuginn.com">{{ gettext('Main page') }}</a>
+    <h1 data-i18n="error-title">{{ gettext('error-title') }}</h1>
+    <p data-i18n="error-message-1">{{ gettext('error-message-1') }}</p> <a href="https://game.thehuginn.com" data-i18n="error-game">{{ gettext('error-game') }}</a>
+    <p data-i18n="error-message-2">{{ gettext('error-message-2') }}</p> <a href="https://thehuginn.com" data-i18n="error-main-page">{{ gettext('error-main-page') }}</a>
+    <script>
+        $(document).ready(function() {
+
+            fetch("/lang/sk").then((response) => response.json()).then((messages) => {
+            $.i18n().load(messages, 'sk');
+            $.i18n().locale = 'sk';
+            $('html').i18n();
+            document.documentElement.setAttribute('lang', 'sk');
+            });
+
+        });
+    </script>
 {% endblock %}

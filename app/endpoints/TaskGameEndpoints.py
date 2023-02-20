@@ -12,12 +12,12 @@ def categories():
     categories = request.form.getlist('categories[]')
 
     if (len(categories) == 0):
-        flash(gettext('Choose at least one category'))
-        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('Lobby for players'))
+        flash(gettext('py-one-category'))
+        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('py-lobby'))
 
     service.setCategories(game, categories)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
 
 @task_page.route('/addPlayer', methods=['POST'])
 def addPlayer():
@@ -25,9 +25,9 @@ def addPlayer():
     game = service.getGame(request.cookies.get('gameID'))
     
     if not service.addPlayer(game, name):
-        flash(gettext('Unable to add player. Check the player does not already exist and his name is longer than 2 characters.'))
+        flash(gettext('py-add-player-fail'))
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
 
 @task_page.route('/removePlayer', methods=['DELETE'])
 def removePlayer():
@@ -36,7 +36,7 @@ def removePlayer():
 
     service.removePlayer(game, index)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('Lobby for players'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
 
 @task_page.route('/TaskMode', methods=['POST'])
 def taskMode():
@@ -52,4 +52,4 @@ def taskMode():
     else:
         game = service.resetTaskGame(game)
     
-    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('Choose categories'))
+    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('py-category'))

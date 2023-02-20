@@ -118,11 +118,11 @@ class TaskGame(Game):
 
     def startGame(self):
         if len(self.getPlayers()) < 2:
-            flash(gettext('Don\'t be an alcoholic, find at least one other player'))
+            flash(gettext('py-lobby-failed'))
             return 'lobby.html', {
                 'players': self.getPlayers(),
                 'len': len(self.getPlayers()),
-                'title': gettext('Lobby for players')
+                'title': gettext('py-lobby')
             }
 
         self.newGame()
@@ -168,7 +168,7 @@ class TaskGame(Game):
         self.nextSerialize = super().serializeNextMove()
         if len(self.tasks) == 0:
             args = {
-                "task" : gettext('No more tasks remain.'),
+                "task" : gettext('py-tasks-done'),
                 "noButton" : True
             }
             return "single-simple.html", args
@@ -282,7 +282,7 @@ class Task:
         self.frequency = data.get('frequency', 1)
         self.repeat = data.get('repeat', Task.NEVER).upper()
         self.price = data.get('price', 1)
-        self.message = data.get('message', gettext('Otherwise you drink'))
+        self.message = data.get('message', gettext('py-drink'))
         self.timer = data.get('timer', None)
     
     def checkJSON(data) -> bool:
