@@ -132,7 +132,7 @@ def langInit():
 
         with open(lang, 'r', encoding='utf8') as file:
             languages[lang_code] = json.loads(file.read())
-            app.config['LANGUAGES'].update({lang_code: {'name': languages[lang_code]['@metadata']['name']}})
+            app.config['LANGUAGES'].update({lang_code: {'name': languages[lang_code]['']['name']}})
 
 langInit()
 
