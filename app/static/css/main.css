@@ -11,6 +11,15 @@ body {
     height: 100vh;
 }
 
+.footer {
+    position: absolute;
+    bottom: 10px;
+    font-family: 'Merienda', monospace;
+    font-weight: bold;
+    text-align: center;
+    font-size: 20px;
+}
+
 input,
 div {
     font-family: 'Merienda', monospace;
