@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, make_response, url_for, send_from_directory
 from flask_babel import Babel, gettext
 from services.GameService import GameService
-import secrets
+import secrets, glob, json
 
 
 app = Flask(__name__)
@@ -10,8 +10,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['DEBUG'] = False
 app.config['TESTING'] = False
 app.config['LANGUAGES'] = {
-    'en': 'English',
-    'sk': 'Slovenčina'
+    'en': {'flag':'us', 'name':'English'},
+    'sk': {'flag':'sk', 'name':'Slovak'}
 }
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
@@ -110,6 +110,19 @@ def getCSS():
         data = file.read().replace('\n', ' ')
 
     return data
+
+languages = dict()
+language_list = glob.glob("translations/*.json")
+
+for lang in language_list:
+
+    filename = lang.split('/')
+    print(filename)
+    lang_code = filename[1].split('.')[0]
+
+    with open(lang, 'r', encoding='utf8') as file:
+        print(lang_code)
+        languages[lang_code] = json.loads(file.read())
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
