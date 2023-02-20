@@ -2,13 +2,31 @@
 {% block content_placeholder %}
 <div>
     Bonjour! <br>
-    {{ gettext('about-message-1') }}<br>
-    {{ gettext('about-message-2') }} 🙁. {{ gettext('about-message-3') }}<br>
-    {{ gettext('about-message-4') }} 🍪, {{ gettext('about-message-5') }}<br>
-    {{ gettext('about-message-6') }}<br>
+    <p data-i18n="about-message-1">{{ gettext('about-message-1') }}</br></p>
+    <p data-i18n="about-message-2">{{ gettext('about-message-2') }} </p>
+    <p>🙁.</p>
+    <p data-i18n="about-message-3">{{ gettext('about-message-3') }}<br></p>
+    <p data-i18n="about-message-4">{{ gettext('about-message-4') }} </p>
+    <p>🍪,</p>
+    <p data-i18n="about-message-5">{{ gettext('about-message-5') }}<br></p>
+    <p data-i18n="about-message-6">{{ gettext('about-message-6') }}<br></p>
     Enjoy & Have fun🍷!
 </div>
 <div>
-    <button id="confirm">{{ gettext('about-agree') }}</button>
+    <button id="confirm" data-i18n="about-agree">{{ gettext('about-agree') }}</button>
 </div>
+<script>
+    $(document).ready(function () {
+
+        fetch("/lang/sk").then((response) => response.json()).then((messages) => {
+            $.i18n().load(messages, 'sk');
+            $.i18n().locale = 'sk';
+            setTimeout(function () {
+                $('html').i18n();
+                document.documentElement.setAttribute('lang', 'sk');
+            }, 5000);
+        });
+
+    });
+</script>
 {% endblock %}
