@@ -134,6 +134,7 @@ def langInit():
             languages[lang_code] = json.loads(file.read())
             app.config['LANGUAGES'].update({lang_code: {'name': languages[lang_code]['@metadata']['name']}})
 
+langInit()
+
 if __name__ == "__main__":
-    langInit()
     app.run(host='0.0.0.0')
