@@ -18,6 +18,7 @@ div {
     font-size: 45px;
 }
 
+select,
 button,
 table,
 input {
@@ -88,6 +89,14 @@ img {
     padding: 1rem;
     box-sizing: border-box;
     z-index: 2;
+}
+
+.language {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    text-shadow: none;
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.05);
+    float: right;
 }
 
 .home-btn {

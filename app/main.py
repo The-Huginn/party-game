@@ -79,6 +79,17 @@ def ready():
 def defaultHandler(e):
     return render_template('404.html'), 404
 
+@app.route('/lang/<string:lang>', methods=['GET'])
+def translation(lang):
+    resp = make_response(send_from_directory('i18n', lang + '.json'))
+    resp.set_cookie('lang', lang)
+    return resp
+
+@app.route('/lang', methods=['GET'])
+def languages():
+    return app.config['LANGUAGES']
+
+
 ######################
 # General game moves #
 ######################
@@ -112,13 +123,7 @@ def getCSS():
         data = file.read().replace('\n', ' ')
 
     return data
-
-@app.route('/lang/<string:lang>', methods=['GET'])
-def translation(lang):
-    resp = make_response(send_from_directory('i18n', lang + '.json'))
-    resp.set_cookie('lang', lang)
-    return resp
-
+    
 # Set up supported languages
 def langInit():
     app.config['LANGUAGES'] = dict()
