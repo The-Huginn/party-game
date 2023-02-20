@@ -15,18 +15,4 @@
 <div>
     <button id="confirm" data-i18n="about-agree">{{ gettext('about-agree') }}</button>
 </div>
-<script>
-    $(document).ready(function () {
-
-        fetch("/lang/sk").then((response) => response.json()).then((messages) => {
-            $.i18n().load(messages, 'sk');
-            $.i18n().locale = 'sk';
-            setTimeout(function () {
-                $('html').i18n();
-                document.documentElement.setAttribute('lang', 'sk');
-            }, 5000);
-        });
-
-    });
-</script>
 {% endblock %}
