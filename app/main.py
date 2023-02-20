@@ -112,6 +112,12 @@ def getCSS():
 
     return data
 
+@app.route('/lang/<string:lang>', methods=['GET'])
+def translation(lang):
+    resp = make_response(send_from_directory('i18n', lang + '.json'))
+    resp.set_cookie('lang', lang)
+    return resp
+
 # Set up supported languages
 def langInit():
     app.config['LANGUAGES'] = dict()
