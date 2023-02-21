@@ -151,6 +151,33 @@ function updateCss(defaultCss=true) {
 
 }
 
+function updateLanguages() {
+
+    $.ajax({
+        url: "/lang",
+        type: "get",
+        
+        success: function (response) {
+            $.each(response, function(k,v) {
+                $("#language").append(`<option value=${k}>
+                                        ${v['name']}
+                                        </option>`);
+            })
+        }
+    });
+}
+
+function languageChange() {
+    var lang = $("#language").val();
+    fetch("/lang/" + lang).then((response) => response.json()).then((messages) => {
+        $.i18n().load(messages, lang);
+        $.i18n().locale = lang;
+        $('body').i18n();
+        document.documentElement.setAttribute('lang', lang);
+    });
+
+}
+
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -171,4 +198,5 @@ $(document).ready(function() {
     homeAction();
     updateListeners();
     updateCss();
+    updateLanguages();
 });

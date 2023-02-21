@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" class="area">
 
 <head>
     <title>Party drinking game</title>
@@ -26,10 +26,15 @@
 
 
 <body>
-    <div class="area", id="area">
+    <div id="area">
         <div class="home">
+            
             <button class="home-btn"><img alt="Home" style="z-index: -1;" src="{{url_for('static', filename='image/home-button.png')}}"></button>
             <p id="title"></p>
+            
+            <select class="language" id="language" onchange="languageChange()">
+            </select>
+
         </div>
 
         <div class="context" id="content_placeholder">
