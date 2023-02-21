@@ -4,18 +4,4 @@
     <h1 data-i18n="error-title">{{ gettext('error-title') }}</h1>
     <p data-i18n="error-message-1">{{ gettext('error-message-1') }}</p> <a href="https://game.thehuginn.com" data-i18n="error-game">{{ gettext('error-game') }}</a>
     <p data-i18n="error-message-2">{{ gettext('error-message-2') }}</p> <a href="https://thehuginn.com" data-i18n="error-main-page">{{ gettext('error-main-page') }}</a>
-    <script>
-        $(document).ready(function () {
-    
-            fetch("/lang/sk").then((response) => response.json()).then((messages) => {
-                $.i18n().load(messages, 'sk');
-                $.i18n().locale = 'sk';
-                setTimeout(function () {
-                    $('html').i18n();
-                    document.documentElement.setAttribute('lang', 'sk');
-                }, 5000);
-            });
-    
-        });
-    </script>
 {% endblock %}
