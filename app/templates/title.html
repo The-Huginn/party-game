@@ -1,6 +1,6 @@
 <script>
     {% if title is defined %}
-        $("#title").html("{{ title }}");
+        $("#title").html("{{ gettext(title) }}").attr('data-i18n', '{{ title }}');
     {% else %}
         $("#title").html("  ");
     {% endif %}

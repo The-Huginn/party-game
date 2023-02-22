@@ -13,11 +13,11 @@ def categories():
 
     if (len(categories) == 0):
         flash(gettext('py-one-category'))
-        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('py-lobby'))
+        return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title='py-lobby')
 
     service.setCategories(game, categories)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title='py-lobby')
 
 @task_page.route('/addPlayer', methods=['POST'])
 def addPlayer():
@@ -27,7 +27,7 @@ def addPlayer():
     if not service.addPlayer(game, name):
         flash(gettext('py-add-player-fail'))
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title='py-lobby')
 
 @task_page.route('/removePlayer', methods=['DELETE'])
 def removePlayer():
@@ -36,7 +36,7 @@ def removePlayer():
 
     service.removePlayer(game, index)
 
-    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title=gettext('py-lobby'))
+    return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title='py-lobby')
 
 @task_page.route('/TaskMode', methods=['POST'])
 def taskMode():
@@ -52,4 +52,4 @@ def taskMode():
     else:
         game = service.resetTaskGame(game)
     
-    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title=gettext('py-category'))
+    return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title='py-category')

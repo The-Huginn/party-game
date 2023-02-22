@@ -37,7 +37,7 @@ babel.init_app(app, locale_selector=get_locale)
 @app.route('/gameMode', methods=['POST', 'GET'])
 def gameMode():
     if request.method == 'GET':
-        return render_template('mode-selection.html', title=gettext('py-game-mode'))
+        return render_template('mode-selection.html', title='py-game-mode')
 
     gameID = request.form['gameID']
     if service.getGame(gameID) != None and service.getGame(gameID).continueGame():
@@ -47,14 +47,14 @@ def gameMode():
        resp.set_cookie('gameID', gameID)
        return resp
         
-    resp = make_response(render_template('mode-selection.html', title=gettext('py-game-mode')))
+    resp = make_response(render_template('mode-selection.html', title='py-game-mode'))
     resp.set_cookie('gameID', gameID)
 
     return resp
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home-page.html', title=gettext('py-unique-game-name'))
+    return render_template('home-page.html', title='py-unique-game-name')
 
 @app.route('/')
 def hello_world():
