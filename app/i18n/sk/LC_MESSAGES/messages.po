@@ -124,7 +124,6 @@ msgid "error-game"
 msgstr "Hru"
 
 #: templates/404.html:6
-#, fuzzy
 msgid "error-message-2"
 msgstr "Inak sa vráďte na hlávnu stránku"
 

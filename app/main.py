@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, make_response, url_for, send_from_directory
+from flask import Flask, request, session, render_template, make_response, url_for, send_from_directory
 from flask_babel import Babel, gettext
 from services.GameService import GameService
 import secrets, glob, json
@@ -29,11 +29,7 @@ def static_seo():
     return send_from_directory(app.static_folder, request.path[1:])
 
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
-    # lang = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
-    # resp = make_response(lang)
-    # resp.set_cookie('lang', lang)
-    # return resp
+    return session.get('language', request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
 
 babel.init_app(app, locale_selector=get_locale)
 
@@ -81,9 +77,10 @@ def defaultHandler(e):
 
 @app.route('/lang/<string:lang>', methods=['GET'])
 def translation(lang):
-    resp = make_response(send_from_directory('i18n', lang + '.json'))
-    resp.set_cookie('lang', lang)
-    return resp
+    if lang in app.config['LANGUAGES']:
+        session['language'] = lang
+        
+    return send_from_directory('i18n', lang + '.json')
 
 @app.route('/lang', methods=['GET'])
 def languages():
@@ -123,7 +120,7 @@ def getCSS():
         data = file.read().replace('\n', ' ')
 
     return data
-    
+
 # Set up supported languages
 def langInit():
     app.config['LANGUAGES'] = dict()
