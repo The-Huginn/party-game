@@ -10,6 +10,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['DEBUG'] = False
 app.config['TESTING'] = False
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'i18n'
+app.config['SESSION_COOKIE_SAMESITE'] = "None"
+app.config['SESSION_COOKIE_SECURE'] = True
 
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
