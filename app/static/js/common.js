@@ -154,7 +154,7 @@ function updateCss(defaultCss=true) {
 function updateLanguages() {
 
     $.ajax({
-        url: "/lang",
+        url: "/languages",
         type: "get",
         
         success: function (response) {
@@ -162,6 +162,16 @@ function updateLanguages() {
                 $("#language").append(`<option value=${k}>
                                         ${v['name']}
                                         </option>`);
+            });
+
+            // for setting session language as selected
+            $.ajax({
+                url: "/language",
+                type: "get",
+
+                success: function(response) {
+                    $("#language").val(response);
+                }
             })
         }
     });
@@ -169,7 +179,7 @@ function updateLanguages() {
 
 function languageChange() {
     var lang = $("#language").val();
-    fetch("/lang/" + lang).then((response) => response.json()).then((messages) => {
+    fetch("/language/" + lang).then((response) => response.json()).then((messages) => {
         $.i18n().load(messages, lang);
         $.i18n().locale = lang;
         $('body').i18n();

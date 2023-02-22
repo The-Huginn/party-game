@@ -28,6 +28,7 @@ app.register_blueprint(pub_page)
 def static_seo():
     return send_from_directory(app.static_folder, request.path[1:])
 
+@app.route('/language')
 def get_locale():
     return session.get('language', request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
 
@@ -75,14 +76,14 @@ def ready():
 def defaultHandler(e):
     return render_template('404.html'), 404
 
-@app.route('/lang/<string:lang>', methods=['GET'])
+@app.route('/language/<string:lang>', methods=['GET'])
 def translation(lang):
     if lang in app.config['LANGUAGES']:
         session['language'] = lang
-        
+
     return send_from_directory('i18n', lang + '.json')
 
-@app.route('/lang', methods=['GET'])
+@app.route('/languages', methods=['GET'])
 def languages():
     return app.config['LANGUAGES']
 
