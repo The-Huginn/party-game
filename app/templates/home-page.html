@@ -3,9 +3,9 @@
 {% block content %}
 
 <form id="game_form">
-    {{ gettext('game-name') }}:<br>
+    <p data-i18n="game-name">{{ gettext('game-name') }}</p>:<br>
     <input type="text" id="gameName"></input>
-    <button id="button">{{ gettext('start') }}</button>
+    <button id="button" data-i18n="start">{{ gettext('start') }}</button>
 </form>
 
 {% endblock %}

@@ -3,9 +3,9 @@
 {% block content %}
 
 <form id="player_form">
-    {{ gettext('add-player') }}:<br>
+    <p data-i18n="add-player">{{ gettext('add-player') }}</p>:<br>
     <input type="text" id="playerName"></input>
-    <button id="addPlayer">{{ gettext('add') }}</button>
+    <button id="addPlayer" data-i18n="add">{{ gettext('add') }}</button>
 </form>
 
 <table class="child" id="table">
@@ -15,7 +15,7 @@
     <tr>
         <td>{{i}}</td>
         <td>{{players[i]}}</td>
-        <td><button class="removeButton", id="{{i}}">{{ gettext('remove') }}</button></td>
+        <td><button class="removeButton", id="{{i}}" data-i18n="remove">{{ gettext('remove') }}</button></td>
 
         {%endfor%}
 
@@ -24,7 +24,7 @@
 </table>
 
 <form id="startGame">
-    <button id="startButton">{{ gettext('start') }}</button>
+    <button id="startButton" data-i18n="start">{{ gettext('start') }}</button>
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>

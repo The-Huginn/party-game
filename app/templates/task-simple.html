@@ -89,10 +89,10 @@
 
 {% block footer %}
 {% if timer is defined %}
-<button id="startTimer" onclick="startTimer();">{{ gettext('start-time') }}</button>
+<button id="startTimer" onclick="startTimer();" data-i18n="start-time">{{ gettext('start-time') }}</button>
 {% endif %}
 {% if noButton is not defined %}
-<button id="nextMove">{{ gettext('next-task') }}</button>
+<button id="nextMove" data-i18n="next-task">{{ gettext('next-task') }}</button>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 

@@ -2,6 +2,6 @@
 
 {% block header %}
     {% if currentPlayer is defined %}
-    {{ gettext('player-turn') }} {{currentPlayer}}
+    <p data-i18n="player-turn">{{ gettext('player-turn') }}</p> {{currentPlayer}}
     {% endif %}
 {% endblock %}

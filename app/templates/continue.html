@@ -2,9 +2,9 @@
 
 {% block content %}
 <div>
-    {{ gettext('game-detected') }}<br>
-    <button onclick="continueGame()">{{ gettext('continue') }}</button>
-    <button onclick="discardOldGame()">{{ gettext('new-game-anyway') }}</button>
+    <p data-i18n="game-detected">{{ gettext('game-detected') }}</p><br>
+    <button onclick="continueGame()" data-i18n="continue">{{ gettext('continue') }}</button>
+    <button onclick="discardOldGame()" data-i18n="new-game-anyway">{{ gettext('new-game-anyway') }}</button>
 </div>
 
 {% endblock %}
