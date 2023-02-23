@@ -10,8 +10,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['DEBUG'] = False
 app.config['TESTING'] = False
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'i18n'
-app.config['SESSION_COOKIE_SAMESITE'] = "None"
-app.config['SESSION_COOKIE_SECURE'] = True
+# app.config['SESSION_COOKIE_SAMESITE'] = "None"
+# app.config['SESSION_COOKIE_SECURE'] = True
 
 secret = secrets.token_urlsafe(32)
 app.secret_key = secret
@@ -32,7 +32,7 @@ def static_seo():
 
 @app.route('/language')
 def get_locale():
-    return session.get('language', request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+    return request.cookies.get('language', request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
 
 babel.init_app(app, locale_selector=get_locale)
 
@@ -80,10 +80,12 @@ def defaultHandler(e):
 
 @app.route('/language/<string:lang>', methods=['GET'])
 def translation(lang):
+    resp = make_response(send_from_directory('i18n', lang + '.json'))
+    
     if lang in app.config['LANGUAGES']:
-        session['language'] = lang
+        resp.set_cookie('language', lang)
 
-    return send_from_directory('i18n', lang + '.json')
+    return resp
 
 @app.route('/languages', methods=['GET'])
 def languages():
