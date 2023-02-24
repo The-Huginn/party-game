@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 class Game(ABC):
     TASK_PATH = "/etc/backend/"
+    CSS_PATH = "/static/css/"
     DELTA = timedelta(days=1)
 
     def __init__(self, name, timestamp) -> None:

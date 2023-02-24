@@ -15,7 +15,7 @@ class TaskGame(Game):
                 tasks = [],
                 currentTask = 0,
                 selected = set(),
-                css = "/static/css/default.css"):
+                css = Game.CSS_PATH + "default.css"):
         super().__init__(name, timestamp)
         self.players = players
         self.currentPlayer = currentPlayer
@@ -186,7 +186,7 @@ class TaskGame(Game):
             toDelete = toDelete + 1
             self.nextTask()
 
-        self.css = "/static/css/" + task.getCSS() + ".css"
+        self.css = Game.CSS_PATH + task.getCSS() + ".css"
 
         template = task.template
         args = task.templateArgs(self)

@@ -73,11 +73,11 @@ class PubGame(Game):
     # Some temporary solution
     def getCSS(self):
         if self.currentTask % 3 == 0:
-            return "/static/css/single.css"
+            return Game.CSS_PATH + "single.css"
         elif self.currentTask % 3 == 1:
-            return "/static/css/duo.css"
+            return Game.CSS_PATH + "duo.css"
 
-        return "/static/css/all.css"
+        return Game.CSS_PATH + "all.css"
 
     def getID(self):
         return self.name
