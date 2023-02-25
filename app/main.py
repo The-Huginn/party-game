@@ -45,9 +45,9 @@ def gameMode():
     if service.getGame(gameID) != None and service.getGame(gameID).continueGame():
         # We can continue previously played game
 
-       resp = make_response(render_template('continue.html'))
-       resp.set_cookie('gameID', gameID)
-       return resp
+        resp = make_response(render_template('continue.html'))
+        resp.set_cookie('gameID', gameID)
+        return resp
         
     resp = make_response(render_template('mode-selection.html', title='py-game-mode'))
     resp.set_cookie('gameID', gameID)
@@ -56,7 +56,7 @@ def gameMode():
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home-page.html', title='py-unique-game-name')
+    return render_template('home-page.html', title='py-unique-game-name', gameID=request.cookies.get('gameID', ''))
 
 @app.route('/')
 def hello_world():
