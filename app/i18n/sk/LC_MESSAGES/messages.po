@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-02-20 13:11+0100\n"
+"POT-Creation-Date: 2023-02-25 11:32+0100\n"
 "PO-Revision-Date: 2023-02-20 13:05+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sk\n"
@@ -18,33 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.11.0\n"
 
-#: main.py:42 main.py:52
-msgid "py-game-mode"
-msgstr "Vyber si mód hry"
-
-#: main.py:59
-msgid "py-unique-game-name"
-msgstr "Vyber si unikátne meno hry"
-
 #: endpoints/TaskGameEndpoints.py:15
 msgid "py-one-category"
 msgstr "Vyber aspoň jednu kategóriu"
-
-#: endpoints/TaskGameEndpoints.py:16 endpoints/TaskGameEndpoints.py:20
-#: endpoints/TaskGameEndpoints.py:30 endpoints/TaskGameEndpoints.py:39
-#: entities/TaskGame.py:125
-msgid "py-lobby"
-msgstr "Lobby pre hráčov"
 
 #: endpoints/TaskGameEndpoints.py:28
 msgid "py-add-player-fail"
 msgstr ""
 "Nepodarilo sa pridať hráča. Skontrolujte, že hráč neexistuje a jeho meno "
 "má viac ako 2 znaky."
-
-#: endpoints/TaskGameEndpoints.py:55
-msgid "py-category"
-msgstr "Vyber kategóriu"
 
 #: entities/PubGame.py:48
 msgid "py-rules"
@@ -103,6 +85,10 @@ msgstr "Úloha číslo"
 msgid "py-lobby-failed"
 msgstr "Nebuď alkoholik, nájdi si ešte aspoň jedného hráča"
 
+#: entities/TaskGame.py:125
+msgid "py-lobby"
+msgstr "Lobby pre hráčov"
+
 #: entities/TaskGame.py:171
 msgid "py-tasks-done"
 msgstr "Už žiadne ďalšie úlohy neostali."
@@ -144,23 +130,29 @@ msgstr ""
 "Poprosím Vás nehľadajte iné hry prehľadávaním mien a nekazte tak zábavu "
 "iným, inak sa budete musieť eventuélne prihlasovať"
 
-#: templates/about.html:6
+#: templates/about.html:8
 msgid "about-message-3"
 msgstr "A to nikto nechce."
 
-#: templates/about.html:7
+#: templates/about.html:9
 msgid "about-message-4"
 msgstr "Zároveň asi musím upozorniť, že používam"
 
-#: templates/about.html:7
+#: templates/about.html:11
 msgid "about-message-5"
 msgstr "čiže pri pokračovaní potvrdzujete, že ich môžem používať."
 
-#: templates/about.html:8
+#: templates/about.html:12
 msgid "about-message-6"
+msgstr ""
+"Na koniec, napriek tomu, že nie som proti myšlienke viac ako 2 pohlaví, tak táto hra to nepodporuje. "
+"Pokiaľ sa ťa to týka, tak sa bojím, že nič sa s tým nedá robiť 🤷 ."
+
+#: templates/about.html:13
+msgid "about-message-7"
 msgstr "Hlavne pite s rozumom a myslite na maminy!"
 
-#: templates/about.html:12
+#: templates/about.html:17
 msgid "about-agree"
 msgstr "Potvrdzujem"
 
@@ -219,4 +211,13 @@ msgstr "Hráč na rade"
 #: templates/task-simple.html:92
 msgid "start-time"
 msgstr "Spustiť časovač"
+
+#~ msgid "py-game-mode"
+#~ msgstr "Vyber si mód hry"
+
+#~ msgid "py-unique-game-name"
+#~ msgstr "Vyber si unikátne meno hry"
+
+#~ msgid "py-category"
+#~ msgstr "Vyber kategóriu"
 
