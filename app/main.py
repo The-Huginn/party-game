@@ -1,7 +1,7 @@
 from flask import Flask, request, session, render_template, make_response, url_for, send_from_directory
 from flask_babel import Babel, gettext
 from services.GameService import GameService
-import secrets, glob, json
+import secrets, glob, json, string, random
 
 
 app = Flask(__name__)
@@ -54,9 +54,17 @@ def gameMode():
 
     return resp
 
+def randomGameID():
+    gameID = ''
+    for i in range(0, 2):
+        gameID = gameID + '-' if i != 0 else ''
+        gameID = gameID + ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))
+    
+    return gameID
+
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home-page.html', title='py-unique-game-name', gameID=request.cookies.get('gameID', ''))
+    return render_template('home-page.html', title='py-unique-game-name', gameID=request.cookies.get('gameID', randomGameID()))
 
 @app.route('/')
 def hello_world():
