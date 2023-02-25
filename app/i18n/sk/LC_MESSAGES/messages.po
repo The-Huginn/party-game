@@ -212,12 +212,12 @@ msgstr "Hráč na rade"
 msgid "start-time"
 msgstr "Spustiť časovač"
 
-#~ msgid "py-game-mode"
-#~ msgstr "Vyber si mód hry"
+msgid "py-game-mode"
+msgstr "Vyber si mód hry"
 
-#~ msgid "py-unique-game-name"
-#~ msgstr "Vyber si unikátne meno hry"
+msgid "py-unique-game-name"
+msgstr "Vyber si unikátne meno hry"
 
-#~ msgid "py-category"
-#~ msgstr "Vyber kategóriu"
+msgid "py-category"
+msgstr "Vyber kategóriu"
 

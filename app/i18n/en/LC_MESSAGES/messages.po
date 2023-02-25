@@ -212,12 +212,12 @@ msgstr "Turn of player"
 msgid "start-time"
 msgstr "Start Timer"
 
-#~ msgid "py-game-mode"
-#~ msgstr "Choose game mode"
+msgid "py-game-mode"
+msgstr "Choose game mode"
 
-#~ msgid "py-unique-game-name"
-#~ msgstr "Choose your unique game name"
+msgid "py-unique-game-name"
+msgstr "Choose your unique game name"
 
-#~ msgid "py-category"
-#~ msgstr "Choose categories"
+msgid "py-category"
+msgstr "Choose categories"
 
