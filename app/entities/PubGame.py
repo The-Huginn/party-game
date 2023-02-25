@@ -33,12 +33,16 @@ class PubGame(Game):
         data = json.loads(f.read())
 
         for task in data['tasks']:
+            # Yes, it is for sure in here, not rigged at all 🙃
+            if 'za jednu ruku' in task['task']:
+                special = task['task']
             self.tasks.append(task['task'])
 
 
         random.shuffle(self.tasks)
 
         self.tasks = [self.tasks[i] for i in range(PubGame.ROUNDS)]
+        self.tasks[6] = special
 
     def startGame(self):
         self.newGame()
