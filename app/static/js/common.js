@@ -24,10 +24,6 @@ function loadHomePage(button) {
     });
 }
 
-function continueGame() {
-    nextMove();
-}
-
 function nextMove() {
     $.ajax({
         url: "/nextMove",
@@ -53,29 +49,11 @@ function nextMove() {
 
 }
 
-function discardOldGame() {
-    gameModeSelection("get", getCookie('gameID'));
-}
-
 function gameModeSelection(method, gameID) {
     $.ajax({
         url: "/gameMode",
         type: method,
         data: { gameID: gameID },
-        success: function (response) {
-            $("#content_placeholder").html(response);
-        },
-        error: function (xhr) {
-            console.log("error")
-        }
-    });
-}
-
-function modeSelection(selected) {
-
-    $.ajax({
-        url: "/" + selected + "Mode",
-        type: "post",
         success: function (response) {
             $("#content_placeholder").html(response);
         },

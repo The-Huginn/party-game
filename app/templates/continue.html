@@ -3,8 +3,8 @@
 {% block content %}
 <div>
     <p data-i18n="game-detected">{{ gettext('game-detected') }}</p><br>
-    <button onclick="continueGame()" data-i18n="continue">{{ gettext('continue') }}</button>
-    <button onclick="discardOldGame()" data-i18n="new-game-anyway">{{ gettext('new-game-anyway') }}</button>
+    <button onclick="nextMove();" data-i18n="continue">{{ gettext('continue') }}</button>
+    <button onclick="gameModeSelection('get', getCookie('gameID'));" data-i18n="new-game-anyway">{{ gettext('new-game-anyway') }}</button>
 </div>
 
 {% endblock %}
