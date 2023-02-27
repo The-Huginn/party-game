@@ -69,7 +69,7 @@ class PubGame(Game):
         if self.currentTask >= PubGame.ROUNDS:
             return self.template, {'title' : gettext('py-congratulations'), 'task' : gettext('py-finished') + ' ' + str(PubGame.ROUNDS) + ' ' + gettext('py-pub-game'), 'noButton' : ''}
 
-        args = {'task' : self.tasks[self.currentTask], 'title' : gettext('py-task-number') + ' ' + str(self.currentTask + 1)}
+        args = {'task' : self.tasks[self.currentTask], 'title' : gettext('py-task-number'), 'title_static' : str(self.currentTask + 1)}
         self.currentTask = self.currentTask + 1
 
         return self.template, args
