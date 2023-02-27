@@ -1,6 +1,7 @@
 from flask import Flask, request, session, render_template, make_response, url_for, send_from_directory
 from flask_babel import Babel, gettext
 from services.GameService import GameService
+from datetime import datetime, timedelta
 import secrets, glob, json, string, random
 
 
@@ -46,11 +47,11 @@ def gameMode():
         # We can continue previously played game
 
         resp = make_response(render_template('continue.html'))
-        resp.set_cookie('gameID', gameID)
+        resp.set_cookie('gameID', gameID, expires=datetime.utcnow() + timedelta(weeks=55))
         return resp
         
     resp = make_response(render_template('mode-selection.html', title='py-game-mode'))
-    resp.set_cookie('gameID', gameID)
+    resp.set_cookie('gameID', gameID, expires=datetime.utcnow() + timedelta(weeks=55))
 
     return resp
 
@@ -91,7 +92,7 @@ def translation(lang):
     resp = make_response(send_from_directory('i18n', lang + '.json'))
     
     if lang in app.config['LANGUAGES']:
-        resp.set_cookie('language', lang)
+        resp.set_cookie('language', lang, expires=datetime.utcnow() + timedelta(weeks=55))
 
     return resp
 
