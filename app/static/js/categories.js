@@ -12,7 +12,6 @@ $("#categories_form").submit(function (e) {
         data: {categories: array},
         success: function (response) {
             $("#content_placeholder").html(response);
-            updateListeners();
         },
         error: function (xhr) {
             console.log(xhr);
