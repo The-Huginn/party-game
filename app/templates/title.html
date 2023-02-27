@@ -2,13 +2,13 @@
     {% if title is defined %}
         $("#title").html("{{ gettext(title) }}").attr('data-i18n', '{{ title }}');
     {% else %}
-        $("#title").html("  ");
+        $("#title").html("").attr('data-i18n', '');
     {% endif %}
 
     {% if title_static is defined %}
         $("#title-static").html("{{ title_static }}");
     {% else %}
-        $("#title-static").html("  ");
+        $("#title-static").html("");
     {% endif %}
 </script>
 {% block content_placeholder %}
