@@ -5,35 +5,6 @@ function homeAction() {
 
 const myAudioContext = new AudioContext();
 
-// Confirm about page
-function confirmAction() {
-    loadHomePage($("#confirm"));
-}
-
-function categoriesAction() {
-    $("#categories_form").submit(function (e) {
-        e.preventDefault();
-
-        var array = [];
-        $("input:checkbox:checked").each(function() {
-            array.push($(this).val());
-        });
-
-        $.ajax({
-            url: "/categories",
-            type: "post",
-            data: {categories: array},
-            success: function (response) {
-                $("#content_placeholder").html(response);
-                updateListeners();
-            },
-            error: function (xhr) {
-                console.log(xhr);
-            }
-        })
-    })
-}
-
 function loadHomePage(button) {
     button.on('click', function (e) {
         e.preventDefault();
@@ -43,7 +14,6 @@ function loadHomePage(button) {
             type: "get",
             success: function (response) {
                 $("#content_placeholder").html(response);
-                updateListeners();
             },
             error: function (xhr) {
                 console.log("error")
@@ -51,17 +21,6 @@ function loadHomePage(button) {
         });
 
         updateCss();
-    });
-}
-
-// Game start
-function gameStart() {
-    $("#game_form").submit(function (e) {
-        e.preventDefault();
-    
-        var name = $("#gameName").val();
-    
-        gameModeSelection("post", name);
     });
 }
 
@@ -105,18 +64,11 @@ function gameModeSelection(method, gameID) {
         data: { gameID: gameID },
         success: function (response) {
             $("#content_placeholder").html(response);
-            updateListeners();
         },
         error: function (xhr) {
             console.log("error")
         }
     });
-}
-
-function updateListeners() {
-    gameStart();
-    categoriesAction();
-    confirmAction();
 }
 
 function modeSelection(selected) {
@@ -126,7 +78,6 @@ function modeSelection(selected) {
         type: "post",
         success: function (response) {
             $("#content_placeholder").html(response);
-            updateListeners();
         },
         error: function (xhr) {
             console.log("error")
@@ -206,7 +157,6 @@ function getCookie(cname) {
 
 $(document).ready(function() {
     homeAction();
-    updateListeners();
     updateCss();
     updateLanguages();
 });

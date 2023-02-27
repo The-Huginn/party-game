@@ -1,0 +1,1 @@
+loadHomePage($("#confirm"));
