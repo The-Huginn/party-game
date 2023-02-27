@@ -122,7 +122,7 @@ class TaskGame(Game):
             return 'lobby.html', {
                 'players': self.getPlayers(),
                 'len': len(self.getPlayers()),
-                'title': gettext('py-lobby')
+                'title': 'py-lobby'
             }
 
         self.newGame()
