@@ -12,7 +12,7 @@ def categories():
     categories = request.form.getlist('categories[]')
 
     if (len(categories) == 0):
-        flash(gettext('py-one-category'))
+        flash('py-one-category')
         return render_template('categories.html', categories=TaskGame.getAllCategories(), selected=game.getCategories(), title='py-lobby')
 
     service.setCategories(game, categories)
@@ -25,7 +25,7 @@ def addPlayer():
     game = service.getGame(request.cookies.get('gameID'))
     
     if not service.addPlayer(game, name):
-        flash(gettext('py-add-player-fail'))
+        flash('py-add-player-fail')
 
     return render_template('lobby.html', players=game.getPlayers(), len=len(game.getPlayers()), title='py-lobby')
 

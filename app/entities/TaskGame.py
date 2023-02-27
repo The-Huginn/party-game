@@ -118,7 +118,7 @@ class TaskGame(Game):
 
     def startGame(self):
         if len(self.getPlayers()) < 2:
-            flash(gettext('py-lobby-failed'))
+            flash('py-lobby-failed')
             return 'lobby.html', {
                 'players': self.getPlayers(),
                 'len': len(self.getPlayers()),
