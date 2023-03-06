@@ -73,6 +73,9 @@ class PubGame(Game):
         self.currentTask = self.currentTask + 1
 
         return self.template, args
+    
+    def currentMove(self):
+        return super().currentMove()
 
     # Some temporary solution
     def getCSS(self):

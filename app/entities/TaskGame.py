@@ -226,6 +226,9 @@ class TaskGame(Game):
             })
             
         return template, args
+    
+    def currentMove(self):
+        return super().nextMove()
 
     def getCSS(self):
         return self.css

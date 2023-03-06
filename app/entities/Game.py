@@ -41,7 +41,14 @@ class Game(ABC):
     @abstractmethod
     def nextMove(self):
         """
-        Returns tuple of (template, args)
+        Returns tuple of (template, args) for next Move
+        """
+        self.lastAccess = datetime.utcnow()
+
+    @abstractmethod
+    def currentMove(self):
+        """
+        Returns tuple of (template, args) for current Move
         """
         self.lastAccess = datetime.utcnow()
 
