@@ -27,7 +27,7 @@ class PubGame(Game):
     def newGame(self):
         super().newGame()
         self.tasks.clear()
-        self.currentTask = 0
+        self.currentTask = -1
 
         f = open(f'{Game.TASK_PATH}tasks/PubMode/pub.json', "r")
         data = json.loads(f.read())
@@ -62,20 +62,24 @@ class PubGame(Game):
                         <p><br>''' + gettext('py-pub-message-6') + '''</p>
                         '''
         }
-
-    def nextMove(self):
-        super().nextMove()
-
+    
+    def getMove(self):
         if self.currentTask >= PubGame.ROUNDS:
             return self.template, {'title' : gettext('py-congratulations'), 'task' : gettext('py-finished') + ' ' + str(PubGame.ROUNDS) + ' ' + gettext('py-pub-game'), 'noButton' : ''}
 
         args = {'task' : self.tasks[self.currentTask], 'title' : 'py-task-number', 'title_static' : str(self.currentTask + 1)}
-        self.currentTask = self.currentTask + 1
 
         return self.template, args
+
+    def nextMove(self):
+        super().nextMove()
+
+        self.currentTask = self.currentTask + 1
+        return self.getMove()
     
     def currentMove(self):
-        return super().currentMove()
+        super().currentMove()
+        return self.getMove()
 
     # Some temporary solution
     def getCSS(self):
