@@ -49,3 +49,6 @@ class GameService():
         ], ordered=True)
 
         return template, args
+    
+    def currentMove(self, game: Game):
+        return game.currentMove()

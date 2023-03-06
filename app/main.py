@@ -112,6 +112,13 @@ def start():
     template, args = service.startGame(game)
     return make_response(render_template(template, **args))
 
+@app.route('/currentMove', methods=['GET'])
+def currentMove():
+    game = service.getGame(request.cookies.get('gameID'))
+
+    template, args = service.currentMove(game)
+    return make_response(render_template(template, **args))
+
 @app.route('/nextMove', methods=['GET'])
 def nextMove():
     game = service.getGame(request.cookies.get('gameID'))
