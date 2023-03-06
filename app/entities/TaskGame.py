@@ -70,7 +70,7 @@ class TaskGame(Game):
         super().newGame()
         self.tasks.clear()
         self.currentPlayer = 0
-        self.currentTask = 0
+        self.currentTask = -1
 
         perPlayerTasks = list()
         for filename in self.selected:
@@ -161,6 +161,7 @@ class TaskGame(Game):
     # We do not delete unresolvable / removable task. This is done in service
     def nextMove(self):
         super().nextMove()
+
         self.currentPlayer = self.currentPlayer + 1
         if (self.currentPlayer >= len(self.players)):
             self.currentPlayer = 0
@@ -175,8 +176,14 @@ class TaskGame(Game):
 
         toDelete = 0
 
+        # We delete removable task retrospectively
+        if self.currentTask != -1:
+            if self.tasks[self.currentTask].canRemove():
+                toDelete = toDelete + 1
+
         beforeTask = self.currentTask
         while True:
+            self.nextTask()
             task = self.tasks[self.currentTask]
             if task.canResolve(self):
                 break
@@ -184,16 +191,11 @@ class TaskGame(Game):
             # If we overflow we should have only resolvable tasks
             # Note in case this does no hold true service has to be updated
             toDelete = toDelete + 1
-            self.nextTask()
 
         self.css = Game.CSS_PATH + task.getCSS() + ".css"
 
         template = task.template
         args = task.templateArgs(self)
-
-        if self.tasks[self.currentTask].canRemove():
-            toDelete = toDelete + 1
-
 
         # We prepare query for updating DB
         self.nextSerialize['$set'].update({
@@ -202,20 +204,21 @@ class TaskGame(Game):
         })
         if toDelete > 0:
 
-            if self.currentTask >= len(self.tasks) - toDelete:
-                self.tasks = self.tasks[:len(self.tasks) - toDelete]
-                self.reshuffle()
+            # We need to delete only the last one
+            if beforeTask > self.currentTask:
+                self.tasks = self.tasks[:len(self.tasks) - 1]
                 self.nextSerialize['$set'].update({"currentTask" : 0})
+                self.reshuffle()
             else:
                 while toDelete > 0:
                     if '$unset' not in self.nextSerialize:
-                        self.nextSerialize['$unset'] = {f"tasks.{self.currentTask - toDelete + 1}" : 1}
+                        self.nextSerialize['$unset'] = {f"tasks.{self.currentTask - toDelete}" : 1}
                     else:
-                        self.nextSerialize['$unset'].update({f"tasks.{self.currentTask - toDelete + 1}" : 1})
+                        self.nextSerialize['$unset'].update({f"tasks.{self.currentTask - toDelete}" : 1})
                     toDelete = toDelete - 1
             
         else:
-            self.nextTask()
+            # self.nextTask()
 
             # Check for reshuffle
             if beforeTask > self.currentTask:
@@ -228,7 +231,20 @@ class TaskGame(Game):
         return template, args
     
     def currentMove(self):
-        return super().nextMove()
+        super().nextMove()
+
+        if len(self.tasks) == 0:
+            args = {
+                "task" : gettext('py-tasks-done'),
+                "noButton" : True
+            }
+            return "single-simple.html", args
+
+        task = self.tasks[self.currentTask]
+        template = task.template
+        args = task.templateArgs(self)
+
+        return template, args
 
     def getCSS(self):
         return self.css
