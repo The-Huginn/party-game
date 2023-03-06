@@ -7,6 +7,26 @@ accesslog = '-'
 errorlog = '-'
 loglevel='debug'
 
+import logging
+from gunicorn import glogging
+
+
+class CustomGunicornLogger(glogging.Logger):
+
+    def setup(self, cfg):
+        super().setup(cfg)
+
+        # Add filters to Gunicorn logger
+        logger = logging.getLogger("gunicorn.access")
+        logger.addFilter(HealthCheckFilter())
+
+class HealthCheckFilter(logging.Filter):
+    def filter(self, record):
+        return 'GET /health' not in record.getMessage() and 'GET /ready' not in record.getMessage()
+
+accesslog = '-'
+logger_class = CustomGunicornLogger
+
 def pre_request(worker, req):
     if req.path == '/health' or req.path == '/ready':
         return
