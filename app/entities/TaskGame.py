@@ -167,7 +167,7 @@ class TaskGame(Game):
             self.currentPlayer = 0
 
         self.nextSerialize = super().serializeNextMove()
-        if len(self.tasks) == 0:
+        if len(self.tasks) == 1 and self.tasks[0].canRemove():
             args = {
                 "task" : gettext('py-tasks-done'),
                 "noButton" : True
