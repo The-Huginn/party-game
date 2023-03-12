@@ -8,6 +8,7 @@ function modeSelection(selected) {
         },
         error: function (xhr) {
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 }

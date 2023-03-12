@@ -15,6 +15,7 @@ $("#categories_form").submit(function (e) {
         },
         error: function (xhr) {
             console.log(xhr);
-        }
+        },
+        timeout: 5000
     });
 });

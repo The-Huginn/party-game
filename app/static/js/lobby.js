@@ -13,7 +13,8 @@ $("#player_form").submit(function (e) {
         error: function (xhr) {
             //Do Something to handle error
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 });
 
@@ -40,7 +41,8 @@ $("#startGame").submit(function (e) {
         error: function (xhr) {
             //Do Something to handle error
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 });
 
@@ -61,6 +63,7 @@ $(".removeButton").on('click', function (e) {
         error: function (xhr) {
             //Do Something to handle error
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 });

@@ -13,6 +13,7 @@ $("#submit_form").submit(function (e) {
         error: function (xhr) {
             //Do Something to handle error
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 });

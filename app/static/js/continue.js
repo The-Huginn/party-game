@@ -15,6 +15,7 @@ function currentMove() {
         },
         error: function (xhr) {
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 }

@@ -17,7 +17,8 @@ function loadHomePage(button) {
             },
             error: function (xhr) {
                 console.log("error")
-            }
+            },
+            timeout: 5000
         });
 
         updateCss();
@@ -44,7 +45,8 @@ function nextMove() {
         error: function (xhr) {
             //Do Something to handle error
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 
 }
@@ -59,7 +61,8 @@ function gameModeSelection(method, gameID) {
         },
         error: function (xhr) {
             console.log("error")
-        }
+        },
+        timeout: 5000
     });
 }
 
@@ -75,7 +78,8 @@ function updateCss(defaultCss=true) {
         },
         error: function (xhr) {
             console.log("error" + xhr.responseType);
-        }
+        },
+        timeout: 5000
     });
 
 }
@@ -100,9 +104,17 @@ function updateLanguages() {
 
                 success: function(response) {
                     $("#language").val(response);
-                }
+                },
+                error: function(e) {
+                    console.log("error");
+                },
+                timeout: 5000
             })
-        }
+        },
+        error: function(e) {
+            console.log("error");
+        },
+        timeout: 5000
     });
 }
 
