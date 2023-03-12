@@ -23,25 +23,25 @@
             <br>
         </div>
         {% endfor %}
-        <div class="category-wrapper" style="margin-left: 75px;">
+        <div style="text-align: center;">
             <button id="button" style="width: 100px;" data-i18n="next">{{ gettext('next') }}</button>
         </div>
-        <script>
-            $(document).ready(function () {
-                $('.info-wrapper').css('height', $('.category-wrapper').height());
-                $('.category').css('height', $('.category-wrapper').height());
-
-                var max = 0;
-                $('.category-wrapper').each(function (i) {
-                    if (max < $(this).width()) {
-                        max = $(this).width();
-                    }
-                });
-                console.log(max);
-                $('.category-wrapper').css('width', max);
-            });
-        </script>
     </form>
+    <script>
+        $(document).ready(function () {
+            $('.info-wrapper').css('height', $('.category-wrapper').height());
+            $('.category').css('height', $('.category-wrapper').height());
+
+            var max = 0;
+            $('.category-wrapper').each(function (i) {
+                if (max < $(this).width()) {
+                    max = $(this).width();
+                }
+            });
+            console.log(max);
+            $('.category-wrapper').css('width', max);
+        });
+    </script>
 </div>
 
 <script src="{{ url_for('static', filename='js/categories.js') }}" defer></script>
