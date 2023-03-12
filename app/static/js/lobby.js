@@ -47,7 +47,6 @@ $("#startGame").submit(function (e) {
 });
 
 $(".removeButton").on('click', function (e) {
-    console.log("clicled")
     e.preventDefault();
 
     var obj = $(this);
