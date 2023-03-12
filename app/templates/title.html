@@ -2,7 +2,7 @@
     {% if title is defined %}
         $("#title").html("{{ gettext(title) }}").attr('data-i18n', '{{ title }}');
     {% else %}
-        $("#title").html("").attr('data-i18n', '');
+        $("#title").html("").attr('data-i18n', ' ');
     {% endif %}
 
     {% if title_static is defined %}
