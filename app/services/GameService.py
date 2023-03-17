@@ -12,8 +12,16 @@ class GameService():
         HOST = os.environ.get('DB_HOST')
         PORT = os.environ.get('DB_PORT')
         # NAME = os.environ.get('DB_NAME')
-        client = MongoClient(f'mongodb://{USER}:{PASSWORD}@{HOST}:{PORT}')
-        self.db = client['party-game']['games']
+        self.client = MongoClient(f'mongodb://{USER}:{PASSWORD}@{HOST}:{PORT}', serverSelectionTimeoutMS=10, connectTimeoutMS=5000)
+        self.db = self.client['party-game']['games']
+
+    def checkConnection(self):
+        try:
+            self.client.server_info()
+        except Exception:
+            return False
+        
+        return True
 
     def deleteGame(self, _id):
         return self.db.delete_one({"_id" : _id})

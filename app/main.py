@@ -81,6 +81,8 @@ def health():
 
 @app.route('/ready', methods=['GET'])
 def ready():
+    if not service.checkConnection():
+        return 'KO', 500
     return 'OK', 200
 
 @app.errorhandler(404)
