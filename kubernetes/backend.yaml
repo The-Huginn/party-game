@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: backend-pv
+  name: backend
   labels:
     app: drinking-game
 spec:
-  storageClassName: backend-manual
+  storageClassName: backend-storage
   capacity:
     storage: 128Mi
   accessModes:
@@ -18,11 +18,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: backend-pvc
+  name: backend
   labels:
     app: drinking-game
 spec:
-  storageClassName: backend-manual
+  storageClassName: backend-storage
   accessModes:
     - ReadWriteOnce
   resources:
@@ -48,12 +48,12 @@ spec:
         app: backend
     spec:
       volumes:
-        - name: backend-pv-storage
+        - name: backend-storage
           persistentVolumeClaim:
-            claimName: backend-pvc
+            claimName: backend
       containers:
       - name: backend
-        image: localhost/game
+        image: registry.localhost/game
         imagePullPolicy: Always
 
         env:
@@ -68,9 +68,9 @@ spec:
               name: db-credentials
               key: password
         - name: DB_HOST
-          value: $(MONGO_SVC_SERVICE_HOST)
+          value: $(MONGO_SERVICE_HOST)
         - name: DB_PORT
-          value: $(MONGO_SVC_SERVICE_PORT)
+          value: $(MONGO_SERVICE_PORT)
         
         resources:
           limits:
@@ -99,14 +99,14 @@ spec:
         
         volumeMounts:
         - mountPath: /etc/backend
-          name: backend-pv-storage
+          name: backend-storage
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-svc
+  name: backend
   labels:
     app: drinking-game
 spec:

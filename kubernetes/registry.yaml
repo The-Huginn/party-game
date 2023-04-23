@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  registry-auth
+  labels:
+    app: registry-auth
+spec:
+  storageClassName: registry-auth
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/bifrost/k3s-volumes/registry/auth
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name:  registry-auth
+  labels:
+    app: registry-auth
+spec:
+  storageClassName: registry-auth
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  registry-data
+  labels:
+    app: registry-data
+spec:
+  storageClassName: registry-data
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/bifrost/k3s-volumes/registry/data
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name:  registry-data
+  labels:
+    app: registry-data
+spec:
+  storageClassName: registry-data
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  registry
+  labels:
+    app: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  registry
+  template:
+    metadata:
+      labels:
+        app:  registry
+    spec:
+      volumes:
+        - name:  registry-data
+          persistentVolumeClaim:
+            claimName:  registry-data
+        - name:  registry-auth
+          persistentVolumeClaim:
+            claimName:  registry-auth
+      containers:
+      - name: registry
+        image: docker.io/library/registry:2
+        imagePullPolicy: Always
+        
+        env:
+        - name: REGISTRY_AUTH
+          value: htpasswd
+        - name: REGISTRY_AUTH_HTPASSWD_REALM
+          value: "Registry Realm"
+        - name: REGISTRY_AUTH_HTPASSWD_PATH
+          value: /auth/htpasswd
+        
+        resources:
+          limits:
+            memory: 256Mi
+            cpu: 300m
+          requests:
+            memory: 128Mi
+            cpu: 150m
+
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: /var/lib/registry
+          name:  registry-data
+        - mountPath: /auth
+          name: registry-auth
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name:  registry
+  labels:
+    app: registry
+spec:
+  type: ClusterIP
+  selector:
+    app:  registry
+  ports:
+  - port: 80
+    targetPort: 5000
+  externalIPs:
+  - 192.168.100.200

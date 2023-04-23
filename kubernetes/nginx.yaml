@@ -5,7 +5,7 @@ metadata:
 data:
   default.conf.template: |
       upstream backend {
-          server ${BACKEND_SVC_SERVICE_HOST}:${BACKEND_SVC_SERVICE_PORT};
+          server ${BACKEND_SERVICE_HOST}:${BACKEND_SERVICE_PORT};
       }
 
       server {
@@ -60,7 +60,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-svc
+  name: nginx
   labels:
     app: drinking-game
 spec:

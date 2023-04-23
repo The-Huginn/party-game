@@ -20,7 +20,7 @@ spec:
         path: /
         backend:
           service:
-            name: nginx-svc
+            name: nginx
             port: 
               number: 80
               
@@ -31,25 +31,36 @@ spec:
         path: /
         backend:
           service:
-            name: registry-svc
+            name: registry
             port: 
               number: 5000
               
-  - host: ergo.thehuginn.com
+  # - host: ergo.thehuginn.com
+  #   http:
+  #     paths:
+  #     - pathType: Prefix
+  #       path: /
+  #       backend:
+  #         service:
+  #           name: ergo-svc
+  #           port: 
+  #             number: 9053
+
+  - host: registry.localhost
     http:
       paths:
       - pathType: Prefix
         path: /
         backend:
           service:
-            name: ergo-svc
-            port: 
-              number: 9053
+            name: registry
+            port:
+              number: 5000
           
   tls:
     - hosts:
         - thehuginn.com
         - registry.thehuginn.com
-        - ergo.thehuginn.com
+        # - ergo.thehuginn.com
         - game.thehuginn.com
       secretName: thehuginn-com-tls

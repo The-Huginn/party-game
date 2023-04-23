@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name:  mongo-pv
+  name:  mongo
   labels:
     app: drinking-game
 spec:
-  storageClassName:  mongo-manual
+  storageClassName:  mongo
   capacity:
     storage: 2Gi
   accessModes:
@@ -18,11 +18,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  mongo-pvc
+  name:  mongo
   labels:
     app: drinking-game
 spec:
-  storageClassName:  mongo-manual
+  storageClassName:  mongo
   accessModes:
     - ReadWriteOnce
   resources:
@@ -48,9 +48,9 @@ spec:
         app:  mongo
     spec:
       volumes:
-        - name:  mongo-pv-storage
+        - name:  mongo-storage
           persistentVolumeClaim:
-            claimName:  mongo-pvc
+            claimName:  mongo
       containers:
       - name:  mongo
         image: mongo
@@ -80,14 +80,14 @@ spec:
         - containerPort: 27017
         volumeMounts:
         - mountPath: /data/db
-          name:  mongo-pv-storage
+          name:  mongo-storage
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name:  mongo-svc
+  name:  mongo
   labels:
     app: drinking-game
 spec:
