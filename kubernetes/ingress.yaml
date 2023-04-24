@@ -33,7 +33,7 @@ spec:
           service:
             name: registry
             port: 
-              number: 5000
+              number: 80
               
   # - host: ergo.thehuginn.com
   #   http:
@@ -55,7 +55,7 @@ spec:
           service:
             name: registry
             port:
-              number: 5000
+              number: 80
           
   tls:
     - hosts:
