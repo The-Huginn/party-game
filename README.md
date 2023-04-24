@@ -19,7 +19,7 @@ Please note, you will need to rewrite a bit more things especially domain name, 
 
 ## Registry
 
-* Add DNS entry for (usually `/etc/hosts`) `registry.localhost` to point to `192.168.100.200`
+* Add DNS entry for (usually `/etc/hosts`) `registry.localhost` to point to your public IP
 * Configure insecure container registry for your container runtime to accept `registry.localhost`.\
     For my setup I add the following into `/etc/containers/registries.conf`\
     `[[registry]]`\
