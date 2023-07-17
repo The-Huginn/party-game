@@ -20,7 +20,7 @@ spec:
         path: /
         backend:
           service:
-            name: nginx
+            name: game-service
             port: 
               number: 80
               

@@ -89,7 +89,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: game-service-postgres
 spec:
   type: ClusterIP
   ports:
