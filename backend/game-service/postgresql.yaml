@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name:  game-service-postgresql
+  labels:
+    app: party-game
+spec:
+  storageClassName:  game-service-postgresql
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/bifrost/k3s-volumes/game-service/postgresql
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name:  game-service-postgresql
+  labels:
+    app: party-game
+spec:
+  storageClassName:  game-service-postgresql
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: game-service-postgres
+  labels:
+    app: party-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: game-service-postgres
+  template:
+    metadata:
+      labels:
+        service: game-service-postgres
+    spec:
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: game-service-postgresql
+
+      containers:
+      - name: postgres
+        image: postgres:15.1
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: game-service-postgresql
+                key: database-name
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: game-service-postgresql
+                key: database-username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: game-service-postgresql
+                key: database-password
+
+        resources:
+          limits:
+            memory: 256Mi
+            cpu: 250m
+          requests:
+            memory: 128Mi
+            cpu: 100m
+
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name:  storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    service: game-service-postgres

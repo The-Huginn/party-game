@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cloudflared
+  name: cloudflared
+spec:
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+      - name: cloudflared
+        image: cloudflare/cloudflared:2022.7.1
+        # image: ghcr.io/maggie0002/cloudflared:2022.3.0
+        imagePullPolicy: Always
+        args: ["tunnel", "--no-autoupdate", "run", "--token=${token}"]
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 60
