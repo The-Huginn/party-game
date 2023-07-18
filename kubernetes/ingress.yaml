@@ -7,9 +7,6 @@ metadata:
     cert-manager.io/issuer: prod-issuer
     cert-manager.io/issuer-kind: OriginIssuer
     cert-manager.io/issuer-group: cert-manager.k8s.cloudflare.com
-    # dns record
-    # external-dns.alpha.kubernetes.io/hostname: thehuginn.com
-    # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     
 spec:
   rules:
@@ -20,7 +17,7 @@ spec:
         path: /
         backend:
           service:
-            name: game-service
+            name: svelte-frontend
             port: 
               number: 80
               
@@ -35,17 +32,6 @@ spec:
             port: 
               number: 80
               
-  # - host: ergo.thehuginn.com
-  #   http:
-  #     paths:
-  #     - pathType: Prefix
-  #       path: /
-  #       backend:
-  #         service:
-  #           name: ergo-svc
-  #           port: 
-  #             number: 9053
-
   - host: registry.localhost
     http:
       paths:
@@ -61,6 +47,5 @@ spec:
     - hosts:
         - thehuginn.com
         - registry.thehuginn.com
-        # - ergo.thehuginn.com
         - game.thehuginn.com
       secretName: thehuginn-com-tls
