@@ -595,14 +595,14 @@ public class TestGameService extends AbstractResolutionTaskTest {
     @Order(14)
     void testCycleTasks(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("First task")
-                        .repeat(Task.Repeat.ALWAYS)
-                        .type(Task.Type.SINGLE)
-                        .build())
+                .repeat(Task.Repeat.ALWAYS)
+                .type(Task.Type.SINGLE)
+                .build())
                 .invoke(task1 -> asserter.putData("task1", task1)));
         asserter.execute(() -> taskService.createTask(new Task.Builder("Second task")
-                        .repeat(Task.Repeat.ALWAYS)
-                        .type(Task.Type.SINGLE)
-                        .build())
+                .repeat(Task.Repeat.ALWAYS)
+                .type(Task.Type.SINGLE)
+                .build())
                 .invoke(task1 -> asserter.putData("task2", task1)));
 
         asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
@@ -618,17 +618,17 @@ public class TestGameService extends AbstractResolutionTaskTest {
 
         asserter.execute(() -> {
             ObjectMapper mapper = new ObjectMapper();
-                String first = given()
-                        .cookie(new Cookie.Builder("gameId", GAME).build())
-                        .cookie(new Cookie.Builder("locale", "en").build())
-                        .queryParam("resolutionContext", resolutionContext)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .when()
-                        .put("/task/next")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.OK)
-                        .extract()
-                        .asString();
+            String first = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
 
             // second task
             String second = given()
@@ -658,7 +658,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 String expectedTask = i % 2 == 0 ? first : second;
                 try {
                     String taskTag = mapper.readTree(expectedTask).get("data").get("task").asText();
-                    Assertions.assertEquals(mapper.readTree(expectedTask).get("data").get(taskTag).asText(), mapper.readTree(receivedTask).get("data").get(taskTag).asText());
+                    Assertions.assertEquals(mapper.readTree(expectedTask).get("data").get(taskTag).asText(),
+                            mapper.readTree(receivedTask).get("data").get(taskTag).asText());
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }

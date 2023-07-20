@@ -1,4 +1,5 @@
 . ~/.configs/registry.config
+. ~/.configs/github.config
 
 git pull origin
 
@@ -14,9 +15,10 @@ done
 echo -e '\033[1mRolling out update for frontend...\033[0m'
 kubectl rollout restart deployment svelte-frontend
 
-cd ~/party-game/population/tasks && git pull origin
+rm -rf ~/party-game/population/tasks && mkdir ~/party-game/population/tasks
+cd ~/party-game/population/tasks && git clone https://The-Huginn:${GITHUB_TOKEN}@github.com/The-Huginn/party-game-tasks.git .
 
-echo -e '\033[1mWaiting for pods to activate for 10 seconds...\033[0m'
-sleep 10
+echo -e '\033[1mWaiting for pods to activate for 15 seconds...\033[0m'
+sleep 15
 echo -e '\033[1mPopulating tasks...\033[0m'
 cd ~/party-game/population && python3.11 populate.py
