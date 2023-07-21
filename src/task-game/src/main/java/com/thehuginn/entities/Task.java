@@ -49,6 +49,11 @@ public class Task extends PanacheEntity {
         public int price = 1;
 
         public Price() {}
+
+        public Price(boolean enabled, int price) {
+            this.enabled = enabled;
+            this.price = price;
+        }
     }
 
     @Embeddable
@@ -58,12 +63,18 @@ public class Task extends PanacheEntity {
         public int duration = 60;
 
         public Timer() {}
+
+        public Timer(boolean enabled, int duration) {
+            this.enabled = enabled;
+            this.duration = duration;
+        }
     }
 
     public Task() {}
 
-
     public static class Builder {
+
+        private long id;
 
         private List<String> task;
 
@@ -106,8 +117,14 @@ public class Task extends PanacheEntity {
             return this;
         }
 
+        public Builder id(long id) {
+            this.id = id;
+            return this;
+        }
+
         public Task build() {
             Task builtTask = new Task();
+            builtTask.id = id;
             builtTask.task = task;
             builtTask.type = type;
             builtTask.repeat = repeat;

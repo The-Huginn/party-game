@@ -46,7 +46,7 @@ public class TaskService {
     @PUT
     @Path("/{id}")
     @WithTransaction
-    public Uni<Task> updateTask(@RestPath Long id, Task updatedTask) {
+    public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
         return Task.<Task>findById(id)
                 .onItem()
                 .transform(task -> {
