@@ -21,7 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 @TestHTTPEndpoint(GameService.class)
 public class TestNonExistingGame {
 
-    private final static String ID = "foo";
+    private static final String ID = "foo";
 
     @BeforeEach
     @RunOnVertxContext

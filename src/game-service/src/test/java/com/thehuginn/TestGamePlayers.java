@@ -1,7 +1,6 @@
 package com.thehuginn;
 
 import com.thehuginn.entities.Game;
-import com.thehuginn.service.GameService;
 import com.thehuginn.service.PlayerService;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.panache.mock.PanacheMock;
@@ -24,7 +23,7 @@ import static org.hamcrest.CoreMatchers.is;
 @TestHTTPEndpoint(PlayerService.class)
 public class TestGamePlayers {
 
-    private final static String ID = "foo";
+    private static final String ID = "foo";
 
     @BeforeEach
     @RunOnVertxContext

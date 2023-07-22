@@ -9,9 +9,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import org.jboss.resteasy.reactive.RestCookie;
-import org.jboss.resteasy.reactive.RestResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/")
