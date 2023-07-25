@@ -1,5 +1,6 @@
 package com.thehuginn;
 
+import com.thehuginn.entities.Category;
 import com.thehuginn.entities.Task;
 import com.thehuginn.services.TaskService;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -11,19 +12,29 @@ import io.quarkus.test.vertx.UniAsserter;
 import io.restassured.http.ContentType;
 import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.Assertions;
-import org.mockito.Mockito;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.util.Arrays;
-
+import static com.thehuginn.util.EntityCreator.createTask;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 @TestHTTPEndpoint(TaskService.class)
 public class TestTaskService {
+
+    @BeforeEach
+    @RunOnVertxContext
+    public void setup(UniAsserter asserter) {
+        asserter.execute(() -> {
+            Task.deleteAll();
+            Category.deleteAll();
+        });
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 
     @Test
     @RunOnVertxContext
@@ -70,7 +81,8 @@ public class TestTaskService {
     public void testGetTask(UniAsserter asserter) {
         asserter.execute(() -> {
             PanacheMock.mock(Task.class);
-            createTask(1L);
+            Task task = createTask(1L);
+            Mockito.when(Task.<Task>findById(1L)).thenReturn(Uni.createFrom().item(task));
 
             given()
                     .pathParam("id", 1L)
@@ -98,7 +110,9 @@ public class TestTaskService {
     public void updateTask(UniAsserter asserter) {
         asserter.execute(() -> {
             PanacheMock.mock(Task.class);
-            createTask(1L);
+
+            Task task = createTask(1L);
+            Mockito.when(Task.<Task>findById(1L)).thenReturn(Uni.createFrom().item(task));
 
             given()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -177,18 +191,5 @@ public class TestTaskService {
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    private void createTask(long id) {
-        Task task = new Task.Builder(Arrays.asList("drink responsibly", "<player_1>"))
-                .id(id)
-                .type(Task.Type.ALL)
-                .repeat(Task.Repeat.PER_PLAYER)
-                .frequency((short) 3)
-                .price(new Task.Price(true, 1))
-                .timer(new Task.Timer(true, 15))
-                .build();
-
-        Mockito.when(Task.<Task>findById(id)).thenReturn(Uni.createFrom().item(task));
     }
 }

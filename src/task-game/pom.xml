@@ -61,6 +61,11 @@
       <artifactId>quarkus-hibernate-validator</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.thehuginn</groupId>
+      <artifactId>game-service</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-panache-mock</artifactId>
       <scope>test</scope>

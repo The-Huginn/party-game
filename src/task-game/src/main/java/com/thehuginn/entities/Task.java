@@ -2,6 +2,8 @@ package com.thehuginn.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
+import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -133,5 +135,12 @@ public class Task extends PanacheEntity {
             builtTask.timer = timer;
             return builtTask;
         }
+    }
+
+    public static Uni<List<Task>> findByIds(List<Task> tasks) {
+        List<Long> ids = tasks.stream()
+                .map(task -> task.id)
+                .toList();
+        return Task.<Task>find("From Task t where t.id IN :ids", Parameters.with("ids", ids)).list();
     }
 }
