@@ -1,5 +1,6 @@
 package com.thehuginn.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
@@ -11,6 +12,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
@@ -43,6 +45,11 @@ public class Task extends PanacheEntity {
 
     @JsonProperty
     public Timer timer = new Timer();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    private Category category;
 
     @Embeddable
     public static class Price {
@@ -126,7 +133,6 @@ public class Task extends PanacheEntity {
 
         public Task build() {
             Task builtTask = new Task();
-            builtTask.id = id;
             builtTask.task = task;
             builtTask.type = type;
             builtTask.repeat = repeat;

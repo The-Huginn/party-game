@@ -4,20 +4,15 @@ import com.thehuginn.entities.Category;
 import com.thehuginn.entities.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.panache.mock.PanacheMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
-import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,21 +20,28 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 public class TestCategoryService {
 
-    @BeforeEach
+    @AfterEach
     @RunOnVertxContext
-    public void setup(UniAsserter asserter) {
-        asserter.execute(() -> {
-            PanacheMock.mock(Task.class);
-            PanacheMock.mock(Category.class);
-        });
+    public void teardown(UniAsserter asserter) {
+        asserter.execute(() -> Task.deleteAll());
+        asserter.execute(() -> Category.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
+    @BeforeEach
+    @RunOnVertxContext
+    public void setup(UniAsserter asserter) {
+        asserter.execute(() -> Task.deleteAll());
+        asserter.execute(() -> Category.deleteAll());
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+
     @Test
+    @Order(1)
     @RunOnVertxContext
     public void testCreateEmptyCategory(UniAsserter asserter) {
-        asserter.execute(() -> {
-
+        asserter.execute(() ->
             given()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("""
@@ -48,25 +50,22 @@ public class TestCategoryService {
                                 "description": "first test"
                             }
                             """)
-                    .when().post("/category")
+                    .when().post("category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("name", is("test"),
                             "description", is("first test"),
-                            "tasks.size()", is(0));
-        });
+                            "tasks.size()", is(0))
+        );
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
+    @Order(2)
     @RunOnVertxContext
     public void testCreateCategory(UniAsserter asserter) {
-        asserter.execute(() -> {
-            List<Task> taskList = new ArrayList<>(Arrays.asList(EntityCreator.createTask(1L), EntityCreator.createTask(2L)));
-            Mockito.when(Task.findByIds(Mockito.anyList())).thenReturn(Uni.createFrom().item(taskList));
-        });
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-
+        asserter.execute(() -> EntityCreator.createTask().persistAndFlush());
+        asserter.execute(() -> EntityCreator.createTask().persistAndFlush());
         asserter.execute(() -> {
             String tasks = """
                                     {
@@ -118,7 +117,6 @@ public class TestCategoryService {
                             "description", is("first test"),
                             "tasks.size()", is(2));
         });
-
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 }

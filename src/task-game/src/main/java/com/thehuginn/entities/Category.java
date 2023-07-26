@@ -7,7 +7,6 @@ import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
@@ -24,8 +23,7 @@ public class Category extends PanacheEntity {
     public String description;
 
     @JsonProperty
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     public List<Task> tasks = new ArrayList<>();
 
     public Category() {}

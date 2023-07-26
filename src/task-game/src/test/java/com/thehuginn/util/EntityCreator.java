@@ -6,9 +6,8 @@ import java.util.Arrays;
 
 public class EntityCreator {
 
-    public static Task createTask(long id) {
+    public static Task createTask() {
         Task task = new Task.Builder(Arrays.asList("drink responsibly", "<player_1>"))
-                .id(id)
                 .type(Task.Type.ALL)
                 .repeat(Task.Repeat.PER_PLAYER)
                 .frequency((short) 3)

@@ -33,10 +33,7 @@ public class CategoryService {
     @POST
     @WithTransaction
     public Uni<Category> createCategory(Category category) {
-        return Uni.createFrom()
-                .item(category.tasks)
-                .onItem()
-                .transformToUni(tasks -> Task.findByIds(category.tasks))
+        return Task.findByIds(category.tasks)
                 .onItem()
                 .transform(tasks -> {
                     if (category.tasks.size() != tasks.size()) {
