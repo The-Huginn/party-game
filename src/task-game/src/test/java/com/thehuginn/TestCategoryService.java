@@ -11,13 +11,16 @@ import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestCategoryService {
 
     @AfterEach
@@ -53,7 +56,8 @@ public class TestCategoryService {
                     .when().post("category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is("test"),
+                    .body("id", is(1),
+                            "name", is("test"),
                             "description", is("first test"),
                             "tasks.size()", is(0))
         );
@@ -113,7 +117,8 @@ public class TestCategoryService {
                     .when().post("category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is("test"),
+                    .body("id", is(2),
+                            "name", is("test"),
                             "description", is("first test"),
                             "tasks.size()", is(2));
         });

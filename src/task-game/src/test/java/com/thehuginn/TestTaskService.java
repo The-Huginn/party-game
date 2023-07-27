@@ -11,8 +11,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static com.thehuginn.util.EntityCreator.createTask;
 import static io.restassured.RestAssured.given;
@@ -20,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 @TestHTTPEndpoint(TaskService.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestTaskService {
 
     @AfterEach
@@ -55,7 +58,8 @@ public class TestTaskService {
                     .when().post()
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("task.size()", is(1),
+                    .body("id", is(1),
+                            "task.size()", is(1),
                             "task[0]", is("test"),
                             "type", is("DUO"),
                             "repeat", is("PER_PLAYER"),
