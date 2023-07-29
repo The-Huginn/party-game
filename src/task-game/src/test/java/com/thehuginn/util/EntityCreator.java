@@ -1,8 +1,11 @@
 package com.thehuginn.util;
 
+import com.thehuginn.entities.Category;
 import com.thehuginn.entities.Task;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EntityCreator {
 
@@ -16,5 +19,21 @@ public class EntityCreator {
                 .build();
 
         return task;
+    }
+
+    public static Category createCategory(long... taskIds) {
+        Category category = new Category();
+        category.name = "name";
+        category.description = "description";
+        Set<Task> tasks = Arrays.stream(taskIds)
+                .mapToObj(value -> {
+                    Task task = createTask();
+                    task.id = value;
+
+                    return task;
+                })
+                .collect(Collectors.toSet());
+        category.tasks = tasks;
+        return category;
     }
 }

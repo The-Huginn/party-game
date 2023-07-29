@@ -63,7 +63,7 @@
     <dependency>
       <groupId>com.thehuginn</groupId>
       <artifactId>game-service</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

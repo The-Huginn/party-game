@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.List;
+import java.util.Set;
 
 @Path("/category")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,8 +27,9 @@ import java.util.List;
 public class CategoryService {
 
     @GET
-    public Uni<List<Category>> getCategories() {
-        return Category.listAll();
+    @WithTransaction
+    public Uni<List<Category.CategoryDto>> getCategories() {
+        return Category.findAll().project(Category.CategoryDto.class).list();
     }
 
     @POST
@@ -35,23 +37,28 @@ public class CategoryService {
     public Uni<Category> createCategory(Category category) {
         return Task.findByIds(category.tasks)
                 .onItem()
-                .transform(tasks -> {
+                .<Category>transformToUni(tasks -> {
                     if (category.tasks.size() != tasks.size()) {
                         throw new WebApplicationException("Unable to retrieve all tasks");
                     }
                     category.tasks = tasks;
-                    return category;
+                    return category.persist();
                 })
                 .onItem()
-                .<Category>transformToUni(category1 -> category1.persist())
+                .call(category1 -> Task.addToCategory(category1.id, category1.tasks))
                 .onFailure()
                 .invoke(throwable -> Log.error(throwable));
     }
 
     @PUT
+    @Path("/{id}")
     @WithTransaction
-    public Uni<Category> updateCategory(Category category) {
-        return Category.<Category>findById(category.id)
+    public Uni<Category> updateCategory(@RestPath Long id, Category category) {
+        return Category.findByIdFetch(id)
+                .onItem()
+                .call(category1 -> Task.deleteFromCategory(category1.id, category1.tasks))
+                .onItem()
+                .call(category1 -> Task.addToCategory(category1.id, category.tasks))
                 .onItem()
                 .transform(category1 -> {
                     category1.name = category.name;
@@ -66,14 +73,16 @@ public class CategoryService {
     @Path("/{id}")
     @WithTransaction
     public Uni<Boolean> deleteCategory(@RestPath long id) {
-        return Category.deleteById(id);
+        return Category.getTasks(id)
+                .onItem()
+                .call(tasks -> Task.deleteFromCategory(id, tasks))
+                .onItem()
+                .transformToUni(tasks -> Category.deleteById(id));
     }
 
     @GET
     @Path("/{id}")
-    public Uni<List<Task>> getTasks(@RestPath long id) {
-        return Category.<Category>findById(id)
-                .onItem()
-                .transformToUni(Category::getTasks);
+    public Uni<Set<Task>> getTasks(@RestPath long id) {
+        return Category.getTasks(id);
     }
 }

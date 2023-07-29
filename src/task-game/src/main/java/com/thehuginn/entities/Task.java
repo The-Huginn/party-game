@@ -16,6 +16,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 public class Task extends PanacheEntity {
@@ -49,7 +51,7 @@ public class Task extends PanacheEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore
-    private Category category;
+    public Category category;
 
     @Embeddable
     public static class Price {
@@ -83,6 +85,7 @@ public class Task extends PanacheEntity {
 
     public static class Builder {
 
+        private boolean setId = false;
         private long id;
 
         private List<String> task;
@@ -96,6 +99,8 @@ public class Task extends PanacheEntity {
         private Price price = new Price();
 
         private Timer timer = new Timer();
+
+        public Builder() {}
 
         public Builder(List<String> task) {
             this.task = task;
@@ -128,11 +133,15 @@ public class Task extends PanacheEntity {
 
         public Builder id(long id) {
             this.id = id;
+            this.setId = true;
             return this;
         }
 
         public Task build() {
             Task builtTask = new Task();
+            if (setId) {
+                builtTask.id = this.id;
+            }
             builtTask.task = task;
             builtTask.type = type;
             builtTask.repeat = repeat;
@@ -143,10 +152,31 @@ public class Task extends PanacheEntity {
         }
     }
 
-    public static Uni<List<Task>> findByIds(List<Task> tasks) {
+    public static Uni<Set<Task>> findByIds(Set<Task> tasks) {
         List<Long> ids = tasks.stream()
                 .map(task -> task.id)
                 .toList();
-        return Task.<Task>find("From Task t where t.id IN :ids", Parameters.with("ids", ids)).list();
+        return Task.<Task>find("From Task t where t.id IN :ids", Parameters.with("ids", ids))
+                .list()
+                .map(tasks1 -> new HashSet<>(tasks1));
+    }
+
+    public static Uni<Integer> addToCategory(Long id, Set<Task> tasks) {
+        return updateCategory(id, false, tasks);
+    }
+
+    public static Uni<Integer> deleteFromCategory(Long id, Set<Task> tasks) {
+        return updateCategory(id, true, tasks);
+    }
+
+    private static Uni<Integer> updateCategory(Long id, boolean delete, Set<Task> tasks) {
+        List<Long> taskIds = tasks.stream()
+                .map(task -> task.id)
+                .toList();
+
+        Parameters parameters = Parameters.with("id", delete ? null : id)
+                .and("ids", taskIds);
+
+        return Task.update("update from Task set category.id = :id where id in :ids", parameters);
     }
 }
