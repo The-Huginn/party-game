@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -120,37 +121,54 @@ public class TestCategoryService {
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1")))
                 .onItem()
-                .invoke(category -> asserter.putData("id", category.id)));
+                .invoke(category -> {
+                    asserter.putData("id", category.id);
+                    asserter.putData("category", category);
+                }));
+
         asserter.execute(() -> {
-            Category update = new Category();
-            update.description = "new";
-            update.tasks = Set.of(new Task.Builder().id((long) asserter.getData("task2")).build());
-            return new CategoryService().updateCategory((long) asserter.getData("id"), update);
+            long id = (long) asserter.getData("id");
+
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(String.format(categoryBody,
+                            "new name", "new description",
+                            String.format("{ \"id\": %s }", asserter.getData("task2"))
+                    ))
+                    .pathParam("id", id)
+                    .when().put("category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("id", is((int) id),
+                            "name", is("new name"),
+                            "description", is("new description"),
+                            "tasks.size()", is(1),
+                            "tasks[0].id", is((int)((long) asserter.getData("task2"))));
         });
 
-//        asserter.execute(() -> {
-//            long id = (long) asserter.getData("id");
-//
-//            given()
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .body(String.format(categoryBody,
-//                            "new name", "new description",
-//                            String.format("{ \"id\": %s }", asserter.getData("task2"))
-//                    ))
-//                    .pathParam("id", id)
-//                    .when().put("category/{id}")
-//                    .then()
-//                    .statusCode(RestResponse.StatusCode.OK)
-//                    .body("id", is((int) id),
-//                            "name", is("new name"),
-//                            "description", is("new description"),
-//                            "tasks.size()", is(1));
-////                            "tasks[0].id", is((int)((long) asserter.getData("task2"))));
-//        });
+        asserter.execute(() -> {
+            Set<Object> categories = given()
+                    .when()
+                    .get("/category")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .as(Set.class);
 
-        asserter.assertThat(() -> Category.findByIdFetch(asserter.getData("id")), category -> {
-            Assertions.assertEquals(category.tasks.size(), 1);
-            category.tasks.stream().forEach(task -> Assertions.assertEquals(task.id, (long) asserter.getData("task2")));
+            Assertions.assertEquals(categories.size(), 1);
+
+            LinkedHashMap<String, String> category = (LinkedHashMap<String, String>) categories.stream().findAny().orElseThrow(IllegalStateException::new);
+            Assertions.assertEquals(category.get("name"), "new name");
+            Assertions.assertEquals(category.get("description"), "new description");
+
+            given()
+                    .pathParam("id", (long) asserter.getData("id"))
+                    .when()
+                    .get("/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("$.size()", is(1),
+                            "[0].id", is((int) ((long) asserter.getData("task2"))));
         });
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -165,7 +183,6 @@ public class TestCategoryService {
         asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
-
         asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2"))
                 .<Category>persistAndFlush()
                 .onItem()
@@ -173,7 +190,7 @@ public class TestCategoryService {
                     asserter.putData("id", category.id);
                     asserter.putData("category", category);
                 }));
-        
+
         asserter.execute(() -> {
             long id = (long) asserter.getData("id");
             Boolean response = given()
@@ -193,6 +210,66 @@ public class TestCategoryService {
             Assertions.assertTrue(tasks.stream().allMatch(task ->
                     task.id == (long) asserter.getData("task1") ||
                             task.id == (long) asserter.getData("task2")));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(5)
+    @RunOnVertxContext
+    public void testGetCategories(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category1", category.id)));
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category2", category.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .when()
+                    .get("/category")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("$.size()", is(2),
+                            "[0].id",is((int) ((long) asserter.getData("category1"))),
+                            "[1].id",is((int) ((long) asserter.getData("category2"))));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(6)
+    @RunOnVertxContext
+    public void testGetCategoryTasks(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task1", task.id)));
+        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task2", task.id)));
+        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
+                .onItem()
+                .invoke(category -> {
+                    asserter.putData("id", category.id);
+                    asserter.putData("category", category);
+                }));
+
+        asserter.execute(() -> {
+
+            given()
+                    .pathParam("id", asserter.getData("id"))
+                    .when()
+                    .get("/category/{id}?sort=id")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("$.size()", is(2),
+                            "[0].id",is((int) ((long) asserter.getData("task1"))),
+                            "[1].id",is((int) ((long) asserter.getData("task2"))));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
