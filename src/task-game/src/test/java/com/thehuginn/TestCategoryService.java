@@ -1,6 +1,7 @@
 package com.thehuginn;
 
 import com.thehuginn.entities.Category;
+import com.thehuginn.entities.LocaleCategory;
 import com.thehuginn.entities.Task;
 import com.thehuginn.services.CategoryService;
 import com.thehuginn.util.EntityCreator;
@@ -19,10 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -40,7 +43,8 @@ public class TestCategoryService {
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
         asserter.execute(() -> Task.deleteAll());
-        asserter.execute(() -> Category.deleteAll());
+        asserter.execute(() -> Category.delete("id > 0"));
+        asserter.execute(() -> LocaleCategory.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -48,7 +52,8 @@ public class TestCategoryService {
     @RunOnVertxContext
     public void teardown(UniAsserter asserter) {
         asserter.execute(() -> Task.deleteAll());
-        asserter.execute(() -> Category.deleteAll());
+        asserter.execute(() -> Category.delete("id > 0"));
+        asserter.execute(() -> LocaleCategory.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -119,7 +124,8 @@ public class TestCategoryService {
         asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
-        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1")))
+        asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"))
+                .<Category>persistAndFlush()
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -155,11 +161,11 @@ public class TestCategoryService {
                     .extract()
                     .as(Set.class);
 
-            Assertions.assertEquals(categories.size(), 1);
+            Assertions.assertEquals(categories.size(), 2);
 
-            LinkedHashMap<String, String> category = (LinkedHashMap<String, String>) categories.stream().findAny().orElseThrow(IllegalStateException::new);
-            Assertions.assertEquals(category.get("name"), "new name");
-            Assertions.assertEquals(category.get("description"), "new description");
+            Assertions.assertTrue(categories.stream()
+                    .anyMatch(o -> ((LinkedHashMap<String, String>)o).get("name").equals("new name") &&
+                            ((LinkedHashMap<String, String>)o).get("description").equals("new description")));
 
             given()
                     .pathParam("id", (long) asserter.getData("id"))
@@ -234,9 +240,10 @@ public class TestCategoryService {
                     .get("/category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("$.size()", is(2),
-                            "[0].id",is((int) ((long) asserter.getData("category1"))),
-                            "[1].id",is((int) ((long) asserter.getData("category2"))));
+                    .body("$.size()", is(3),
+                            "[0].id",is(0),
+                            "[1].id",is((int) ((long) asserter.getData("category1"))),
+                            "[2].id",is((int) ((long) asserter.getData("category2"))));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -260,16 +267,235 @@ public class TestCategoryService {
                 }));
 
         asserter.execute(() -> {
-
-            given()
+            List tasks = given()
                     .pathParam("id", asserter.getData("id"))
                     .when()
-                    .get("/category/{id}?sort=id")
+                    .get("/category/{id}")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("$.size()", is(2),
-                            "[0].id",is((int) ((long) asserter.getData("task1"))),
-                            "[1].id",is((int) ((long) asserter.getData("task2"))));
+                    .extract()
+                    .as(List.class);
+
+            Assertions.assertEquals(tasks.size(), 2);
+            Assertions.assertTrue(tasks.stream()
+                    .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task1")) ||
+                            ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task2"))));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(7)
+    @RunOnVertxContext
+    public void testCreateCategoryTranslation(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> {
+                    asserter.putData("id", category.id);
+                    asserter.putData("category", category);
+                }));
+
+        asserter.execute(() -> {
+            given()
+                    .body(String.format("""
+                            {
+                            "category": {
+                            "id": "%s"
+                            },
+                            "name_content": "Default Category",
+                            "description_content": "Default English Category Description",
+                            "locale": "en"
+                            }""", asserter.getData("id")))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .post("/category/translation/")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("category", is((int) (long)asserter.getData("id")),
+                            "locale", is("en"),
+                            "name_content", startsWith("Default Category"),
+                            "description_content",startsWith("Default English Category Description"));
+
+            given()
+                    .body(String.format("""
+                            {
+                            "category": {
+                            "id": "%s"
+                            },
+                            "name_content": "Východzia Kategória",
+                            "description_content": "Popis Východzej Kategórie",
+                            "locale": "sk"
+                            }""", asserter.getData("id")))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .post("/category/translation/")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("category", is((int) (long)asserter.getData("id")),
+                            "locale", is("sk"),
+                            "name_content", startsWith("Východzia Kategória"),
+                            "description_content",startsWith("Popis Východzej Kategórie"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    private LocaleCategory createRandomLocaleCategory(long id, String locale) {
+        LocaleCategory localeCategory = new LocaleCategory();
+        Category category = new Category();
+        category.id = id;
+
+        localeCategory.locale = locale;
+        localeCategory.category = category;
+        localeCategory.name_content = "Default Category" + Math.random();
+        localeCategory.description_content = "Default English Category Description" + Math.random();
+
+        return localeCategory;
+    }
+
+    @Test
+    @Order(8)
+    @RunOnVertxContext
+    public void testGetCategoryTranslation(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id1", category.id)));
+
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id2", category.id)));
+
+        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id1"), "en")
+                .<LocaleCategory>persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
+
+        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id2"), "sk")
+                .<LocaleCategory>persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("sk_locale", localeCategory)));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id1"))
+                    .pathParam("locale", "en")
+                    .when()
+                    .get("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
+                            "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id2"))
+                    .pathParam("locale", "sk")
+                    .when()
+                    .get("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
+                            "description",is(((LocaleCategory) asserter.getData("sk_locale")).description_content));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(9)
+    @RunOnVertxContext
+    public void testUpdateCategoryTranslation(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id", category.id)));
+
+        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
+                .<LocaleCategory>persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
+
+        asserter.execute(() -> {
+            given()
+                    .body("""
+                            {
+                            "category": {
+                            "id": 20
+                            },
+                            "name_content": "Východzia Kategória",
+                            "description_content": "Popis Východzej Kategórie",
+                            "locale": "sk"
+                            }""")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "en")
+                    .when()
+                    .put("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name_content", is("Východzia Kategória"),
+                            "description_content",is("Popis Východzej Kategórie"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "en")
+                    .when()
+                    .get("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name", is("Východzia Kategória"),
+                            "description", is("Popis Východzej Kategórie"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(10)
+    @RunOnVertxContext
+    public void testDefaultCategoryTasks(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task1", task.id)));
+        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task2", task.id)));
+        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task3", task.id)));
+        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
+                .onItem()
+                .invoke(category -> {
+                    asserter.putData("id", category.id);
+                    asserter.putData("category", category);
+                }));
+
+        asserter.execute(() -> {
+            List tasks = given()
+                    .pathParam("id", 0)
+                    .when()
+                    .get("/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .as(List.class);
+
+            Assertions.assertEquals(tasks.size(), 1);
+            Assertions.assertTrue(tasks.stream()
+                    .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task3"))));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

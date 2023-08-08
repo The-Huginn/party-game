@@ -51,7 +51,7 @@ public class Task extends PanacheEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore
-    public Category category;
+    public Category category = Category.getDefaultInstance();
 
     @Embeddable
     public static class Price {

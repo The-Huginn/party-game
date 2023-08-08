@@ -14,6 +14,10 @@ import jakarta.persistence.OneToMany;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * We have a special Category with id 0. All Tasks without being
+ *  assigned to any Category fall under this `special` Category.
+ */
 @Entity
 public class Category extends PanacheEntity {
 
@@ -29,6 +33,12 @@ public class Category extends PanacheEntity {
     public Set<Task> tasks = new HashSet<>();
 
     public Category() {}
+
+    public static Category getDefaultInstance() {
+        Category category = new Category();
+        category.id = 0L;
+        return category;
+    }
 
     @JsonIgnore
     public static Uni<Set<Task>> getTasks(Long id) {

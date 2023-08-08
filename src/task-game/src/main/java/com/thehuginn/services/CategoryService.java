@@ -1,13 +1,16 @@
 package com.thehuginn.services;
 
 import com.thehuginn.entities.Category;
+import com.thehuginn.entities.LocaleCategory;
 import com.thehuginn.entities.Task;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -18,6 +21,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Path("/category")
@@ -84,5 +88,36 @@ public class CategoryService {
     @Path("/{id}")
     public Uni<Set<Task>> getTasks(@RestPath long id) {
         return Category.getTasks(id);
+    }
+
+    @GET
+    @Path("/translation/{id}/{locale}")
+    public Uni<Map<String, String>> getTranslation(@RestPath long id, @RestPath @DefaultValue("en") String locale) {
+        return LocaleCategory.translation(id, locale);
+    }
+
+    @POST
+    @Path("/translation/")
+    public Uni<LocaleCategory> createTranslation(LocaleCategory localeCategory) {
+        return Category.<Category>findById(localeCategory.category.id)
+                .onItem()
+                .transformToUni(category -> {
+                    localeCategory.category = category;
+                    return localeCategory.persistAndFlush();
+                });
+    }
+
+    @PUT
+    @Path("/translation/{id}/{locale}")
+    public Uni<LocaleCategory> updateTranslation(@RestPath long id, @RestPath String locale, LocaleCategory localeCategory) {
+        return LocaleCategory.<LocaleCategory>find("category.id = :id and locale = :locale", Parameters.with("id", id)
+                .and("locale", locale))
+                .firstResult()
+                .onItem()
+                .transformToUni(localeCategory1 -> {
+                    localeCategory1.name_content = localeCategory.name_content;
+                    localeCategory1.description_content = localeCategory.description_content;
+                    return localeCategory1.persistAndFlush();
+                });
     }
 }

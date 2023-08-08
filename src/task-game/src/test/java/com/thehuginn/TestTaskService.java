@@ -32,7 +32,7 @@ public class TestTaskService {
     @BeforeEach
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
-        asserter.execute(() -> Category.deleteAll());
+        asserter.execute(() -> Category.delete("id > 0"));
         asserter.execute(() -> Task.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -40,7 +40,7 @@ public class TestTaskService {
     @AfterEach
     @RunOnVertxContext
     public void teardown(UniAsserter asserter) {
-        asserter.execute(() -> Category.deleteAll());
+        asserter.execute(() -> Category.delete("id > 0"));
         asserter.execute(() -> Task.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
