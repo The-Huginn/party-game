@@ -483,6 +483,8 @@ public class TestCategoryService {
                     asserter.putData("category", category);
                 }));
 
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+
         asserter.execute(() -> {
             List tasks = given()
                     .pathParam("id", 0)
@@ -496,6 +498,35 @@ public class TestCategoryService {
             Assertions.assertEquals(tasks.size(), 1);
             Assertions.assertTrue(tasks.stream()
                     .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task3"))));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(11)
+    @RunOnVertxContext
+    public void testDefaultCategoryTranslation(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id", category.id)));
+
+        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
+                .<LocaleCategory>persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when()
+                    .get("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
+                            "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

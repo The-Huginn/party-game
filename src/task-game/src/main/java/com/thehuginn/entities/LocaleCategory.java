@@ -76,12 +76,11 @@ public class LocaleCategory extends PanacheEntityBase {
                 .and("locale", locale))
                 .firstResult()
                 .onItem()
-                .invoke(localeCategory -> {
-                    if (localeCategory == null) {
-                        Log.debugf("Category %s has no locale %s", categoryId, locale);
-                    }
-                })
-                .onFailure().recoverWithUni(localeCategoryUniEnglish);
+                .ifNull()
+                .switchTo(() -> {
+                    Log.debugf("Category %s has no locale %s", categoryId, locale);
+                    return localeCategoryUniEnglish;
+                });
         return Category.<Category>findById(categoryId)
                 .onItem()
                 .invoke(category1 -> {
