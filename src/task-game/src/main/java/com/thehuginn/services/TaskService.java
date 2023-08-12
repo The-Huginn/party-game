@@ -3,6 +3,7 @@ package com.thehuginn.services;
 import com.thehuginn.entities.LocaleText;
 import com.thehuginn.entities.Task;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestPath;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Path("/task")
@@ -49,15 +51,19 @@ public class TaskService {
     public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
         return Task.<Task>findById(id)
                 .onItem()
-                .transform(task -> {
-                    task.task = updatedTask.task;
+                .<Task>transformToUni(task -> {
+                    if (!new HashSet<>(task.tokens).containsAll(updatedTask.tokens) ||
+                            task.tokens.size() != updatedTask.tokens.size()) {
+                        task.tokens.clear();
+                        task.tokens.addAll(updatedTask.tokens);
+                    }
                     task.type = updatedTask.type;
                     task.repeat = updatedTask.repeat;
                     task.frequency = updatedTask.frequency;
                     task.price = updatedTask.price;
                     task.timer = updatedTask.timer;
 
-                    return task;
+                    return task.persist();
                 })
                 .onFailure()
                 .recoverWithNull();
@@ -66,38 +72,44 @@ public class TaskService {
     @GET
     @Path("/{taskId}/keys")
     public Uni<List<String>> getKeys(@RestPath Long taskId) {
-        return LocaleText.getKeys(taskId);
+        return Task.<Task>findById(taskId)
+                .onItem()
+                .transform(task -> task.tokens.stream()
+                        .map(token -> token.key)
+                        .toList());
     }
 
     @GET
-    @Path("/{taskId}/{locale}/{key}")
-    public Uni<LocaleText> getLocale(@RestPath Long taskId, @RestPath String locale, @RestPath String key) {
-        return LocaleText.byKey(taskId, locale, key);
+    @Path("/{key}/{locale}/{key}")
+    public Uni<LocaleText> getLocale(@RestPath String key, @RestPath String locale) {
+        return LocaleText.byLocale(key, locale);
     }
 
     @POST
-    @Path("/{taskId}")
+    @Path("/{key}/{locale}")
     @WithTransaction
-    public Uni<LocaleText> createKey(@RestPath Long taskId, LocaleText localeText) {
-        return Task.<Task>findById(taskId)
-                .map(task -> {
-                    localeText.task = task;
-                    return localeText;
-                })
-                .onItem().call(localeText1 -> localeText1.persist());
-
+    public Uni<LocaleText> createLocale(@RestPath String key, @RestPath String locale, String content) {
+        return Task.Token.<Task.Token>find("key = :key", Parameters.with("key", key))
+                .firstResult()
+                .onItem()
+                .transformToUni(token -> {
+                    LocaleText localeText = new LocaleText();
+                    localeText.token = token;
+                    localeText.locale = locale;
+                    localeText.content = content;
+                    return localeText.persist();
+                });
     }
 
     @PUT
-    @Path("/{taskId}/{locale}/{key}")
+    @Path("/{key}/{locale}/{key}")
     @WithTransaction
-    public Uni<LocaleText> updateKey(@RestPath Long taskId, @RestPath String locale, @RestPath String key, String newContent) {
-        return LocaleText.byKey(taskId, locale, key)
+    public Uni<LocaleText> updateKey(@RestPath String key, @RestPath String locale, String newContent) {
+        return LocaleText.byLocale(key, locale)
                 .onItem()
-                .transform(localeText -> {
+                .transformToUni(localeText -> {
                     localeText.content = newContent;
-
-                    return localeText;
+                    return localeText.persist();
                 });
     }
 }

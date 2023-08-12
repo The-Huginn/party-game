@@ -51,7 +51,7 @@ public class CategoryService {
                 .onItem()
                 .call(category1 -> Task.addToCategory(category1.id, category1.tasks))
                 .onFailure()
-                .invoke(throwable -> Log.error(throwable));
+                .invoke(Log::error);
     }
 
     @PUT

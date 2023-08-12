@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class EntityCreator {
 
     public static Task createTask() {
-        Task task = new Task.Builder(Arrays.asList("drink responsibly", "<player_1>"))
+        Task task = new Task.Builder(Arrays.asList(Task.Token.textToken("drink_responsibly"), Task.Token.textToken("<player_1>")))
                 .type(Task.Type.ALL)
                 .repeat(Task.Repeat.PER_PLAYER)
                 .frequency((short) 3)

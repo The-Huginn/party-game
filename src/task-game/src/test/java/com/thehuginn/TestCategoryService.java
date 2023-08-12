@@ -153,7 +153,7 @@ public class TestCategoryService {
         });
 
         asserter.execute(() -> {
-            Set<Object> categories = given()
+            Set<?> categories = given()
                     .when()
                     .get("/category")
                     .then()
@@ -163,12 +163,13 @@ public class TestCategoryService {
 
             Assertions.assertEquals(categories.size(), 2);
 
+            //noinspection unchecked
             Assertions.assertTrue(categories.stream()
                     .anyMatch(o -> ((LinkedHashMap<String, String>)o).get("name").equals("new name") &&
                             ((LinkedHashMap<String, String>)o).get("description").equals("new description")));
 
             given()
-                    .pathParam("id", (long) asserter.getData("id"))
+                    .pathParam("id", asserter.getData("id"))
                     .when()
                     .get("/category/{id}")
                     .then()
@@ -234,17 +235,15 @@ public class TestCategoryService {
                 .onItem()
                 .invoke(category -> asserter.putData("category2", category.id)));
 
-        asserter.execute(() -> {
-            given()
-                    .when()
-                    .get("/category")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("$.size()", is(3),
-                            "[0].id",is(0),
-                            "[1].id",is((int) ((long) asserter.getData("category1"))),
-                            "[2].id",is((int) ((long) asserter.getData("category2"))));
-        });
+        asserter.execute(() -> given()
+                .when()
+                .get("/category")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("$.size()", is(3),
+                        "[0].id",is(0),
+                        "[1].id",is((int) ((long) asserter.getData("category1"))),
+                        "[2].id",is((int) ((long) asserter.getData("category2")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -267,7 +266,7 @@ public class TestCategoryService {
                 }));
 
         asserter.execute(() -> {
-            List tasks = given()
+            List<?> tasks = given()
                     .pathParam("id", asserter.getData("id"))
                     .when()
                     .get("/category/{id}")
@@ -277,6 +276,7 @@ public class TestCategoryService {
                     .as(List.class);
 
             Assertions.assertEquals(tasks.size(), 2);
+            //noinspection unchecked
             Assertions.assertTrue(tasks.stream()
                     .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task1")) ||
                             ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task2"))));
@@ -381,31 +381,27 @@ public class TestCategoryService {
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
-        asserter.execute(() -> {
-            given()
-                    .pathParam("id", asserter.getData("id1"))
-                    .pathParam("locale", "en")
-                    .when()
-                    .get("/category/translation/{id}/{locale}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                            "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content));
-        });
+        asserter.execute(() -> given()
+                .pathParam("id", asserter.getData("id1"))
+                .pathParam("locale", "en")
+                .when()
+                .get("/category/translation/{id}/{locale}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
+                        "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
-        asserter.execute(() -> {
-            given()
-                    .pathParam("id", asserter.getData("id2"))
-                    .pathParam("locale", "sk")
-                    .when()
-                    .get("/category/translation/{id}/{locale}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
-                            "description",is(((LocaleCategory) asserter.getData("sk_locale")).description_content));
-        });
+        asserter.execute(() -> given()
+                .pathParam("id", asserter.getData("id2"))
+                .pathParam("locale", "sk")
+                .when()
+                .get("/category/translation/{id}/{locale}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
+                        "description",is(((LocaleCategory) asserter.getData("sk_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -424,41 +420,37 @@ public class TestCategoryService {
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
-        asserter.execute(() -> {
-            given()
-                    .body("""
-                            {
-                            "category": {
-                            "id": 20
-                            },
-                            "name_content": "Východzia Kategória",
-                            "description_content": "Popis Východzej Kategórie",
-                            "locale": "sk"
-                            }""")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .pathParam("id", asserter.getData("id"))
-                    .pathParam("locale", "en")
-                    .when()
-                    .put("/category/translation/{id}/{locale}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("name_content", is("Východzia Kategória"),
-                            "description_content",is("Popis Východzej Kategórie"));
-        });
+        asserter.execute(() -> given()
+                .body("""
+                        {
+                        "category": {
+                        "id": 20
+                        },
+                        "name_content": "Východzia Kategória",
+                        "description_content": "Popis Východzej Kategórie",
+                        "locale": "sk"
+                        }""")
+                .contentType(MediaType.APPLICATION_JSON)
+                .pathParam("id", asserter.getData("id"))
+                .pathParam("locale", "en")
+                .when()
+                .put("/category/translation/{id}/{locale}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name_content", is("Východzia Kategória"),
+                        "description_content",is("Popis Východzej Kategórie")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
-        asserter.execute(() -> {
-            given()
-                    .pathParam("id", asserter.getData("id"))
-                    .pathParam("locale", "en")
-                    .when()
-                    .get("/category/translation/{id}/{locale}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is("Východzia Kategória"),
-                            "description", is("Popis Východzej Kategórie"));
-        });
+        asserter.execute(() -> given()
+                .pathParam("id", asserter.getData("id"))
+                .pathParam("locale", "en")
+                .when()
+                .get("/category/translation/{id}/{locale}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name", is("Východzia Kategória"),
+                        "description", is("Popis Východzej Kategórie")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -486,7 +478,7 @@ public class TestCategoryService {
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
         asserter.execute(() -> {
-            List tasks = given()
+            List<?> tasks = given()
                     .pathParam("id", 0)
                     .when()
                     .get("/category/{id}")
@@ -496,6 +488,7 @@ public class TestCategoryService {
                     .as(List.class);
 
             Assertions.assertEquals(tasks.size(), 1);
+            //noinspection unchecked
             Assertions.assertTrue(tasks.stream()
                     .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task3"))));
         });
@@ -517,17 +510,15 @@ public class TestCategoryService {
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
-        asserter.execute(() -> {
-            given()
-                    .pathParam("id", asserter.getData("id"))
-                    .pathParam("locale", "sk")
-                    .when()
-                    .get("/category/translation/{id}/{locale}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                            "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content));
-        });
+        asserter.execute(() -> given()
+                .pathParam("id", asserter.getData("id"))
+                .pathParam("locale", "sk")
+                .when()
+                .get("/category/translation/{id}/{locale}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
+                        "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

@@ -37,10 +37,9 @@ public class LocaleCategory extends PanacheEntityBase {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof LocaleCategoryPK)) {
+            if (!(obj instanceof LocaleCategoryPK pk)) {
                 return false;
             } else {
-                LocaleCategoryPK pk = (LocaleCategoryPK) obj;
                 return category == pk.category && locale.equals(pk.locale);
             }
         }

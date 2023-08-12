@@ -22,10 +22,9 @@ public class GameTask extends PanacheEntityBase {
 
         @Override
         public boolean equals(Object obj) {
-            if (! (obj instanceof GameTaskPK)) {
+            if (! (obj instanceof GameTaskPK taskPK)) {
                 return false;
             } else {
-                GameTaskPK taskPK = (GameTaskPK) obj;
                 return game.equals(taskPK.game) && id == taskPK.id;
             }
         }

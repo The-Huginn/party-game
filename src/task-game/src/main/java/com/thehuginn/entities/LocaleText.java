@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -15,51 +14,46 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "LocaleText.byKey", query = "from LocaleText where task.id = :task_id and locale = :locale and key = :key"),
-//        @NamedQuery(name = "LocaleText.getKeys", query = "select distinct(t.key) from LocaleText t where task.id = :task_id")
-    @NamedQuery(name = "LocaleText.getKeys", query = "select t from LocaleText t where task.id = :task_id")
+    @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and token.key = :token")
 })
 @IdClass(LocaleText.LocaleTextPK.class)
 public class LocaleText extends PanacheEntityBase {
 
     public static class LocaleTextPK {
-        public long task;
-        public String key;
+        public Long token;
         public String locale;
 
         public LocaleTextPK() {}
 
         @Override
         public boolean equals(Object obj) {
-            if (! (obj instanceof LocaleTextPK)) {
+            if (! (obj instanceof LocaleTextPK pk)) {
                 return false;
             } else {
-                LocaleTextPK pk = (LocaleTextPK) obj;
-                return task == pk.task && key.equals(pk.key) && locale.equals(pk.locale);
+                return Objects.equals(token, pk.token) && locale.equals(pk.locale);
             }
         }
 
         @Override
         public int hashCode() {
-            return Long.hashCode(task) + key.hashCode() + locale.hashCode();
+            return token.hashCode() + locale.hashCode();
         }
     }
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "id")
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    public Task task;
-
-    @Id
-    public String key;
+    public Task.Token token;
 
     @Id
     public String locale = "en";
@@ -68,25 +62,13 @@ public class LocaleText extends PanacheEntityBase {
 
     public LocaleText() {}
 
-    public LocaleText(String key) {
-        this.key = key;
-    }
-
-    public static Uni<LocaleText> byKey(Long taskId, String locale, String key) {
-        return LocaleText.<LocaleText>find("#LocaleText.byKey", Parameters.with("task_id", taskId).and("locale", locale).and("key", key))
+    public static Uni<LocaleText> byLocale(String tokenId, String locale) {
+        return LocaleText.<LocaleText>find("#LocaleText.byLocale", Parameters.with("locale", locale).and("token", tokenId))
                 .firstResult()
-                .onFailure().recoverWithItem(() -> new LocaleText(key));
-    }
-
-    public static Uni<List<String>> getKeys(Long taskId) {
-        return LocaleText.<LocaleText>find("#LocaleText.getKeys", Parameters.with("task_id", taskId))
-                .list()
-                .map(localeTexts -> localeTexts.stream()
-                        .map(localeText -> localeText.key)
-                        .distinct()
-                        .toList()
-                )
-                .onFailure()
-                .recoverWithItem(new ArrayList<>());
+                .onItem()
+                .ifNull()
+                .switchTo(LocaleText
+                        .<LocaleText>find("#LocaleText.byLocale", Parameters.with("locale", "en").and("token", tokenId))
+                        .firstResult());
     }
 }
