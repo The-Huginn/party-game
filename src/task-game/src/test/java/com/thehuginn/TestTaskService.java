@@ -1,8 +1,9 @@
 package com.thehuginn;
 
-import com.thehuginn.entities.Category;
-import com.thehuginn.entities.Task;
 import com.thehuginn.services.TaskService;
+import com.thehuginn.task.Category;
+import com.thehuginn.task.Task;
+import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.Objects;
+
 import static com.thehuginn.util.EntityCreator.createTask;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -29,18 +32,12 @@ import static org.hamcrest.CoreMatchers.is;
 public class TestTaskService {
 
     @BeforeEach
+    @AfterEach
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
         asserter.execute(() -> Category.delete("id > 0"));
         asserter.execute(() -> Task.deleteAll());
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @AfterEach
-    @RunOnVertxContext
-    public void teardown(UniAsserter asserter) {
-        asserter.execute(() -> Category.delete("id > 0"));
-        asserter.execute(() -> Task.deleteAll());
+        asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -53,38 +50,25 @@ public class TestTaskService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("""
                             {
-                                "tokens": [
-                                       {
-                                         "type": "TEXT",
-                                         "key": "test"
-                                       }
-                                     ],
+                                "task": "test",
                                 "type": "DUO",
                                 "repeat": "PER_PLAYER",
                                 "frequency": 3,
                                 "price": {
                                     "enabled": false,
                                     "price": 2
-                                },
-                                "timer": {
-                                    "enabled": true,
-                                    "duration": 11
                                 }
                             }
                             """)
                     .when().post()
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("tokens.size()", is(1),
-                            "tokens[0].key", is("test"),
-                            "tokens[0].type", is("TEXT"),
+                    .body("task", is("test"),
                             "type", is("DUO"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
                             "price.enabled", is(false),
-                            "price.price", is(2),
-                            "timer.enabled", is(true),
-                            "timer.duration", is(11));
+                            "price.price", is(2));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -94,7 +78,7 @@ public class TestTaskService {
     @Order(2)
     @RunOnVertxContext
     public void testGetTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask().<Task>persistAndFlush()
+        asserter.execute(() -> createTask("drink responsibly with <player_1>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -105,18 +89,12 @@ public class TestTaskService {
             .when().get("/{id}")
             .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("tokens.size()", is(2),
-                            "tokens[0].key", is("drink_responsibly"),
-                            "tokens[0].type", is("TEXT"),
-                            "tokens[1].key", is("<player_1>"),
-                            "tokens[1].type", is("TEXT"),
+                    .body("task", is("drink responsibly with <player_1>"),
                             "type", is("ALL"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
                             "price.enabled", is(true),
-                            "price.price", is(1),
-                            "timer.enabled", is(true),
-                            "timer.duration", is(15));
+                            "price.price", is(1));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -126,7 +104,7 @@ public class TestTaskService {
     @Order(3)
     @RunOnVertxContext
     public void updateTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask().<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -138,22 +116,13 @@ public class TestTaskService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("""
                             {
-                                "tokens": [
-                                       {
-                                         "type": "TEXT",
-                                         "key": "test"
-                                       }
-                                     ],
+                                "task": "updated task",
                                 "type": "DUO",
                                 "repeat": "PER_PLAYER",
                                 "frequency": 3,
                                 "price": {
                                     "enabled": false,
                                     "price": 2
-                                },
-                                "timer": {
-                                    "enabled": true,
-                                    "duration": 11
                                 }
                             }
                             """)
@@ -161,16 +130,12 @@ public class TestTaskService {
             .when().put("/{id}")
             .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("tokens.size()", is(1),
-                            "tokens[0].key", is("test"),
-                            "tokens[0].type", is("TEXT"),
+                    .body("task", is("updated task"),
                             "type", is("DUO"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
                             "price.enabled", is(false),
-                            "price.price", is(2),
-                            "timer.enabled", is(true),
-                            "timer.duration", is(11));
+                            "price.price", is(2));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -180,7 +145,7 @@ public class TestTaskService {
     @Order(4)
     @RunOnVertxContext
     public void testDeleteTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask().<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
         asserter.execute(() -> {
@@ -203,18 +168,16 @@ public class TestTaskService {
     @Order(5)
     @RunOnVertxContext
     public void testEntityCreatorCreateTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask().<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
         asserter.assertThat(() -> Task.<Task>findById(asserter.getData("id")), task -> Assertions.assertTrue(
-                task.tokens.stream().allMatch(token -> token.key.equals("drink_responsibly") || token.key.equals("<player_1>")) &&
+//                task.tokens.stream().allMatch(token -> token.key.equals("drink_responsibly") || token.key.equals("<player_1>")) &&
             task.type == Task.Type.ALL &&
             task.repeat == Task.Repeat.PER_PLAYER &&
-            task.frequency == (short) 3 &&
-            task.price.enabled == true &&
+            Objects.equals(task.frequency, (short) 3) &&
+            task.price.enabled &&
             task.price.price == 1 &&
-            task.timer.enabled == true &&
-            task.timer.duration == 15 &&
             task.id == (long) asserter.getData("id")));
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -223,7 +186,7 @@ public class TestTaskService {
     @Order(6)
     @RunOnVertxContext
     public void testCreateLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask().<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 

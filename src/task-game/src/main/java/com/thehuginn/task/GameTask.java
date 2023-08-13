@@ -1,5 +1,6 @@
-package com.thehuginn.entities;
+package com.thehuginn.task;
 
+import com.thehuginn.entities.Game;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class GameTask extends PanacheEntityBase {
+public class GameTask extends PanacheEntityBase implements ResolvableTask {
 
     public static class GameTaskPK {
         public String game;
@@ -53,8 +54,9 @@ public class GameTask extends PanacheEntityBase {
         this.unresolvedTask = task;
     }
 
-    public ResolvedTask resolve() {
-        return new ResolvedTask();
+    @Override
+    public ResolvedTask resolve(ResolutionContext context) {
+        return unresolvedTask.resolve(context);
     }
 
     public static List<GameTask> generateGameTasks(Game game,  List<Task> tasks) {

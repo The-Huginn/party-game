@@ -1,9 +1,10 @@
 package com.thehuginn;
 
-import com.thehuginn.entities.Category;
-import com.thehuginn.entities.LocaleCategory;
-import com.thehuginn.entities.Task;
 import com.thehuginn.services.CategoryService;
+import com.thehuginn.task.Category;
+import com.thehuginn.task.LocaleCategory;
+import com.thehuginn.task.Task;
+import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -40,20 +41,13 @@ public class TestCategoryService {
             """;
 
     @BeforeEach
+    @AfterEach
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
         asserter.execute(() -> Task.deleteAll());
         asserter.execute(() -> Category.delete("id > 0"));
         asserter.execute(() -> LocaleCategory.deleteAll());
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @AfterEach
-    @RunOnVertxContext
-    public void teardown(UniAsserter asserter) {
-        asserter.execute(() -> Task.deleteAll());
-        asserter.execute(() -> Category.delete("id > 0"));
-        asserter.execute(() -> LocaleCategory.deleteAll());
+        asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -87,10 +81,10 @@ public class TestCategoryService {
     @Order(2)
     @RunOnVertxContext
     public void testCreateCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> {
@@ -118,10 +112,10 @@ public class TestCategoryService {
     @Order(3)
     @RunOnVertxContext
     public void testUpdatingCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"))
@@ -184,10 +178,10 @@ public class TestCategoryService {
     @Order(4)
     @RunOnVertxContext
     public void testDeletingCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2"))
@@ -252,10 +246,10 @@ public class TestCategoryService {
     @Order(6)
     @RunOnVertxContext
     public void testGetCategoryTasks(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
@@ -340,19 +334,6 @@ public class TestCategoryService {
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    private LocaleCategory createRandomLocaleCategory(long id, String locale) {
-        LocaleCategory localeCategory = new LocaleCategory();
-        Category category = new Category();
-        category.id = id;
-
-        localeCategory.locale = locale;
-        localeCategory.category = category;
-        localeCategory.name_content = "Default Category" + Math.random();
-        localeCategory.description_content = "Default English Category Description" + Math.random();
-
-        return localeCategory;
     }
 
     @Test
@@ -459,15 +440,18 @@ public class TestCategoryService {
     @Order(10)
     @RunOnVertxContext
     public void testDefaultCategoryTasks(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
-        asserter.execute(() -> EntityCreator.createTask().<Task>persistAndFlush()
+
+        asserter.execute(() -> EntityCreator.createTask("<task>").<Task>persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task3", task.id)));
+
         asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
                 .onItem()
                 .invoke(category -> {
@@ -521,5 +505,18 @@ public class TestCategoryService {
                         "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    private LocaleCategory createRandomLocaleCategory(long id, String locale) {
+        LocaleCategory localeCategory = new LocaleCategory();
+        Category category = new Category();
+        category.id = id;
+
+        localeCategory.locale = locale;
+        localeCategory.category = category;
+        localeCategory.name_content = "Default Category" + Math.random();
+        localeCategory.description_content = "Default English Category Description" + Math.random();
+
+        return localeCategory;
     }
 }

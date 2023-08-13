@@ -1,4 +1,4 @@
-package com.thehuginn.entities;
+package com.thehuginn.task;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;

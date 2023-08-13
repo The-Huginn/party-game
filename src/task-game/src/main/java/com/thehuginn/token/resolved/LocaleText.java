@@ -1,4 +1,4 @@
-package com.thehuginn.entities;
+package com.thehuginn.token.resolved;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
@@ -21,12 +21,12 @@ import java.util.Objects;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and token.key = :token")
+        @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and token.key = :token")
 })
 @IdClass(LocaleText.LocaleTextPK.class)
-public class LocaleText extends PanacheEntityBase {
+class LocaleText extends PanacheEntityBase {
 
-    public static class LocaleTextPK {
+    static class LocaleTextPK {
         public Long token;
         public String locale;
 
@@ -53,7 +53,7 @@ public class LocaleText extends PanacheEntityBase {
     @JoinColumn(name = "id")
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    public Task.Token token;
+    public TextResolvedToken token;
 
     @Id
     public String locale = "en";

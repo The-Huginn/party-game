@@ -1,4 +1,4 @@
-package com.thehuginn.entities;
+package com.thehuginn.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,8 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * We have a special Category with id 0. All Tasks without being

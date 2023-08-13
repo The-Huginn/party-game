@@ -1,4 +1,4 @@
-package com.thehuginn.entities;
+package com.thehuginn.task;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.CollectionTable;
@@ -23,4 +23,6 @@ public class ResolvedTask extends PanacheEntity {
     @MapKeyColumn(name = "token_name")
     @Column(name = "tokens")
     public Map<String, String> tokens;
+
+
 }

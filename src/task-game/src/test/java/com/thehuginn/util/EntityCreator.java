@@ -1,39 +1,35 @@
 package com.thehuginn.util;
 
-import com.thehuginn.entities.Category;
-import com.thehuginn.entities.Task;
+import com.thehuginn.task.Category;
+import com.thehuginn.task.Task;
 
 import java.util.Arrays;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EntityCreator {
 
-    public static Task createTask() {
-        Task task = new Task.Builder(Arrays.asList(Task.Token.textToken("drink_responsibly"), Task.Token.textToken("<player_1>")))
+    public static Task createTask(String task) {
+
+        return new Task.Builder(task)
                 .type(Task.Type.ALL)
                 .repeat(Task.Repeat.PER_PLAYER)
                 .frequency((short) 3)
                 .price(new Task.Price(true, 1))
-                .timer(new Task.Timer(true, 15))
                 .build();
-
-        return task;
     }
 
     public static Category createCategory(long... taskIds) {
         Category category = new Category();
         category.name = "name";
         category.description = "description";
-        Set<Task> tasks = Arrays.stream(taskIds)
+        category.tasks = Arrays.stream(taskIds)
                 .mapToObj(value -> {
-                    Task task = createTask();
+                    Task task = createTask("this is a task");
                     task.id = value;
 
                     return task;
                 })
                 .collect(Collectors.toSet());
-        category.tasks = tasks;
         return category;
     }
 }

@@ -1,7 +1,15 @@
-package com.thehuginn.entities;
+package com.thehuginn.task;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
+import com.thehuginn.token.unresolved.TextUnresolvedToken;
+import com.thehuginn.token.unresolved.Token;
+import com.thehuginn.util.TokenResolver;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -11,24 +19,33 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.OneToOne;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Task extends PanacheEntity {
+public class Task extends PanacheEntity implements ResolvableTask {
 
     public enum Type {SINGLE, DUO, ALL}
 
     public enum Repeat {ALWAYS, PER_PLAYER, NEVER}
 
-    @JsonProperty
-    @NotEmpty(message = "task sequence can't be empty")
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
+            targetEntity = AbstractUnresolvedToken.class
+    )
+//    @JoinTable(name = "tasks_tokens",
+//    joinColumns = @JoinColumn(name = "task_id"),
+//    inverseJoinColumns = @JoinColumn(name = "AbstractUnresolvedToken_key"),
+//    inverseForeignKey = @ForeignKey(
+//            name = "AbstractUnresolvedToken_fk_delete",
+//            foreignKeyDefinition = "FOREIGN KEY (AbstractUnresolvedToken_id) REFERENCES AbstractUnresolvedToken(id) ON DELETE CASCADE;")
+//    )
     public List<Token> tokens;
 
     @JsonProperty
@@ -38,53 +55,31 @@ public class Task extends PanacheEntity {
     public Repeat repeat = Repeat.NEVER;
 
     @JsonProperty
-    public short frequency = 1;
+    public Short frequency = 1;
 
     @JsonProperty
     public Price price = new Price();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "key")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonProperty
-    public Timer timer = new Timer();
+    public TextUnresolvedToken task;
+
+    @JsonSetter
+    public void setTask(String task) {
+        this.task = new TextUnresolvedToken(task);
+    }
+
+    public String defaultLocale = "en";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore
     public Category category = Category.getDefaultInstance();
 
-    @Entity
-//    @Table(uniqueConstraints = @UniqueConstraint(columnNames = "value"))
-    public static class Token extends PanacheEntity {
-        public enum TokenType {TEXT, PLAYER, TIMER}
-
-        @JsonProperty
-        public TokenType type = TokenType.TEXT;
-
-        @Column(name = "key")
-        public String key;
-
-        public Token() {}
-
-        private Token(TokenType type,  String key) {
-            this.type = type;
-            this.key = key;
-        }
-
-        public static Token textToken(String text) {
-            return new Token(TokenType.TEXT, text);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof Token other)) {
-                return false;
-            }
-            return key.equals(other.key) && type == other.type;
-        }
-
-        @Override
-        public int hashCode() {
-            return key.hashCode() + type.hashCode();
-        }
+    public List<Token> getTokens() {
+        return tokens;
     }
 
     @Embeddable
@@ -101,20 +96,6 @@ public class Task extends PanacheEntity {
         }
     }
 
-    @Embeddable
-    public static class Timer {
-        @Column(name = "timer_enabled")
-        public boolean enabled = false;
-        public int duration = 60;
-
-        public Timer() {}
-
-        public Timer(boolean enabled, int duration) {
-            this.enabled = enabled;
-            this.duration = duration;
-        }
-    }
-
     public Task() {}
 
     public static class Builder {
@@ -122,7 +103,7 @@ public class Task extends PanacheEntity {
         private boolean setId = false;
         private long id;
 
-        private List<Token> task;
+        private TextUnresolvedToken task;
 
         private Type type = Type.SINGLE;
 
@@ -132,12 +113,10 @@ public class Task extends PanacheEntity {
 
         private Price price = new Price();
 
-        private Timer timer = new Timer();
-
         public Builder() {}
 
-        public Builder(List<Token> task) {
-            this.task = task;
+        public Builder(String task) {
+            this.task = new TextUnresolvedToken(task);
         }
 
         public Builder type(Type type) {
@@ -160,11 +139,6 @@ public class Task extends PanacheEntity {
             return this;
         }
 
-        public Builder timer(Timer timer) {
-            this.timer = timer;
-            return this;
-        }
-
         public Builder id(long id) {
             this.id = id;
             this.setId = true;
@@ -176,15 +150,21 @@ public class Task extends PanacheEntity {
             if (setId) {
                 builtTask.id = this.id;
             }
-            builtTask.tokens = task;
+            builtTask.task = task;
+            builtTask.tokens = TokenResolver.translateTask(task.getKey());
             builtTask.type = type;
             builtTask.repeat = repeat;
             builtTask.frequency = frequency;
             builtTask.price = price;
-            builtTask.timer = timer;
             return builtTask;
         }
     }
+
+    @Override
+    public ResolvedTask resolve(ResolutionContext context) {
+        return null;
+    }
+
 
     public static Uni<Set<Task>> findByIds(Set<Task> tasks) {
         List<Long> ids = tasks.stream()
