@@ -1,6 +1,6 @@
 package com.thehuginn;
 
-import com.thehuginn.services.TaskService;
+import com.thehuginn.services.UnresolvedTaskService;
 import com.thehuginn.task.Category;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
@@ -23,13 +23,12 @@ import java.util.Objects;
 
 import static com.thehuginn.util.EntityCreator.createTask;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
-@TestHTTPEndpoint(TaskService.class)
+@TestHTTPEndpoint(UnresolvedTaskService.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TestTaskService {
+public class TestUnresolvedTaskService {
 
     @BeforeEach
     @AfterEach
@@ -50,7 +49,10 @@ public class TestTaskService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("""
                             {
-                                "task": "test",
+                                "task": {
+                                    "content": "test",
+                                    "locale": "en"
+                                },
                                 "type": "DUO",
                                 "repeat": "PER_PLAYER",
                                 "frequency": 3,
@@ -63,7 +65,8 @@ public class TestTaskService {
                     .when().post()
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("task", is("test"),
+                    .body("task.content", is("test"),
+                            "task.locale", is("en"),
                             "type", is("DUO"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
@@ -86,10 +89,10 @@ public class TestTaskService {
             long id = (long) asserter.getData("id");
             given()
                     .pathParam("id", id)
-            .when().get("/{id}")
-            .then()
+                    .when().get("/{id}")
+                    .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("task", is("drink responsibly with <player_1>"),
+                    .body("task.content", is("drink responsibly with <player_1>"),
                             "type", is("ALL"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
@@ -116,7 +119,9 @@ public class TestTaskService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("""
                             {
-                                "task": "updated task",
+                                "task": {
+                                    "content": "updated task"
+                                },
                                 "type": "DUO",
                                 "repeat": "PER_PLAYER",
                                 "frequency": 3,
@@ -127,10 +132,11 @@ public class TestTaskService {
                             }
                             """)
                     .pathParam("id", id)
-            .when().put("/{id}")
-            .then()
+                    .when().put("/{id}")
+                    .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("task", is("updated task"),
+                    .body("task.content", is("updated task"),
+                            "task.locale", is("en"),
                             "type", is("DUO"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
@@ -150,16 +156,16 @@ public class TestTaskService {
                 .invoke(task -> asserter.putData("id", task.id)));
         asserter.execute(() -> {
             long id = (long) asserter.getData("id");
-        Boolean response = given()
-            .pathParam("id", id)
-            .accept(MediaType.APPLICATION_JSON)
-        .when().delete("/{id}")
-        .then()
-            .statusCode(RestResponse.StatusCode.OK)
-            .extract()
-            .as(Boolean.class);
+            Boolean response = given()
+                    .pathParam("id", id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .when().delete("/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .as(Boolean.class);
 
-        Assertions.assertTrue(response);
+            Assertions.assertTrue(response);
         });
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -173,12 +179,12 @@ public class TestTaskService {
                 .invoke(task -> asserter.putData("id", task.id)));
         asserter.assertThat(() -> Task.<Task>findById(asserter.getData("id")), task -> Assertions.assertTrue(
 //                task.tokens.stream().allMatch(token -> token.key.equals("drink_responsibly") || token.key.equals("<player_1>")) &&
-            task.type == Task.Type.ALL &&
-            task.repeat == Task.Repeat.PER_PLAYER &&
-            Objects.equals(task.frequency, (short) 3) &&
-            task.price.enabled &&
-            task.price.price == 1 &&
-            task.id == (long) asserter.getData("id")));
+                task.type == Task.Type.ALL &&
+                        task.repeat == Task.Repeat.PER_PLAYER &&
+                        Objects.equals(task.frequency, (short) 3) &&
+                        task.price.enabled &&
+                        task.price.price == 1 &&
+                        task.id == (long) asserter.getData("id")));
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -194,14 +200,124 @@ public class TestTaskService {
             given()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("Pi zodpovedne")
-                    .pathParam("key", "drink_responsibly")
+                    .pathParam("id", asserter.getData("id"))
                     .pathParam("locale", "sk")
-                    .when().post("/{key}/{locale}")
+                    .when().post("/{id}/{locale}")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("token", anyOf(is(1), is(2)),
-                            "locale", is("sk"),
+                    .body("locale", is("sk"),
                             "content", is("Pi zodpovedne"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(7)
+    @RunOnVertxContext
+    public void updateTaskWithLocaleFail(UniAsserter asserter) {
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+
+        asserter.execute(() -> {
+            long id = (long) asserter.getData("id");
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("""
+                            {
+                                "task": {
+                                    "locale": "sk"
+                                },
+                                "type": "DUO",
+                                "repeat": "PER_PLAYER",
+                                "frequency": 3,
+                                "price": {
+                                    "enabled": false,
+                                    "price": 2
+                                }
+                            }
+                            """)
+                    .pathParam("id", id)
+                    .when().put("/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("task.content", is("<drink_responsibly>"),
+                            "task.locale", is("en"),
+                            "type", is("DUO"),
+                            "repeat", is("PER_PLAYER"),
+                            "frequency", is(3),
+                            "price.enabled", is(false),
+                            "price.price", is(2));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(8)
+    @RunOnVertxContext
+    public void testGettingDefaultLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().get("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("task.content", is("<drink_responsibly>"),
+                            "task.locale", is("en"),
+                            "type", is("ALL"),
+                            "repeat", is("PER_PLAYER"),
+                            "frequency", is(3),
+                            "price.enabled", is(true),
+                            "price.price", is(1));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(9)
+    @RunOnVertxContext
+    public void testGettingNewLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("Pi zodpovedne")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("locale", is("sk"),
+                            "content", is("Pi zodpovedne"));
+        });
+
+        asserter.execute(() -> {
+            given()
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().get("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("task.content", is("Pi zodpovedne"),
+                            "task.locale", is("sk"),
+                            "type", is("ALL"),
+                            "repeat", is("PER_PLAYER"),
+                            "frequency", is(3),
+                            "price.enabled", is(true),
+                            "price.price", is(1));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

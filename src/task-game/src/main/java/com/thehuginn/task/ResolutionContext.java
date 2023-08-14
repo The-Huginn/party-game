@@ -15,6 +15,14 @@ public class ResolutionContext {
     private final List<Player> players;
     private final List<Player> shuffledPlayers;
 
+    private ResolutionContext(String locale) {
+        this.locale = locale;
+        gameId = null;
+        player = null;
+        players = null;
+        shuffledPlayers = null;
+    }
+
     private ResolutionContext(
             String locale,
             String gameId,
@@ -35,9 +43,13 @@ public class ResolutionContext {
         return new Builder(gameId);
     }
 
+    public static ResolutionContext locale(String locale) {
+        return new ResolutionContext(locale);
+    }
+
     public static class Builder {
         private String locale = "en";
-        private String gameId = null;
+        private final String gameId;
         private Player player = null;
         private List<Player> players = null;
 

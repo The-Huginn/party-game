@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class ResolvedResult {
 
+    private boolean resolved = false;
     private String resolvedMessage;
 
     private Uni<StringBuilder> message = Uni.createFrom().item(StringBuilder::new);
@@ -30,6 +31,7 @@ public class ResolvedResult {
                 .call(() -> Uni.combine()
                         .all()
                         .unis(dataUnis)
+                        .usingConcurrencyOf(1)
                         .combinedWith(objects -> {
                             assert objects.size() == data.size();
                             Iterator<?> iterator = objects.iterator();
@@ -39,7 +41,23 @@ public class ResolvedResult {
 
                             return data;
                         })
-                );
+                )
+                .onItem()
+                .invoke(resolvedResult -> resolvedResult.resolved = true);
+    }
+
+    public String getMessage() {
+        if (!resolved) {
+            throw new IllegalStateException("First call " + ResolvedResult.class + "#resolve() method to resolve unis");
+        }
+        return resolvedMessage;
+    }
+
+    public Map<String, Object> getData() {
+        if (!resolved) {
+            throw new IllegalStateException("First call " + ResolvedResult.class + "#resolve() method to resolve unis");
+        }
+        return data;
     }
 
     public ResolvedResult appendMessage(Uni<String> message) {

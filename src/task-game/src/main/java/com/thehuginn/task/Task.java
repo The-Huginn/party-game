@@ -56,17 +56,8 @@ public class Task extends PanacheEntity implements ResolvableTask {
     @JsonProperty
     public Price price = new Price();
 
-//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "key")
-//    @JsonIdentityReference(alwaysAsId = true)
-    // TODO convert into string without spaces etc
-    @JsonProperty
-    public String task;
-//    public TextUnresolvedToken task;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
-    public LocaleText defaultLocale;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "task")
+    public LocaleText task;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -100,6 +91,8 @@ public class Task extends PanacheEntity implements ResolvableTask {
 
         private String task;
 
+        private String locale = "en";
+
         private Type type = Type.SINGLE;
 
         private Repeat repeat = Repeat.NEVER;
@@ -112,6 +105,11 @@ public class Task extends PanacheEntity implements ResolvableTask {
 
         public Builder(String task) {
             this.task = task;
+        }
+
+        public Builder locale(String locale) {
+            this.locale = locale;
+            return this;
         }
 
         public Builder type(Type type) {
@@ -145,7 +143,7 @@ public class Task extends PanacheEntity implements ResolvableTask {
             if (setId) {
                 builtTask.id = this.id;
             }
-            builtTask.task = task;
+            builtTask.task = new LocaleText(builtTask, locale, task);
             builtTask.tokens = TokenResolver.translateTask(task);
             builtTask.type = type;
             builtTask.repeat = repeat;
@@ -153,6 +151,11 @@ public class Task extends PanacheEntity implements ResolvableTask {
             builtTask.price = price;
             return builtTask;
         }
+    }
+
+    @JsonIgnore
+    public String getKey() {
+        return "task_" + id;
     }
 
     @Override

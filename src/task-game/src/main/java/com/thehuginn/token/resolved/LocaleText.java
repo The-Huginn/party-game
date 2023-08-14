@@ -1,8 +1,7 @@
 package com.thehuginn.token.resolved;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.task.ResolutionContext;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -54,28 +53,45 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id")
-    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
+    @JsonIgnore
     public Task task;
 
     @Id
+    @JsonProperty
     public String locale = "en";
 
+    @JsonProperty
     public String content = "<missing_value>";
 
     public LocaleText() {}
 
+    public LocaleText(String locale, String content) {
+        this.locale = locale;
+        this.content = content;
+    }
+
+    public LocaleText(Task task,  String locale, String content) {
+        this.task = task;
+        this.locale = locale;
+        this.content = content;
+    }
+
     @Override
     public ResolvedResult resolve(ResolutionContext context, ResolvedResult result) {
-        Uni<String> localeTextUni = LocaleText
+        Uni<LocaleText> localeTextUni = LocaleText
                 .<LocaleText>find("#LocaleText.byLocale",
                         Parameters.with("locale", context.getLocale()).and("id", task.id))
                 .firstResult()
                 .onItem()
                 .ifNull()
-                .continueWith(this)
-                .onItem()
-                .transform(localeText -> localeText.content);
-        return result.appendData(Map.entry(task.task, localeTextUni));
+                .continueWith(this);
+        return result.appendData(Map.entry(task.getKey(),
+                        localeTextUni
+                                .onItem()
+                                .transform(localeText -> localeText.content)))
+                .appendData(Map.entry("locale",
+                        localeTextUni
+                                .onItem()
+                                .transform(localeText -> localeText.locale)));
     }
 }
