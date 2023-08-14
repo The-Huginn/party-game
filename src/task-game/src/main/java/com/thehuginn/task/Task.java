@@ -1,13 +1,9 @@
 package com.thehuginn.task;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.thehuginn.token.resolved.LocaleText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
-import com.thehuginn.token.unresolved.TextUnresolvedToken;
 import com.thehuginn.token.unresolved.Token;
 import com.thehuginn.util.TokenResolver;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
@@ -60,18 +56,17 @@ public class Task extends PanacheEntity implements ResolvableTask {
     @JsonProperty
     public Price price = new Price();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "key")
-    @JsonIdentityReference(alwaysAsId = true)
+//    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "key")
+//    @JsonIdentityReference(alwaysAsId = true)
+    // TODO convert into string without spaces etc
     @JsonProperty
-    public TextUnresolvedToken task;
+    public String task;
+//    public TextUnresolvedToken task;
 
-    @JsonSetter
-    public void setTask(String task) {
-        this.task = new TextUnresolvedToken(task);
-    }
-
-    public String defaultLocale = "en";
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    public LocaleText defaultLocale;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -103,7 +98,7 @@ public class Task extends PanacheEntity implements ResolvableTask {
         private boolean setId = false;
         private long id;
 
-        private TextUnresolvedToken task;
+        private String task;
 
         private Type type = Type.SINGLE;
 
@@ -116,7 +111,7 @@ public class Task extends PanacheEntity implements ResolvableTask {
         public Builder() {}
 
         public Builder(String task) {
-            this.task = new TextUnresolvedToken(task);
+            this.task = task;
         }
 
         public Builder type(Type type) {
@@ -151,7 +146,7 @@ public class Task extends PanacheEntity implements ResolvableTask {
                 builtTask.id = this.id;
             }
             builtTask.task = task;
-            builtTask.tokens = TokenResolver.translateTask(task.getKey());
+            builtTask.tokens = TokenResolver.translateTask(task);
             builtTask.type = type;
             builtTask.repeat = repeat;
             builtTask.frequency = frequency;

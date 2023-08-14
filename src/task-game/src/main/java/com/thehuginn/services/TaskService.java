@@ -27,7 +27,7 @@ public class TaskService {
     public Uni<Task> createTask(@Valid Task task) {
         return Uni.createFrom()
                 .item(task)
-                .invoke(task1 -> task1.tokens = TokenResolver.translateTask(task1.task.getKey()))
+                .invoke(task1 -> task1.tokens = TokenResolver.translateTask(task1.task))
                 .onItem()
                 .transformToUni(task1 -> task1.persist());
     }
@@ -55,7 +55,7 @@ public class TaskService {
                     if (updatedTask.task != null) {
                         task.task = updatedTask.task;
                         task.tokens.clear();
-                        task.tokens.addAll(TokenResolver.translateTask(updatedTask.task.getKey()));
+                        task.tokens.addAll(TokenResolver.translateTask(updatedTask.task));
                     }
                     task.type = updatedTask.type != null ? updatedTask.type : task.type;
                     task.repeat = updatedTask.repeat != null ? updatedTask.repeat : task.repeat;

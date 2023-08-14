@@ -3,6 +3,8 @@ package com.thehuginn.token.resolved;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.thehuginn.task.ResolutionContext;
+import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -17,17 +19,18 @@ import jakarta.persistence.NamedQuery;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and token.key = :token")
+        @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and task.id = :id")
 })
 @IdClass(LocaleText.LocaleTextPK.class)
-class LocaleText extends PanacheEntityBase {
+public class LocaleText extends PanacheEntityBase implements ResolvedToken {
 
     static class LocaleTextPK {
-        public Long token;
+        public Long task;
         public String locale;
 
         public LocaleTextPK() {}
@@ -37,13 +40,13 @@ class LocaleText extends PanacheEntityBase {
             if (! (obj instanceof LocaleTextPK pk)) {
                 return false;
             } else {
-                return Objects.equals(token, pk.token) && locale.equals(pk.locale);
+                return Objects.equals(task, pk.task) && locale.equals(pk.locale);
             }
         }
 
         @Override
         public int hashCode() {
-            return token.hashCode() + locale.hashCode();
+            return task.hashCode() + locale.hashCode();
         }
     }
 
@@ -53,7 +56,7 @@ class LocaleText extends PanacheEntityBase {
     @JoinColumn(name = "id")
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    public TextResolvedToken token;
+    public Task task;
 
     @Id
     public String locale = "en";
@@ -62,13 +65,17 @@ class LocaleText extends PanacheEntityBase {
 
     public LocaleText() {}
 
-    public static Uni<LocaleText> byLocale(String tokenId, String locale) {
-        return LocaleText.<LocaleText>find("#LocaleText.byLocale", Parameters.with("locale", locale).and("token", tokenId))
+    @Override
+    public ResolvedResult resolve(ResolutionContext context, ResolvedResult result) {
+        Uni<String> localeTextUni = LocaleText
+                .<LocaleText>find("#LocaleText.byLocale",
+                        Parameters.with("locale", context.getLocale()).and("id", task.id))
                 .firstResult()
                 .onItem()
                 .ifNull()
-                .switchTo(LocaleText
-                        .<LocaleText>find("#LocaleText.byLocale", Parameters.with("locale", "en").and("token", tokenId))
-                        .firstResult());
+                .continueWith(this)
+                .onItem()
+                .transform(localeText -> localeText.content);
+        return result.appendData(Map.entry(task.task, localeTextUni));
     }
 }
