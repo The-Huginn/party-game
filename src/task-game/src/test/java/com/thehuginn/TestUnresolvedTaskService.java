@@ -1,7 +1,7 @@
 package com.thehuginn;
 
+import com.thehuginn.category.Category;
 import com.thehuginn.services.UnresolvedTaskService;
-import com.thehuginn.task.Category;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.Panache;

@@ -1,10 +1,10 @@
 package com.thehuginn.services;
 
-import com.thehuginn.task.ResolutionContext;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.ResolvedResult;
+import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.resolved.LocaleText;
-import com.thehuginn.token.resolved.ResolvedResult;
-import com.thehuginn.util.TokenResolver;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;

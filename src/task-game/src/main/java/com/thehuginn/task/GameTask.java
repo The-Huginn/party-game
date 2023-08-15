@@ -1,11 +1,20 @@
 package com.thehuginn.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thehuginn.entities.Game;
+import com.thehuginn.entities.Player;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.token.resolved.AbstractResolvedToken;
+import com.thehuginn.token.resolved.ResolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.logging.Log;
+import io.smallrye.mutiny.Uni;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 
 import java.util.ArrayList;
@@ -46,29 +55,62 @@ public class GameTask extends PanacheEntityBase implements ResolvableTask {
     @ManyToOne(fetch = FetchType.EAGER)
     public Task unresolvedTask;
 
-    // List of players, who already answered this question in case of type PER_PLAYER
-    public GameTask() {}
+    @ManyToOne(fetch = FetchType.EAGER)
+    public Player assignedPlayer;
 
-    public GameTask(Game game, Task task) {
-        this.game = game.gameId;
-        this.unresolvedTask = task;
-    }
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
+            targetEntity = AbstractResolvedToken.class
+    )
+    public List<ResolvedToken> tokens;
+    public GameTask() {}
 
     @Override
     public ResolvedTask resolve(ResolutionContext context) {
-        return unresolvedTask.resolve(context);
+//        return unresolvedTask.resolve(context);
+        return null;
     }
 
-    public static List<GameTask> generateGameTasks(Game game,  List<Task> tasks) {
-        GameTask.delete("game", game.gameId);
-
+    /**
+     * Change with caution from Uni, such as internally we use shallow-copy,
+     *  and we persist all objects right away
+     */
+    public static Uni<Void> generateGameTasks(Game game, List<Task> tasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
         List<GameTask> createdTasks = new ArrayList<>();
         for (var task : tasks) {
             for (short amount = 0; amount < task.frequency; amount++) {
-                createdTasks.add(new GameTask(game, task));
+                GameTask gameTask = new GameTask();
+                gameTask.game = game.gameId;
+                gameTask.unresolvedTask = task;
+                gameTask.tokens = task.tokens.stream().map(token -> token.resolve(resolutionContext)).toList();
+                if (task.repeat.equals(Task.Repeat.PER_PLAYER)) {
+                    for (Player player: resolutionContext.getPlayers()) {
+                        GameTask shallowCopy = (GameTask) gameTask.clone();
+                        shallowCopy.assignedPlayer = player;
+                        createdTasks.add(shallowCopy);
+                    }
+                } else {
+                    createdTasks.add(gameTask);
+                }
             }
         }
 
-        return createdTasks;
+        Uni<Void> newGameTasks = Uni.combine()
+                .all()
+                .unis(createdTasks.stream()
+                        .map(gameTask -> gameTask.persist())
+                        .toList())
+                .usingConcurrencyOf(1)
+                .discardItems();
+
+        return GameTask.delete("game", game.gameId)
+                .onItem()
+                .invoke(aLong -> {
+                    if (aLong.compareTo(0L) > 0) {
+                        Log.infof("Previous game [%s] was deleted with %d tasks remaining");
+                    }
+                })
+                .replaceWith(newGameTasks);
     }
 }

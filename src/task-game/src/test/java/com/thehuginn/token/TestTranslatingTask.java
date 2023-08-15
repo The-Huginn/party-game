@@ -1,8 +1,8 @@
 package com.thehuginn.token;
 
+import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.token.unresolved.PlayerUnresolvedToken;
 import com.thehuginn.token.unresolved.Token;
-import com.thehuginn.util.TokenResolver;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;

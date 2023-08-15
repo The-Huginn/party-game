@@ -1,7 +1,7 @@
 package com.thehuginn.services;
 
-import com.thehuginn.task.Category;
-import com.thehuginn.task.LocaleCategory;
+import com.thehuginn.category.Category;
+import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;

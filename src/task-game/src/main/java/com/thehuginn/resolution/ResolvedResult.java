@@ -1,4 +1,4 @@
-package com.thehuginn.token.resolved;
+package com.thehuginn.resolution;
 
 import io.smallrye.mutiny.Uni;
 

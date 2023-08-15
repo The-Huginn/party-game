@@ -1,6 +1,6 @@
 package com.thehuginn.util;
 
-import com.thehuginn.task.Category;
+import com.thehuginn.category.Category;
 import com.thehuginn.task.Task;
 
 import java.util.Arrays;

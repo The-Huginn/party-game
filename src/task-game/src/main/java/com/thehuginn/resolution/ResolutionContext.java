@@ -1,4 +1,4 @@
-package com.thehuginn.task;
+package com.thehuginn.resolution;
 
 import com.thehuginn.entities.Player;
 import jakarta.annotation.Nonnull;

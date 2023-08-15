@@ -1,6 +1,7 @@
 package com.thehuginn.token.resolved;
 
-import com.thehuginn.task.ResolutionContext;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.ResolvedResult;
 
 public interface ResolvedToken {
 

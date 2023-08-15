@@ -2,7 +2,8 @@ package com.thehuginn.token.resolved;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thehuginn.task.ResolutionContext;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;

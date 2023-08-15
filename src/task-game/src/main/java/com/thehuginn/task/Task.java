@@ -2,10 +2,12 @@ package com.thehuginn.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thehuginn.category.Category;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.token.resolved.LocaleText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.token.unresolved.Token;
-import com.thehuginn.util.TokenResolver;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -24,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Task extends PanacheEntity implements ResolvableTask {
+public class Task extends PanacheEntity {
 
     public enum Type {SINGLE, DUO, ALL}
 
@@ -35,13 +37,6 @@ public class Task extends PanacheEntity implements ResolvableTask {
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
             targetEntity = AbstractUnresolvedToken.class
     )
-//    @JoinTable(name = "tasks_tokens",
-//    joinColumns = @JoinColumn(name = "task_id"),
-//    inverseJoinColumns = @JoinColumn(name = "AbstractUnresolvedToken_key"),
-//    inverseForeignKey = @ForeignKey(
-//            name = "AbstractUnresolvedToken_fk_delete",
-//            foreignKeyDefinition = "FOREIGN KEY (AbstractUnresolvedToken_id) REFERENCES AbstractUnresolvedToken(id) ON DELETE CASCADE;")
-//    )
     public List<Token> tokens;
 
     @JsonProperty
@@ -158,8 +153,7 @@ public class Task extends PanacheEntity implements ResolvableTask {
         return "task_" + id;
     }
 
-    @Override
-    public ResolvedTask resolve(ResolutionContext context) {
+    public GameTask resolve(ResolutionContext context) {
         return null;
     }
 

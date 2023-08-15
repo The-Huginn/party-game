@@ -1,4 +1,4 @@
-package com.thehuginn.util;
+package com.thehuginn.resolution;
 
 import com.thehuginn.token.unresolved.PlayerUnresolvedToken;
 import com.thehuginn.token.unresolved.Token;

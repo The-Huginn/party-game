@@ -1,7 +1,8 @@
-package com.thehuginn.task;
+package com.thehuginn.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.runtime.annotations.RegisterForReflection;

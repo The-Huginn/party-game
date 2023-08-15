@@ -1,8 +1,8 @@
 package com.thehuginn;
 
+import com.thehuginn.category.Category;
+import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.services.CategoryService;
-import com.thehuginn.task.Category;
-import com.thehuginn.task.LocaleCategory;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.util.EntityCreator;
