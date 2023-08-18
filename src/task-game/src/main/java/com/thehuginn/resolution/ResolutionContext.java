@@ -1,6 +1,5 @@
 package com.thehuginn.resolution;
 
-import com.thehuginn.entities.Player;
 import jakarta.annotation.Nonnull;
 
 import java.util.Collections;
@@ -11,9 +10,9 @@ public class ResolutionContext {
 
     private final String locale;
     private final String gameId;
-    private final Player player;
-    private final List<Player> players;
-    private final List<Player> shuffledPlayers;
+    private final String player;
+    private final List<String> players;
+    private final List<String> shuffledPlayers;
 
     private ResolutionContext(String locale) {
         this.locale = locale;
@@ -26,9 +25,12 @@ public class ResolutionContext {
     private ResolutionContext(
             String locale,
             String gameId,
-            Player player,
-            List<Player> players
+            String player,
+            List<String> players
     ) {
+        if (!players.contains(player)) {
+            throw new IllegalArgumentException("Player can not be found between all players.");
+        }
         this.locale = locale;
         this.gameId = gameId;
         this.player = player;
@@ -50,8 +52,8 @@ public class ResolutionContext {
     public static class Builder {
         private String locale = "en";
         private final String gameId;
-        private Player player = null;
-        private List<Player> players = null;
+        private String player = null;
+        private List<String> players = null;
 
         private Builder(@Nonnull String gameId) {
             this.gameId = gameId;
@@ -62,12 +64,12 @@ public class ResolutionContext {
             return this;
         }
 
-        public Builder player(@Nonnull Player player) {
+        public Builder player(@Nonnull String player) {
             this.player = player;
             return this;
         }
 
-        public Builder players(@Nonnull List<Player> players) {
+        public Builder players(@Nonnull List<String> players) {
             this.players = players;
             return this;
         }
@@ -85,15 +87,15 @@ public class ResolutionContext {
         return gameId;
     }
 
-    public Player getPlayer() {
+    public String getPlayer() {
         return player;
     }
 
-    public List<Player> getPlayers() {
+    public List<String> getPlayers() {
         return players;
     }
 
-    public Player getRandomPlayer(Integer index) {
+    public String getRandomPlayer(Integer index) {
         if (index < 0 || index >= shuffledPlayers.size()) {
             throw new ArrayIndexOutOfBoundsException("Not enough players to resolve this task");
         }

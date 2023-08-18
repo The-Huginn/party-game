@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 
+import java.util.Objects;
+
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractUnresolvedToken extends PanacheEntityBase implements Token {
@@ -23,5 +25,18 @@ public abstract class AbstractUnresolvedToken extends PanacheEntityBase implemen
 
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractUnresolvedToken that = (AbstractUnresolvedToken) o;
+        return Objects.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
     }
 }

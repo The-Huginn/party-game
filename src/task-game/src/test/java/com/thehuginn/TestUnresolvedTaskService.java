@@ -1,9 +1,7 @@
 package com.thehuginn;
 
-import com.thehuginn.category.Category;
 import com.thehuginn.services.UnresolvedTaskService;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -28,16 +26,13 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 @TestHTTPEndpoint(UnresolvedTaskService.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TestUnresolvedTaskService {
+public class TestUnresolvedTaskService extends AbstractTest{
 
     @BeforeEach
     @AfterEach
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
-        asserter.execute(() -> Category.delete("id > 0"));
-        asserter.execute(() -> Task.deleteAll());
-        asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+        super.setup(asserter);
     }
 
     @Test

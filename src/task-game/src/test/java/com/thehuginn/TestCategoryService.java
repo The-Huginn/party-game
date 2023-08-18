@@ -4,7 +4,6 @@ import com.thehuginn.category.Category;
 import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.services.CategoryService;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -30,7 +29,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TestCategoryService {
+public class TestCategoryService extends AbstractTest {
 
     String categoryBody = """
             {
@@ -44,11 +43,7 @@ public class TestCategoryService {
     @AfterEach
     @RunOnVertxContext
     public void setup(UniAsserter asserter) {
-        asserter.execute(() -> Task.deleteAll());
-        asserter.execute(() -> Category.delete("id > 0"));
-        asserter.execute(() -> LocaleCategory.deleteAll());
-        asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+        super.setup(asserter);
     }
 
 

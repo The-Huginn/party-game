@@ -1,6 +1,5 @@
 package com.thehuginn.token.resolved;
 
-import com.thehuginn.entities.Player;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.resolution.TokenResolver;
@@ -12,11 +11,11 @@ import java.util.Map;
 public class PlayerResolvedToken extends AbstractResolvedToken {
 
     String playerTag;
-    Player player;
+    String  player;
 
     public PlayerResolvedToken() {}
 
-    private PlayerResolvedToken(String playerTag, Player player) {
+    private PlayerResolvedToken(String playerTag, String player) {
         this.playerTag = playerTag;
         this.player = player;
     }

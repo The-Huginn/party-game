@@ -21,23 +21,24 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 public class Task extends PanacheEntity {
 
-    public enum Type {SINGLE, DUO, ALL}
-
     public enum Repeat {ALWAYS, PER_PLAYER, NEVER}
+
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
             targetEntity = AbstractUnresolvedToken.class
     )
-    public List<Token> tokens;
+    public List<Token> tokens = new ArrayList<>();
 
     @JsonProperty
     public Type type = Type.SINGLE;
@@ -148,6 +149,20 @@ public class Task extends PanacheEntity {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task1 = (Task) o;
+        return Objects.equals(tokens, task1.tokens) && type == task1.type && repeat == task1.repeat && Objects.equals(frequency, task1.frequency) && Objects.equals(price, task1.price) && Objects.equals(task, task1.task);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tokens, type, repeat, frequency, price, task);
+    }
+
+    public enum Type {SINGLE, DUO, ALL}
     @JsonIgnore
     public String getKey() {
         return "task_" + id;

@@ -15,10 +15,8 @@
     <quarkus.platform.version>3.2.0.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
-
     <version.checkstyle>3.3.0</version.checkstyle>
     <version.org.wildfly.checkstyle>1.0.8.Final</version.org.wildfly.checkstyle>
-
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -59,11 +57,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-validator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.thehuginn</groupId>
-      <artifactId>game-service</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
