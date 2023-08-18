@@ -1,11 +1,13 @@
 package com.thehuginn.resolution;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nonnull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ResolutionContext {
 
     private final String locale;
@@ -20,6 +22,14 @@ public class ResolutionContext {
         player = null;
         players = null;
         shuffledPlayers = null;
+    }
+
+    public ResolutionContext() {
+        shuffledPlayers = null;
+        players = null;
+        player = null;
+        gameId = null;
+        locale = null;
     }
 
     private ResolutionContext(

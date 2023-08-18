@@ -5,4 +5,6 @@ import com.thehuginn.resolution.ResolutionContext;
 public interface ResolvableTask {
 
     public ResolvedTask resolve(ResolutionContext context);
+
+    public boolean isResolvable(ResolutionContext context);
 }

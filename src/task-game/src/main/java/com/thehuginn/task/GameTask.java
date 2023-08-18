@@ -36,8 +36,13 @@ public class GameTask extends PanacheEntity implements ResolvableTask, Cloneable
 
     @Override
     public ResolvedTask resolve(ResolutionContext context) {
-//        return unresolvedTask.resolve(context);
-        return null;
+        return new ResolvedTask();
+    }
+
+    @Override
+    // TODO update for players etc...
+    public boolean isResolvable(ResolutionContext context) {
+        return assignedPlayer == null || context.getPlayer().equals(assignedPlayer);
     }
 
     @Override
