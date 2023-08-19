@@ -8,6 +8,7 @@ import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.token.LocaleText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
+import com.thehuginn.token.unresolved.UnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -38,7 +39,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
             targetEntity = AbstractUnresolvedToken.class
     )
-    public List<Resolvable<ResolvedToken>> tokens = new ArrayList<>();
+    public List<UnresolvedToken> tokens = new ArrayList<>();
 
     @JsonProperty
     public Type type = Type.SINGLE;

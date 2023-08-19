@@ -1,13 +1,12 @@
 package com.thehuginn.services;
 
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
-import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.LocaleText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
+import com.thehuginn.token.unresolved.UnresolvedToken;
 import com.thehuginn.util.Helper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
@@ -41,14 +40,14 @@ public class TaskService {
     @WithTransaction
     public Uni<Task> createTask(@Valid Task task) {
         Helper.checkLocale(task.task.locale);
-        Function<List<Resolvable<ResolvedToken>>, UniAndGroupIterable<Resolvable<ResolvedToken>>> findOrCreateTokens = resolvables -> {
+        Function<List<UnresolvedToken>, UniAndGroupIterable<UnresolvedToken>> findOrCreateTokens = resolvables -> {
             List<Uni<AbstractUnresolvedToken>> unis = resolvables.stream()
                     .map(resolvedTokenResolvable ->
                             AbstractUnresolvedToken.<AbstractUnresolvedToken>findById(((AbstractUnresolvedToken) resolvedTokenResolvable).getKey())
                                     .onItem().ifNull().switchTo(((AbstractUnresolvedToken) resolvedTokenResolvable).persist()))
                     .toList();
             return Uni.combine()
-                    .all().<Resolvable<ResolvedToken>>unis(unis)
+                    .all().<UnresolvedToken>unis(unis)
                     .usingConcurrencyOf(1);
         };
         return Uni.createFrom()
@@ -59,7 +58,7 @@ public class TaskService {
                         return Uni.createFrom().voidItem();
                     }
                     return findOrCreateTokens.apply(TokenResolver.translateTask(task1.task.content))
-                            .combinedWith(objects -> task1.tokens = (List<Resolvable<ResolvedToken>>) objects);
+                            .combinedWith(objects -> task1.tokens = (List<UnresolvedToken>) objects);
                 })
                 .chain(task1 -> task1.persist());
     }

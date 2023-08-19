@@ -1,10 +1,9 @@
 package com.thehuginn.token;
 
-import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.TokenResolver;
-import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.token.unresolved.PlayerUnresolvedToken;
 import com.thehuginn.token.unresolved.TimerUnresolvedToken;
+import com.thehuginn.token.unresolved.UnresolvedToken;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,7 +26,7 @@ public class TestTranslatingTask {
     @Test
     @Order(2)
     public void testResolvingTaskWithPlayer() {
-        List<Resolvable<ResolvedToken>> tokens = TokenResolver.translateTask("This is just a test with {player_1}");
+        List<UnresolvedToken> tokens = TokenResolver.translateTask("This is just a test with {player_1}");
         Assertions.assertEquals(tokens.size(), 1);
         Assertions.assertTrue(tokens.get(0) instanceof PlayerUnresolvedToken);
         Assertions.assertEquals(((PlayerUnresolvedToken) tokens.get(0)).getKey(), "{player_1}");
@@ -36,7 +35,7 @@ public class TestTranslatingTask {
     @Test
     @Order(3)
     public void testResolvingTaskWithTimer() {
-        List<Resolvable<ResolvedToken>> tokens = TokenResolver.translateTask("This is just a test with {timer_7}");
+        List<UnresolvedToken> tokens = TokenResolver.translateTask("This is just a test with {timer_7}");
         Assertions.assertEquals(tokens.size(), 1);
         Assertions.assertTrue(tokens.get(0) instanceof TimerUnresolvedToken);
         Assertions.assertEquals(((TimerUnresolvedToken) tokens.get(0)).getKey(), "{timer_7}");
@@ -45,7 +44,7 @@ public class TestTranslatingTask {
     @Test
     @Order(6)
     public void testResolvingTaskWithCurrentPlayerOneRandomPlayerOneTimer() {
-        List<Resolvable<ResolvedToken>> tokens = TokenResolver.translateTask("{player_c} has to laugh with {player_1} for {timer_42}");
+        List<UnresolvedToken> tokens = TokenResolver.translateTask("{player_c} has to laugh with {player_1} for {timer_42}");
         Assertions.assertEquals(tokens.size(), 3);
         Assertions.assertTrue(tokens.get(0) instanceof PlayerUnresolvedToken);
         Assertions.assertEquals(((PlayerUnresolvedToken) tokens.get(0)).getKey(), "{player_c}");

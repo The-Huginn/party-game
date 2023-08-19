@@ -1,8 +1,6 @@
 package com.thehuginn.token.unresolved;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thehuginn.resolution.Resolvable;
-import com.thehuginn.task.ResolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractUnresolvedToken extends PanacheEntityBase implements Resolvable<ResolvedToken> {
+public abstract class AbstractUnresolvedToken extends PanacheEntityBase implements UnresolvedToken {
 
     @Id
     @JsonProperty
