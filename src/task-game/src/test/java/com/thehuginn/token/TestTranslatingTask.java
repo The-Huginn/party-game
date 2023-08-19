@@ -34,6 +34,15 @@ public class TestTranslatingTask {
     }
 
     @Test
+    @Order(3)
+    public void testResolvingTaskWithTimer() {
+        List<Resolvable<ResolvedToken>> tokens = TokenResolver.translateTask("This is just a test with {timer_7}");
+        Assertions.assertEquals(tokens.size(), 1);
+        Assertions.assertTrue(tokens.get(0) instanceof TimerUnresolvedToken);
+        Assertions.assertEquals(((TimerUnresolvedToken) tokens.get(0)).getKey(), "{timer_7}");
+    }
+
+    @Test
     @Order(6)
     public void testResolvingTaskWithCurrentPlayerOneRandomPlayerOneTimer() {
         List<Resolvable<ResolvedToken>> tokens = TokenResolver.translateTask("{player_c} has to laugh with {player_1} for {timer_42}");
