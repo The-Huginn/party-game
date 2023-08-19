@@ -126,10 +126,7 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -168,10 +165,7 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -211,10 +205,7 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -254,10 +245,7 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -297,10 +285,7 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -324,6 +309,49 @@ public class TestGameService extends AbstractTest {
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
                                 anyOf(is(PLAYER + PLAYERS.get(1) + PLAYERS.get(2)), is(PLAYER + PLAYERS.get(2) + PLAYERS.get(1))),
                                 "data.locale", is("en")));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(10)
+    void testStartingGameWithOneTaskWithCurrentPlayerAllRandomPlayerTranslated(UniAsserter asserter) {
+        String task = "%s sa musí s hráčom %s smiať %s";
+        asserter.execute(() -> taskService.createTask(new Task.Builder("{player_c} has to laugh with {player_1} for {timer_42}")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task1 -> asserter.putData("task", task1)));
+        asserter.execute(() -> taskService.createLocale(((Task) asserter.getData("task")).id, "sk",
+                        task.formatted("{player_c}", "{player_1}", "{timer_42}")));
+        asserter.execute(() -> {
+            List<Task> tasks = List.of((Task) asserter.getData("task"));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> {
+            GameSession gameSession = new GameSession();
+            gameSession.gameId = GAME;
+            return gameSession.persistAndFlush();
+        });
+
+        asserter.execute(() ->
+                given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "sk").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/current")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .body("data." + ((Task) asserter.getData("task")).getKey(),
+                                anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")), is(task.formatted(PLAYER, PLAYERS.get(2), "42s"))),
+                                "data.locale", is("sk")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

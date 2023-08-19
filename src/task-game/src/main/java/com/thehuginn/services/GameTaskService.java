@@ -23,27 +23,14 @@ public class GameTaskService {
      *  and we persist all objects right away
      */
     @WithTransaction
-    public Uni<Void> generateGameTasks(String game, Collection<Task> allTasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
+    public Uni<Void> generateGameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
         List<GameTask> createdTasks = new ArrayList<>();
         Set<Task> tasks = new HashSet<>(allTasks);
         for (var task : tasks) {
-            for (short amount = 0; amount < task.frequency; amount++) {
-                GameTask gameTask = new GameTask();
-                gameTask.game = game;
-                gameTask.unresolvedTask = task;
-                if (task.repeat.equals(Task.Repeat.PER_PLAYER)) {
-                    for (String player: resolutionContext.getPlayers()) {
-                        GameTask shallowCopy = gameTask.clone();
-                        shallowCopy.assignedPlayer = player;
-                        createdTasks.add(shallowCopy);
-                    }
-                } else {
-                    createdTasks.add(gameTask);
-                }
-            }
+            createdTasks.addAll(task.resolve(resolutionContext));
         }
 
-        Uni<Long> deletePrevious = GameTask.delete("game", game )
+        Uni<Long> deletePrevious = GameTask.delete("game", resolutionContext.getGameId() )
                 .invoke(aLong -> {
                     if (aLong.compareTo(0L) > 0) {
                         Log.infof("Previous game [%s] was deleted with %d tasks remaining");

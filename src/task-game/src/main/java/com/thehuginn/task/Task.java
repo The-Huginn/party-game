@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Task extends PanacheEntity implements Resolvable<GameTask> {
+public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
 
     public enum Repeat {ALWAYS, PER_PLAYER, NEVER}
 
@@ -162,8 +162,25 @@ public class Task extends PanacheEntity implements Resolvable<GameTask> {
         return "task_" + id;
     }
 
-    public GameTask resolve(ResolutionContext context) {
-        return null;
+    @Override
+    public List<GameTask> resolve(ResolutionContext context) {
+        List<GameTask> tasks = new ArrayList<>();
+        for (short amount = 0; amount < frequency; amount++) {
+            GameTask gameTask = new GameTask();
+            gameTask.game = context.getGameId();
+            gameTask.unresolvedTask = this;
+            if (repeat.equals(Task.Repeat.PER_PLAYER)) {
+                for (String player: context.getPlayers()) {
+                    GameTask shallowCopy = gameTask.clone();
+                    shallowCopy.assignedPlayer = player;
+                    tasks.add(shallowCopy);
+                }
+            } else {
+                tasks.add(gameTask);
+            }
+        }
+
+        return tasks;
     }
 
     @Override

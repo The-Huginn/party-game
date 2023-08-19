@@ -369,4 +369,107 @@ public class TestTaskService extends AbstractTest{
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
+
+    @Test
+    @Order(11)
+    @RunOnVertxContext
+    public void testCreateWrongLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("{player_c} plays").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{player_1} hrá")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.BAD_REQUEST);
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(12)
+    @RunOnVertxContext
+    public void testUpdateToWrongLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("{player_c} plays").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{player_c} hrá")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK);
+        });
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{player_1} hrá")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.BAD_REQUEST);
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(13)
+    @RunOnVertxContext
+    public void testUpdateToCorrectLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("{player_c} plays for {timer_42} with {player_1}")
+                .<Task>persistAndFlush()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{player_c} hrá na {timer_42} s hráčom {player_1}")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK);
+        });
+
+//        asserter.execute(() -> {
+//            Boolean result = given()
+//                    .pathParam("id", asserter.getData("id"))
+//                    .pathParam("locale", "sk")
+//                    .when().delete("/{id}/{locale}")
+//                    .then()
+//                    .statusCode(RestResponse.StatusCode.OK)
+//                    .extract()
+//                    .as(Boolean.class);
+//
+//            Assertions.assertTrue(result);
+//        });
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{player_c} hrá na {timer_42} s hráčom: {player_1}")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .when().put("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("locale", is("sk"),
+                            "content", is("{player_c} hrá na {timer_42} s hráčom: {player_1}"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 }

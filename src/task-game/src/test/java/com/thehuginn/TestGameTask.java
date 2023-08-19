@@ -53,10 +53,7 @@ public class TestGameTask extends AbstractTest{
     void testCreateFromEmptyList(UniAsserter asserter) {
         asserter.execute(() -> {
             try {
-                return new GameTaskService().generateGameTasks(
-                        "game",
-                        Collections.emptyList(),
-                        resolutionContext);
+                return new GameTaskService().generateGameTasks(Collections.emptyList(), resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -79,10 +76,7 @@ public class TestGameTask extends AbstractTest{
                     (Task) asserter.getData("task1")
             );
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -133,10 +127,7 @@ public class TestGameTask extends AbstractTest{
             tasks.add((Task) asserter.getData("task3"));
             tasks.add((Task) asserter.getData("task4"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -212,10 +203,7 @@ public class TestGameTask extends AbstractTest{
             tasks.add((Task) asserter.getData("task1"));
             tasks.add((Task) asserter.getData("task2"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
@@ -227,10 +215,7 @@ public class TestGameTask extends AbstractTest{
             tasks.add((Task) asserter.getData("task4"));
             tasks.add((Task) asserter.getData("task2"));
             try {
-                return gameTaskService.generateGameTasks(
-                        GAME,
-                        tasks,
-                        resolutionContext);
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }

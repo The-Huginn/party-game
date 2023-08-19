@@ -7,7 +7,7 @@ import com.thehuginn.task.Task;
 import com.thehuginn.token.LocaleText;
 import com.thehuginn.util.Helper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
-import io.quarkus.panache.common.Parameters;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
@@ -18,8 +18,10 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.Map;
 
@@ -100,6 +102,7 @@ public class TaskService {
     public Uni<LocaleText> createLocale(@RestPath Long id, @RestPath String locale, String content) {
         Helper.checkLocale(locale);
         return Task.<Task>findById(id)
+                .invoke(task -> preservesTokens(task.task, content))
                 .chain(task -> {
                     LocaleText newLocale = new LocaleText();
                     newLocale.task = task;
@@ -110,15 +113,22 @@ public class TaskService {
     }
 
     @PUT
-    @Path("/{key}/{locale}")
+    @Path("/{id}/{locale}")
     @WithTransaction
     public Uni<LocaleText> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
-        return LocaleText.<LocaleText>find("id = :id and locale = :locale", Parameters.with("id", id).and("locale", locale))
-                .singleResult()
+        return LocaleText.<LocaleText>findById(new LocaleText.LocaleTextPK(id, locale))
+                .invoke(task -> preservesTokens(task, newContent))
                 .onItem().ifNotNull().<LocaleText>transformToUni(localeText -> {
                     localeText.content = newContent;
                     return localeText.persist();
                 })
-                .onFailure().recoverWithNull();
+                .onFailure().invoke(Log::error);
+    }
+
+    private void preservesTokens(LocaleText task, String content) {
+        if (!TokenResolver.translateTask(task.content).equals(TokenResolver.translateTask(content))) {
+            Log.warnf("Trying to create or update locale without preserving tokens in their respective order");
+            throw new WebApplicationException("Trying to create or update locale without preserving tokens in their respective order", RestResponse.StatusCode.BAD_REQUEST);
+        }
     }
 }
