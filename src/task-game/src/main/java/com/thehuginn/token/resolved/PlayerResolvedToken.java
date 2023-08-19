@@ -4,10 +4,13 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Map;
 
 @Entity
+@OnDelete(action = OnDeleteAction.CASCADE)
 public class PlayerResolvedToken extends AbstractResolvedToken {
 
     String playerTag;

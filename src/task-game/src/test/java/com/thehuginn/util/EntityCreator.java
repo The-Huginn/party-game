@@ -1,5 +1,6 @@
 package com.thehuginn.util;
 
+import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
 import com.thehuginn.task.Task;
 
@@ -31,5 +32,11 @@ public class EntityCreator {
                 })
                 .collect(Collectors.toSet());
         return category;
+    }
+
+    public static GameSession createGameSession(String gameId) {
+        GameSession gameSession = new GameSession();
+        gameSession.gameId = gameId;
+        return gameSession;
     }
 }

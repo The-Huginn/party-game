@@ -5,10 +5,13 @@ import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.token.resolved.PlayerResolvedToken;
 import jakarta.persistence.Entity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
 @Entity
+@OnDelete(action = OnDeleteAction.CASCADE)
 public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
 
     public PlayerUnresolvedToken() {}

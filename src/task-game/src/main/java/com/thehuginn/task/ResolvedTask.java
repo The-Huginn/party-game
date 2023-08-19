@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
             orphanRemoval = true,
             mappedBy = "resolvedTask"
     )
-    public List<ResolvedToken> tokens;
+    public List<ResolvedToken> tokens = new ArrayList<>();
 
 
     public ResolvedTask() {}
@@ -38,9 +39,13 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
     public static ResolvedTask resolve(GameTask gameTask, ResolutionContext resolutionContext) {
         ResolvedTask resolvedTask = new ResolvedTask();
         resolvedTask.unresolvedTask = gameTask.unresolvedTask;
-        resolvedTask.tokens = gameTask.unresolvedTask.tokens.stream()
-                .map(resolvedTokenResolvable -> resolvedTokenResolvable.resolve(resolutionContext))
-                .toList();
+        resolvedTask.tokens.addAll(gameTask.unresolvedTask.tokens.stream()
+                .map(resolvedTokenResolvable -> {
+                    ResolvedToken resolvedToken = resolvedTokenResolvable.resolve(resolutionContext);
+                    ((AbstractResolvedToken) resolvedToken).resolvedTask = resolvedTask;
+                    return resolvedToken;
+                })
+                .toList());
         return resolvedTask;
     }
 

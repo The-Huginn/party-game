@@ -4,6 +4,7 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.services.GameTaskService;
 import com.thehuginn.services.TaskService;
 import com.thehuginn.task.Task;
+import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
@@ -13,6 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -58,9 +60,9 @@ public class TestGameService extends AbstractTest {
         asserter.execute(() ->
                 given()
                         .cookie(new Cookie.Builder("gameId", GAME).build())
-                .when()
+                        .when()
                         .post("/game")
-                .then()
+                        .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("gameId", is(GAME),
                                 "categories.size()", is(0)));
@@ -71,11 +73,7 @@ public class TestGameService extends AbstractTest {
     @Test
     @Order(2)
     void testGettingGameSession(UniAsserter asserter) {
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -93,11 +91,7 @@ public class TestGameService extends AbstractTest {
     @Test
     @Order(5)
     void testStartingEmptyGame(UniAsserter asserter) {
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -131,11 +125,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -143,9 +133,9 @@ public class TestGameService extends AbstractTest {
                         .cookie(new Cookie.Builder("locale", "en").build())
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
-                .when()
+                        .when()
                         .get("game/task/current")
-                .then()
+                        .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task"),
                                 "data.locale", is("en")));
@@ -156,10 +146,10 @@ public class TestGameService extends AbstractTest {
     @Test
     @Order(7)
     void testStartingGameWithOneTaskWithRandomPlayer(UniAsserter asserter) {
-            asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
-                            .repeat(Task.Repeat.NEVER)
-                            .type(Task.Type.ALL)
-                            .build())
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
         asserter.execute(() -> {
@@ -170,11 +160,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -187,7 +173,7 @@ public class TestGameService extends AbstractTest {
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
-                                    anyOf(is("simple task for " + PLAYERS.get(1)), is("simple task for " + PLAYERS.get(2))),
+                                anyOf(is("simple task for " + PLAYERS.get(1)), is("simple task for " + PLAYERS.get(2))),
                                 "data.locale", is("en")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -210,11 +196,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -250,11 +232,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -290,11 +268,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -324,7 +298,7 @@ public class TestGameService extends AbstractTest {
                 .onItem()
                 .invoke(task1 -> asserter.putData("task", task1)));
         asserter.execute(() -> taskService.createLocale(((Task) asserter.getData("task")).id, "sk",
-                        task.formatted("{player_c}", "{player_1}", "{timer_42}")));
+                task.formatted("{player_c}", "{player_1}", "{timer_42}")));
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -333,11 +307,7 @@ public class TestGameService extends AbstractTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> {
-            GameSession gameSession = new GameSession();
-            gameSession.gameId = GAME;
-            return gameSession.persistAndFlush();
-        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() ->
                 given()
@@ -352,6 +322,54 @@ public class TestGameService extends AbstractTest {
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
                                 anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")), is(task.formatted(PLAYER, PLAYERS.get(2), "42s"))),
                                 "data.locale", is("sk")));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(11)
+    void testGetCurrentTaskTwice(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task", task)));
+        asserter.execute(() -> {
+            List<Task> tasks = List.of((Task) asserter.getData("task"));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        asserter.execute(() ->
+                asserter.putData("resolvedTask", given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/current")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asPrettyString()));
+
+        asserter.execute(() -> Assertions.assertEquals(asserter.getData("resolvedTask"),
+                given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/current")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asPrettyString()));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

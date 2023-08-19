@@ -4,8 +4,11 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.token.resolved.TimerResolvedToken;
 import jakarta.persistence.Entity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
+@OnDelete(action = OnDeleteAction.CASCADE)
 public class TimerUnresolvedToken extends AbstractUnresolvedToken {
 
     public TimerUnresolvedToken() {}
