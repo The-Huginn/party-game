@@ -3,6 +3,7 @@ package com.thehuginn.services;
 import com.thehuginn.category.Category;
 import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.task.Task;
+import com.thehuginn.util.Helper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
@@ -92,6 +93,7 @@ public class CategoryService {
     @POST
     @Path("/translation/")
     public Uni<LocaleCategory> createTranslation(LocaleCategory localeCategory) {
+        Helper.checkLocale(localeCategory.locale);
         return Category.<Category>findById(localeCategory.category.id)
                 .chain(category -> {
                     localeCategory.category = category;

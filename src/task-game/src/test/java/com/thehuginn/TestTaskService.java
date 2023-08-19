@@ -317,4 +317,56 @@ public class TestTaskService extends AbstractTest{
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
+
+    @Test
+    @Order(9)
+    @RunOnVertxContext
+    public void testCreateTaskWithUnknownLocale(UniAsserter asserter) {
+        asserter.execute(() ->
+                given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("""
+                            {
+                                "task": {
+                                    "content": "test",
+                                    "locale": "foo"
+                                },
+                                "type": "DUO",
+                                "repeat": "PER_PLAYER",
+                                "frequency": 3,
+                                "price": {
+                                    "enabled": false,
+                                    "price": 2
+                                }
+                            }
+                            """)
+                    .when().post()
+                    .then()
+                    .statusCode(RestResponse.StatusCode.BAD_REQUEST)
+        );
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(10)
+    @RunOnVertxContext
+    public void testCreateUnknownLocale(UniAsserter asserter) {
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("id", task.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("foo")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "bar")
+                    .when().post("/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.BAD_REQUEST);
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 }

@@ -5,6 +5,7 @@ import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.LocaleText;
+import com.thehuginn.util.Helper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -31,6 +32,7 @@ public class TaskService {
     @POST
     @WithTransaction
     public Uni<Task> createTask(@Valid Task task) {
+        Helper.checkLocale(task.task.locale);
         return Uni.createFrom()
                 .item(task)
                 .invoke(task1 -> {
@@ -96,6 +98,7 @@ public class TaskService {
     @Path("/{id}/{locale}")
     @WithTransaction
     public Uni<LocaleText> createLocale(@RestPath Long id, @RestPath String locale, String content) {
+        Helper.checkLocale(locale);
         return Task.<Task>findById(id)
                 .chain(task -> {
                     LocaleText newLocale = new LocaleText();
