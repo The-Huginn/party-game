@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -403,8 +404,8 @@ public class TestGameService extends AbstractTest {
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
         asserter.execute(() -> {
-            List<Task> tasks = List.of((Task) asserter.getData("task1"),
-                    (Task) asserter.getData("task2"));
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
             asserter.putData("tasks", tasks);
             try {
                 return gameTaskService.generateGameTasks(tasks, resolutionContext);
@@ -430,10 +431,10 @@ public class TestGameService extends AbstractTest {
             List<Task> tasks = (List<Task>) asserter.getData("tasks");
             if (task.contains("simple task for")) {
                 tasks.remove((Task) asserter.getData("task1"));
-                asserter.putData("other", asserter.getData("task2"));
+                asserter.putData("other", "task_" + ((Task) asserter.getData("task2")).id);
             } else {
                 tasks.remove((Task) asserter.getData("task2"));
-                asserter.putData("other", asserter.getData("task1"));
+                asserter.putData("other", "task_" + ((Task) asserter.getData("task1")).id);
             }
             asserter.putData("tasks", tasks);
         });
@@ -450,9 +451,67 @@ public class TestGameService extends AbstractTest {
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
                     .asString();
-            //noinspection unchecked
-            List<Task> tasks = (List<Task>) asserter.getData("tasks");
-            Assertions.assertTrue(tasks.contains((Task) asserter.getData("other")));
+            Assertions.assertTrue(task.contains((String) asserter.getData("other")));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(11)
+    void testGetCurrentTask(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task1", task)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder("{player_c} with a simple task")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task2", task)));
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        asserter.execute(() -> {
+            String task = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
+            asserter.putData("task", task);
+        });
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("game/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is(asserter.getData("task")));
+//                    .extract()
+//                    .asString();
+//            Assertions.assertTrue(task.contains((String) asserter.getData("other")));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

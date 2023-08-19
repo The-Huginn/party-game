@@ -10,6 +10,7 @@ import jakarta.enterprise.context.RequestScoped;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class GameTaskService {
                     .replaceWithVoid();
         }
 
+        Collections.shuffle(createdTasks);
         Uni<Void> newGameTasks = Uni.combine()
                 .all()
                 .unis(createdTasks.stream()

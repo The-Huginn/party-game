@@ -36,7 +36,7 @@ public class GameSession extends PanacheEntityBase {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    public ResolvedTask currentTask = null;
+    public ResolvedTask currentTask;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -88,13 +88,13 @@ public class GameSession extends PanacheEntityBase {
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext) {
         return GameTask.<GameTask>find("game = :game", Parameters.with("game", gameId))
-                .singleResult()
+                .firstResult()
                 .chain(gameTask -> {
                     if (!gameTask.isResolvable(resolutionContext)) {
                         return nextTaskUni(resolutionContext);
                     }
 
-                    return gameTask.resolve(resolutionContext).persist();
+                    return Uni.createFrom().item(gameTask.resolve(resolutionContext));
                 });
     }
 }

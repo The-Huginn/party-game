@@ -64,4 +64,23 @@ public class GameService {
                 .onItem().ifNull().fail()
                 .onFailure().recoverWithNull();
     }
+
+    @GET
+    @WithTransaction
+    @Path("/task/next")
+    public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
+        return GameSession.<GameSession>findById(gameId)
+                .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))
+                .onItem().ifNotNull().call(gameSession -> Uni.createFrom()
+                        .item(gameSession.currentTask)
+                        .onItem()
+                        .ifNotNull()
+                        .call(resolvedTask -> gameSession.currentTask.remove())
+                )
+                .chain(gameSession -> gameSession.nextTask(resolutionContext))
+                .onItem().ifNotNull().transformToUni(resolvedTask ->
+                        resolvedTask.resolve(resolutionContext).resolve())
+                .onItem().ifNull().fail()
+                .onFailure().recoverWithNull();
+    }
 }
