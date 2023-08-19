@@ -3,7 +3,7 @@ package com.thehuginn.token;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.ResolvedResult;
+import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -79,15 +79,13 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
     }
 
     @Override
-    public ResolvedResult resolve(ResolutionContext context) {
+    public UnresolvedResult resolve(ResolutionContext context) {
         Uni<LocaleText> localeTextUni = LocaleText
                 .<LocaleText>find("#LocaleText.byLocale",
                         Parameters.with("locale", context.getLocale()).and("id", task.id))
                 .firstResult()
-                .onItem()
-                .ifNull()
-                .continueWith(this);
-        return new ResolvedResult().appendData(Map.entry(task.getKey(),
+                .replaceIfNullWith(this);
+        return new UnresolvedResult().task(Map.entry(task.getKey(),
                         localeTextUni
                                 .onItem()
                                 .transform(localeText -> localeText.content)))

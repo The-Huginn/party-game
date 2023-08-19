@@ -2,6 +2,7 @@ package com.thehuginn.resolution;
 
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.token.unresolved.PlayerUnresolvedToken;
+import com.thehuginn.token.unresolved.TimerUnresolvedToken;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.tuples.Tuple2;
 import jakarta.annotation.Nonnull;
@@ -15,14 +16,19 @@ import java.util.stream.Stream;
 
 public class TokenResolver {
 
-    private static final Pattern tokenPattern = Pattern.compile("\\{.*\\}");
+    private static final Pattern tokenPattern = Pattern.compile("\\{.*?\\}");
 
     private TokenResolver() {}
+
+    public static boolean isToken(@Nonnull String key) {
+        return tokenPattern.matcher(key).find();
+    }
 
     public static Tuple2<Class<? extends Resolvable<ResolvedToken>>, List<String >> resolveToken(@Nonnull String key) {
         String[] splitKey = key.substring(1, key.length() - 1).split("_");
         Class<? extends Resolvable<ResolvedToken>> tokenClass = switch (splitKey[0]) {
             case "player" -> PlayerUnresolvedToken.class;
+            case "timer" -> TimerUnresolvedToken.class;
             default -> throw new IllegalStateException("Unexpected token detected with value: " + splitKey[0]);
         };
 
@@ -39,7 +45,7 @@ public class TokenResolver {
             }
             Tuple2<Class<? extends Resolvable<ResolvedToken>>, List<String>> resolvedToken = resolveToken(token.trim());
             try {
-                tokens.add(resolvedToken.getItem1().getConstructor(String.class).newInstance(task));
+                tokens.add(resolvedToken.getItem1().getConstructor(String.class).newInstance(token));
             } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
                 Log.errorf(e, "Unable to instantiate following task [%s] and token [%s] into Token of [%s]",
                         task, token, resolvedToken.getItem1());

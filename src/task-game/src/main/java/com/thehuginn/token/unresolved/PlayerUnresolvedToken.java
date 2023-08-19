@@ -35,9 +35,13 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
             throw new IllegalStateException(PlayerUnresolvedToken.class + "#resolve requires one parameter");
         }
         String player = args.get(0);
-        if (!player.equals("c") && !player.matches("\\d+")) {
+        if (player.equals("c")) {
+            return 0;
+        }
+        if (!player.matches("\\d+")) {
             throw new IllegalArgumentException(PlayerUnresolvedToken.class + "#resolve expects integer or 'c' argument");
         }
-        return Integer.getInteger(player);
+
+        return Integer.valueOf(player);
     }
 }

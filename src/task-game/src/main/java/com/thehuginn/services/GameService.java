@@ -1,9 +1,8 @@
 package com.thehuginn.services;
 
-import com.thehuginn.category.Category;
 import com.thehuginn.resolution.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.ResolvedResult;
+import com.thehuginn.resolution.UnresolvedResult;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.DELETE;
@@ -15,8 +14,6 @@ import jakarta.ws.rs.WebApplicationException;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
-
-import java.util.stream.Collectors;
 
 @Path("/game")
 public class GameService {
@@ -37,34 +34,23 @@ public class GameService {
     @PUT
     @WithTransaction
     @Path("/category/{categoryId}")
-    public Uni<GameSession> addCategory(@RestCookie String gameId, @RestPath Long categoryId) {
+    public Uni<Boolean> addCategory(@RestCookie String gameId, @RestPath Long categoryId) {
         return GameSession.<GameSession>findById(gameId)
-                .onItem()
-                .call(gameSession -> Category.<Category>findById(categoryId)
-                        .onItem()
-                        .ifNotNull()
-                        .invoke(category -> gameSession.categories.add(category)))
-                .onItem()
-                .transformToUni(gameSession -> gameSession.persist());
+                .chain(gameSession -> gameSession.addCategory(categoryId));
     }
 
     @DELETE
     @WithTransaction
     @Path("/category/{categoryId}")
-    public Uni<GameSession> removeCategory(@RestCookie String gameId, @RestPath Long categoryId) {
+    public Uni<Boolean> removeCategory(@RestCookie String gameId, @RestPath Long categoryId) {
         return GameSession.<GameSession>findById(gameId)
-                .onItem()
-                .invoke(gameSession -> gameSession.categories = gameSession.categories.stream()
-                        .filter(category -> !category.id.equals(categoryId))
-                        .collect(Collectors.toSet()))
-                .onItem()
-                .transformToUni(gameSession -> gameSession.persist());
+                .chain(gameSession -> gameSession.removeCategory(categoryId));
     }
 
     @GET
     @WithTransaction
     @Path("/task/current")
-    public Uni<ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
+    public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
         return GameSession.<GameSession>findById(gameId)
                 .onItem()
                 .ifNull()

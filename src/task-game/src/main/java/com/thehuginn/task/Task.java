@@ -60,10 +60,6 @@ public class Task extends PanacheEntity implements Resolvable<GameTask> {
     @JsonIgnore
     public Category category = Category.getDefaultInstance();
 
-    public List<Resolvable<ResolvedToken>> getTokens() {
-        return tokens;
-    }
-
     @Embeddable
     public static class Price {
         @Column(name = "price_enabled")
@@ -83,7 +79,7 @@ public class Task extends PanacheEntity implements Resolvable<GameTask> {
         private boolean setId = false;
         private long id;
 
-        private String task;
+        private final String task;
 
         private String locale = "en";
 
@@ -94,8 +90,6 @@ public class Task extends PanacheEntity implements Resolvable<GameTask> {
         private short frequency = 1;
 
         private Price price = new Price();
-
-        public Builder() {}
 
         public Builder(String task) {
             this.task = task;

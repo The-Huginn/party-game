@@ -5,6 +5,7 @@ import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.resolution.GameSession;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
+import com.thehuginn.token.resolved.AbstractResolvedToken;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -28,6 +29,7 @@ public abstract class AbstractTest {
         asserter.execute(() -> Category.delete("id > 0"));
         asserter.execute(() -> LocaleCategory.deleteAll());
         asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
+        asserter.execute(() -> AbstractResolvedToken.deleteAll());
         asserter.execute(() -> GameSession.deleteAll());
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

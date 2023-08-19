@@ -45,7 +45,8 @@ public class CategoryService {
                     if (category.tasks.size() != tasks.size()) {
                         throw new WebApplicationException("Unable to retrieve all tasks");
                     }
-                    category.tasks = tasks;
+                    category.tasks.clear();
+                    category.tasks.addAll(tasks);
                     return category.persist();
                 })
                 .onItem()

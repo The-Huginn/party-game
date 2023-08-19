@@ -45,6 +45,32 @@ public class GameSession extends PanacheEntityBase {
 
     public GameSession() {}
 
+    public Uni<Boolean> addCategory(Long categoryId) {
+        return Category.<Category>findById(categoryId)
+                .onItem()
+                .transformToUni(category -> {
+                    if (category != null) {
+                        this.categories.add(category);
+                        return this.persist()
+                                .replaceWith(Boolean.TRUE);
+                    }
+                    return Uni.createFrom().item(Boolean.FALSE);
+                });
+    }
+
+    public Uni<Boolean> removeCategory(Long categoryId) {
+        return Category.<Category>findById(categoryId)
+                .onItem()
+                .transformToUni(category -> {
+                    if (category != null) {
+                        Boolean removed = this.categories.remove(category);
+                        return this.persist()
+                                .replaceWith(removed);
+                    }
+                    return Uni.createFrom().item(Boolean.FALSE);
+                });
+    }
+
     public Uni<ResolvedTask> nextTask(ResolutionContext resolutionContext) {
         Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
                 .onItem()

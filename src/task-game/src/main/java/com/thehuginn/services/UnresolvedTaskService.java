@@ -1,8 +1,8 @@
 package com.thehuginn.services;
 
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.resolution.TokenResolver;
+import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.LocaleText;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -85,8 +85,8 @@ public class UnresolvedTaskService {
         return Task.<Task>findById(id)
                 .onItem()
                 .call(task -> {
-                    ResolvedResult resolvedResult = task.task.resolve(resolutionContext);
-                    return resolvedResult.resolve()
+                    UnresolvedResult unresolvedResult = task.task.resolve(resolutionContext);
+                    return unresolvedResult.resolve()
                             .onItem()
                             .invoke(resolvedResult1 -> {
                                 Map<String, Object> map = resolvedResult1.getData();

@@ -3,7 +3,7 @@ package com.thehuginn.task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
-import com.thehuginn.resolution.ResolvedResult;
+import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.token.resolved.AbstractResolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
@@ -17,7 +17,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.List;
 
 @Entity
-public class ResolvedTask extends PanacheEntity implements Resolvable<ResolvedResult> {
+public class ResolvedTask extends PanacheEntity implements Resolvable<UnresolvedResult> {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -26,7 +26,9 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<ResolvedRe
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
-            targetEntity = AbstractResolvedToken.class
+            targetEntity = AbstractResolvedToken.class,
+            orphanRemoval = true,
+            mappedBy = "resolvedTask"
     )
     public List<ResolvedToken> tokens;
 
@@ -44,12 +46,12 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<ResolvedRe
 
     @Override
     // TODO add title, current player etc...
-    public ResolvedResult resolve(ResolutionContext context) {
-        ResolvedResult resolvedResult = unresolvedTask.task.resolve(context);
+    public UnresolvedResult resolve(ResolutionContext context) {
+        UnresolvedResult unresolvedResult = unresolvedTask.task.resolve(context);
         for (ResolvedToken token : tokens) {
-            resolvedResult.addResolvedResult(token.resolve(context));
+            unresolvedResult.addResolvedResult(token.resolve(context));
         }
-        return resolvedResult;
+        return unresolvedResult;
     }
 
     @Override

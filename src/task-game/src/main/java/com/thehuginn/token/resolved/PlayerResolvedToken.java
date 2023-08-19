@@ -1,13 +1,15 @@
 package com.thehuginn.token.resolved;
 
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.resolution.TokenResolver;
+import com.thehuginn.resolution.UnresolvedResult;
 import io.smallrye.mutiny.Uni;
+import jakarta.persistence.Entity;
 
 import java.util.List;
 import java.util.Map;
 
+@Entity
 public class PlayerResolvedToken extends AbstractResolvedToken {
 
     String playerTag;
@@ -38,8 +40,8 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
     }
 
     @Override
-    public ResolvedResult resolve(ResolutionContext context) {
-        return new ResolvedResult().appendData(Map.entry(playerTag, Uni.createFrom().item(player)));
+    public UnresolvedResult resolve(ResolutionContext context) {
+        return new UnresolvedResult().appendData(Map.entry(playerTag, Uni.createFrom().item(player)));
     }
 
     @Override
