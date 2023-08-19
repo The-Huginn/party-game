@@ -3,7 +3,7 @@ package com.thehuginn.services;
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.task.ResolvedTask;
+import com.thehuginn.resolution.ResolvedResult;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.DELETE;
@@ -64,7 +64,7 @@ public class GameService {
     @GET
     @WithTransaction
     @Path("/task/current")
-    public Uni<ResolvedTask> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
+    public Uni<ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
         return GameSession.<GameSession>findById(gameId)
                 .onItem()
                 .ifNull()
@@ -76,6 +76,15 @@ public class GameService {
                         .onItem()
                         .ifNull()
                         .switchTo(gameSession.nextTask(resolutionContext))
-                );
+                )
+                .onItem()
+                .ifNotNull()
+                .transformToUni(resolvedTask -> resolvedTask.resolve(resolutionContext)
+                        .resolve())
+                .onItem()
+                .ifNull()
+                .fail()
+                .onFailure()
+                .recoverWithNull();
     }
 }

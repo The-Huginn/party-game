@@ -118,9 +118,9 @@ public class TestGameService extends AbstractTest {
                 .build()
                 .<Task>persistAndFlush()
                 .onItem()
-                .invoke(task -> asserter.putData("task1", task)));
+                .invoke(task -> asserter.putData("task", task)));
         asserter.execute(() -> {
-            List<Task> tasks = List.of((Task) asserter.getData("task1"));
+            List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
                 return gameTaskService.generateGameTasks(
                         GAME,
@@ -142,10 +142,12 @@ public class TestGameService extends AbstractTest {
                         .cookie(new Cookie.Builder("locale", "en").build())
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .when()
+                .when()
                         .get("game/task/current")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.OK));
+                .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task"),
+                                "data.locale", is("en")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
