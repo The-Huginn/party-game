@@ -12,9 +12,9 @@ public class UnresolvedResult {
     // This needs to be ordered map see #resolveUnis()
     private Map.Entry<String, Uni<String>> task;
     private final Map<String, Uni<?>> data = new LinkedHashMap<>();
-    private String title = null;
 
     public Uni<ResolvedResult> resolve() {
+        //noinspection unchecked
         return Uni.combine()
                 .all()
                 .unis(fetchTask(), fetchData())
@@ -38,8 +38,7 @@ public class UnresolvedResult {
                 .toList();
         return Uni.createFrom()
                 .item(this)
-                .onItem()
-                .transformToUni(unresolvedResult -> Uni.combine()
+                .chain(unresolvedResult -> Uni.combine()
                         .all()
                         .unis(dataUnis)
                         .usingConcurrencyOf(1)

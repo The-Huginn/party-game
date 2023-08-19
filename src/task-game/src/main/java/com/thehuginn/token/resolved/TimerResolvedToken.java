@@ -32,7 +32,7 @@ public class TimerResolvedToken extends AbstractResolvedToken {
             throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
         }
         int durationValue = Integer.parseInt(duration);
-        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(Integer.toString(durationValue) + "s")));
+        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(durationValue + "s")));
     }
 
     @Override

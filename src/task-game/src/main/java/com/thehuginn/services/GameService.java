@@ -1,6 +1,6 @@
 package com.thehuginn.services;
 
-import com.thehuginn.resolution.GameSession;
+import com.thehuginn.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -52,25 +52,16 @@ public class GameService {
     @Path("/task/current")
     public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
         return GameSession.<GameSession>findById(gameId)
-                .onItem()
-                .ifNull()
-                .failWith(new WebApplicationException("Unable to find game session"))
-                .onItem()
-                .ifNotNull()
-                .transformToUni(gameSession -> Uni.createFrom()
+                .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))
+                .onItem().ifNotNull().transformToUni(gameSession -> Uni.createFrom()
                         .item(gameSession.currentTask)
                         .onItem()
                         .ifNull()
                         .switchTo(gameSession.nextTask(resolutionContext))
                 )
-                .onItem()
-                .ifNotNull()
-                .transformToUni(resolvedTask -> resolvedTask.resolve(resolutionContext)
+                .onItem().ifNotNull().transformToUni(resolvedTask -> resolvedTask.resolve(resolutionContext)
                         .resolve())
-                .onItem()
-                .ifNull()
-                .fail()
-                .onFailure()
-                .recoverWithNull();
+                .onItem().ifNull().fail()
+                .onFailure().recoverWithNull();
     }
 }

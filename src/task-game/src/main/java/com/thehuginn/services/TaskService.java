@@ -6,6 +6,7 @@ import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.LocaleText;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
-public class UnresolvedTaskService {
+public class TaskService {
 
     @POST
     @WithTransaction
@@ -36,8 +37,7 @@ public class UnresolvedTaskService {
                     task1.tokens = TokenResolver.translateTask(task1.task.content);
                     task.task = new LocaleText(task1, task.task.locale, task.task.content);
                 })
-                .onItem()
-                .transformToUni(task1 -> task1.persist());
+                .chain(task1 -> task1.persist());
     }
 
     @GET
@@ -58,8 +58,7 @@ public class UnresolvedTaskService {
     @WithTransaction
     public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
         return Task.<Task>findById(id)
-                .onItem()
-                .<Task>transformToUni(task -> {
+                .<Task>chain(task -> {
                     if (updatedTask.task != null) {
                         if (updatedTask.task.content != null && !updatedTask.task.content.equals("<missing_value>")) {
                             task.task.content = updatedTask.task.content;
@@ -74,8 +73,7 @@ public class UnresolvedTaskService {
 
                     return task.persist();
                 })
-                .onFailure()
-                .recoverWithNull();
+                .onFailure().recoverWithNull();
     }
 
     @GET
@@ -83,7 +81,6 @@ public class UnresolvedTaskService {
     public Uni<Task> getLocale(@RestPath Long id, @RestPath String locale) {
         ResolutionContext resolutionContext = ResolutionContext.locale(locale);
         return Task.<Task>findById(id)
-                .onItem()
                 .call(task -> {
                     UnresolvedResult unresolvedResult = task.task.resolve(resolutionContext);
                     return unresolvedResult.resolve()
@@ -100,8 +97,7 @@ public class UnresolvedTaskService {
     @WithTransaction
     public Uni<LocaleText> createLocale(@RestPath Long id, @RestPath String locale, String content) {
         return Task.<Task>findById(id)
-                .onItem()
-                .transformToUni(task -> {
+                .chain(task -> {
                     LocaleText newLocale = new LocaleText();
                     newLocale.task = task;
                     newLocale.locale = locale;
@@ -114,11 +110,12 @@ public class UnresolvedTaskService {
     @Path("/{key}/{locale}")
     @WithTransaction
     public Uni<LocaleText> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
-        return LocaleText.<LocaleText>findById(id)
-                .onItem()
-                .transformToUni(localeText -> {
+        return LocaleText.<LocaleText>find("id = :id and locale = :locale", Parameters.with("id", id).and("locale", locale))
+                .singleResult()
+                .onItem().ifNotNull().<LocaleText>transformToUni(localeText -> {
                     localeText.content = newContent;
                     return localeText.persist();
-                });
+                })
+                .onFailure().recoverWithNull();
     }
 }

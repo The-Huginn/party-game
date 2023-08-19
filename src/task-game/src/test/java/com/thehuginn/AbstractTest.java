@@ -2,7 +2,6 @@ package com.thehuginn;
 
 import com.thehuginn.category.Category;
 import com.thehuginn.category.LocaleCategory;
-import com.thehuginn.resolution.GameSession;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.resolved.AbstractResolvedToken;

@@ -44,7 +44,6 @@ public class GameTaskService {
         }
 
         Uni<Long> deletePrevious = GameTask.delete("game", game )
-                .onItem()
                 .invoke(aLong -> {
                     if (aLong.compareTo(0L) > 0) {
                         Log.infof("Previous game [%s] was deleted with %d tasks remaining");

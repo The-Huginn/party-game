@@ -3,7 +3,6 @@ package com.thehuginn.resolution;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.ext.ParamConverter;
@@ -39,7 +38,7 @@ public class ResolutionContextProvider implements ParamConverterProvider {
                 }
                 String player = root.get("player").asText();
                 List<String> players = new ArrayList<>();
-                ((ArrayNode) root.get("players")).elements().forEachRemaining(jsonNode -> players.add(jsonNode.asText()));
+                root.get("players").elements().forEachRemaining(jsonNode -> players.add(jsonNode.asText()));
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
                         .players(players)
@@ -59,6 +58,7 @@ public class ResolutionContextProvider implements ParamConverterProvider {
     @Override
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
         if (rawType.equals(ResolutionContext.class)) {
+            //noinspection unchecked
             return (ParamConverter<T>) new ResolutionContextConverter(containerRequestContext);
         }
         return null;

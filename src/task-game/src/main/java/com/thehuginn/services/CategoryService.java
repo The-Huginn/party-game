@@ -40,8 +40,7 @@ public class CategoryService {
     @WithTransaction
     public Uni<Category> createCategory(Category category) {
         return Task.findByIds(category.tasks)
-                .onItem()
-                .<Category>transformToUni(tasks -> {
+                .<Category>chain(tasks -> {
                     if (category.tasks.size() != tasks.size()) {
                         throw new WebApplicationException("Unable to retrieve all tasks");
                     }
@@ -49,10 +48,8 @@ public class CategoryService {
                     category.tasks.addAll(tasks);
                     return category.persist();
                 })
-                .onItem()
                 .call(category1 -> Task.addToCategory(category1.id, category1.tasks))
-                .onFailure()
-                .invoke(Log::error);
+                .onFailure().invoke(Log::error);
     }
 
     @PUT
@@ -60,12 +57,9 @@ public class CategoryService {
     @WithTransaction
     public Uni<Category> updateCategory(@RestPath Long id, Category category) {
         return Category.findByIdFetch(id)
-                .onItem()
                 .call(category1 -> Task.deleteFromCategory(category1.id, category1.tasks))
-                .onItem()
                 .call(category1 -> Task.addToCategory(category1.id, category.tasks))
-                .onItem()
-                .transform(category1 -> {
+                .map(category1 -> {
                     category1.name = category.name;
                     category1.description = category.description;
                     category1.tasks = category.tasks;
@@ -79,10 +73,8 @@ public class CategoryService {
     @WithTransaction
     public Uni<Boolean> deleteCategory(@RestPath long id) {
         return Category.getTasks(id)
-                .onItem()
                 .call(tasks -> Task.deleteFromCategory(id, tasks))
-                .onItem()
-                .transformToUni(tasks -> Category.deleteById(id));
+                .chain(tasks -> Category.deleteById(id));
     }
 
     @GET
@@ -101,8 +93,7 @@ public class CategoryService {
     @Path("/translation/")
     public Uni<LocaleCategory> createTranslation(LocaleCategory localeCategory) {
         return Category.<Category>findById(localeCategory.category.id)
-                .onItem()
-                .transformToUni(category -> {
+                .chain(category -> {
                     localeCategory.category = category;
                     return localeCategory.persistAndFlush();
                 });
@@ -114,8 +105,7 @@ public class CategoryService {
         return LocaleCategory.<LocaleCategory>find("category.id = :id and locale = :locale", Parameters.with("id", id)
                 .and("locale", locale))
                 .firstResult()
-                .onItem()
-                .transformToUni(localeCategory1 -> {
+                .chain(localeCategory1 -> {
                     localeCategory1.name_content = localeCategory.name_content;
                     localeCategory1.description_content = localeCategory.description_content;
                     return localeCategory1.persistAndFlush();

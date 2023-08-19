@@ -1,10 +1,11 @@
-package com.thehuginn.resolution;
+package com.thehuginn;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.thehuginn.category.Category;
+import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.ResolvedTask;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -47,8 +48,7 @@ public class GameSession extends PanacheEntityBase {
 
     public Uni<Boolean> addCategory(Long categoryId) {
         return Category.<Category>findById(categoryId)
-                .onItem()
-                .transformToUni(category -> {
+                .chain(category -> {
                     if (category != null) {
                         this.categories.add(category);
                         return this.persist()
@@ -60,8 +60,7 @@ public class GameSession extends PanacheEntityBase {
 
     public Uni<Boolean> removeCategory(Long categoryId) {
         return Category.<Category>findById(categoryId)
-                .onItem()
-                .transformToUni(category -> {
+                .chain(category -> {
                     if (category != null) {
                         Boolean removed = this.categories.remove(category);
                         return this.persist()
@@ -73,30 +72,24 @@ public class GameSession extends PanacheEntityBase {
 
     public Uni<ResolvedTask> nextTask(ResolutionContext resolutionContext) {
         Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
-                .onItem()
                 .invoke(gameSession -> gameSession.currentTask = resolvedTask)
-                .onItem()
                 .call(gameSession -> gameSession.persist());
         return GameTask.count("game = :game", Parameters.with("game", gameId))
-                .onItem()
-                .transformToUni(count -> {
+                .chain(count -> {
                     if (count.equals(0L)) {
                         return Uni.createFrom().failure(new IllegalStateException("No more tasks remain for current game"));
                     }
 
                     return nextTaskUni(resolutionContext);
                 })
-                .onItem()
                 .call(updateResolvedTask)
-                .onFailure()
-                .recoverWithNull();
+                .onFailure().recoverWithNull();
     }
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext) {
         return GameTask.<GameTask>find("game = :game", Parameters.with("game", gameId))
                 .singleResult()
-                .onItem()
-                .transformToUni(gameTask -> {
+                .chain(gameTask -> {
                     if (!gameTask.isResolvable(resolutionContext)) {
                         return nextTaskUni(resolutionContext);
                     }

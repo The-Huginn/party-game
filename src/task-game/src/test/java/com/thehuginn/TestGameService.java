@@ -1,9 +1,8 @@
 package com.thehuginn;
 
-import com.thehuginn.resolution.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.services.GameTaskService;
-import com.thehuginn.services.UnresolvedTaskService;
+import com.thehuginn.services.TaskService;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -44,7 +43,7 @@ public class TestGameService extends AbstractTest {
     GameTaskService gameTaskService;
 
     @Inject
-    UnresolvedTaskService taskService;
+    TaskService taskService;
 
     @BeforeEach
     @AfterEach

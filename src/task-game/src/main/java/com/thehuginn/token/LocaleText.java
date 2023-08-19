@@ -87,12 +87,10 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
                 .replaceIfNullWith(this);
         return new UnresolvedResult().task(Map.entry(task.getKey(),
                         localeTextUni
-                                .onItem()
-                                .transform(localeText -> localeText.content)))
+                                .map(localeText -> localeText.content)))
                 .appendData(Map.entry("locale",
                         localeTextUni
-                                .onItem()
-                                .transform(localeText -> localeText.locale)));
+                                .map(localeText -> localeText.locale)));
     }
 
     @Override

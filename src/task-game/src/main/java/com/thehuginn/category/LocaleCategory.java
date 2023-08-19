@@ -74,21 +74,17 @@ public class LocaleCategory extends PanacheEntityBase {
                 <LocaleCategory>find("#LocaleCategory.byCategory", Parameters.with("id", categoryId)
                 .and("locale", locale))
                 .firstResult()
-                .onItem()
-                .ifNull()
-                .switchTo(() -> {
-                    Log.debugf("Category %s has no locale %s", categoryId, locale);
+                .onItem().ifNull().switchTo(() -> {
+                    Log.warnf("Category %s has no locale %s", categoryId, locale);
                     return localeCategoryUniEnglish;
                 });
         return Category.<Category>findById(categoryId)
-                .onItem()
                 .invoke(category1 -> {
                     if (category1 == null) {
                         throw new IllegalStateException("Category with id: " + categoryId + " does not exist");
                     }
                 })
-                .onItem()
-                .transformToUni(category1 -> localeCategoryUni
+                .chain(category1 -> localeCategoryUni
                         .onItem()
                         .transform(localeCategory -> Map.of(category1.name, localeCategory.name_content,
                                 category1.description, localeCategory.description_content)));
