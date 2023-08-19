@@ -31,7 +31,6 @@ public class GameTaskService {
                 GameTask gameTask = new GameTask();
                 gameTask.game = game;
                 gameTask.unresolvedTask = task;
-                gameTask.tokens = task.tokens.stream().map(token -> token.resolve(resolutionContext)).toList();
                 if (task.repeat.equals(Task.Repeat.PER_PLAYER)) {
                     for (String player: resolutionContext.getPlayers()) {
                         GameTask shallowCopy = gameTask.clone();

@@ -1,8 +1,9 @@
-package com.thehuginn.token.resolved;
+package com.thehuginn.token;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
@@ -27,7 +28,7 @@ import java.util.Objects;
         @NamedQuery(name = "LocaleText.byLocale", query = "from LocaleText where locale = :locale and task.id = :id")
 })
 @IdClass(LocaleText.LocaleTextPK.class)
-public class LocaleText extends PanacheEntityBase implements ResolvedToken {
+public class LocaleText extends PanacheEntityBase implements Resolvable<ResolvedResult> {
 
     static class LocaleTextPK {
         public Long task;
@@ -78,7 +79,7 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
     }
 
     @Override
-    public ResolvedResult resolve(ResolutionContext context, ResolvedResult result) {
+    public ResolvedResult resolve(ResolutionContext context) {
         Uni<LocaleText> localeTextUni = LocaleText
                 .<LocaleText>find("#LocaleText.byLocale",
                         Parameters.with("locale", context.getLocale()).and("id", task.id))
@@ -86,7 +87,7 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
                 .onItem()
                 .ifNull()
                 .continueWith(this);
-        return result.appendData(Map.entry(task.getKey(),
+        return new ResolvedResult().appendData(Map.entry(task.getKey(),
                         localeTextUni
                                 .onItem()
                                 .transform(localeText -> localeText.content)))
@@ -94,5 +95,10 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
                         localeTextUni
                                 .onItem()
                                 .transform(localeText -> localeText.locale)));
+    }
+
+    @Override
+    public boolean isResolvable(ResolutionContext context) {
+        return true;
     }
 }

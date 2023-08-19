@@ -15,7 +15,7 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
 
     public PlayerResolvedToken() {}
 
-    private PlayerResolvedToken(String playerTag, String player) {
+    public PlayerResolvedToken(String playerTag, String player) {
         this.playerTag = playerTag;
         this.player = player;
     }
@@ -38,8 +38,12 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
     }
 
     @Override
-    public ResolvedResult resolve(ResolutionContext context, ResolvedResult result) {
-        return result.appendMessage(Uni.createFrom().item(playerTag))
-                .appendData(Map.entry(playerTag, Uni.createFrom().item(player)));
+    public ResolvedResult resolve(ResolutionContext context) {
+        return new ResolvedResult().appendData(Map.entry(playerTag, Uni.createFrom().item(player)));
+    }
+
+    @Override
+    public boolean isResolvable(ResolutionContext context) {
+        return true;
     }
 }

@@ -1,22 +1,14 @@
 package com.thehuginn.task;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.token.resolved.AbstractResolvedToken;
-import com.thehuginn.token.resolved.ResolvedToken;
+import com.thehuginn.resolution.Resolvable;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.List;
 
 @Entity
-public class GameTask extends PanacheEntity implements ResolvableTask, Cloneable {
+public class GameTask extends PanacheEntity implements Resolvable<ResolvedTask>, Cloneable {
 
     public String game;
 
@@ -24,19 +16,11 @@ public class GameTask extends PanacheEntity implements ResolvableTask, Cloneable
     public Task unresolvedTask;
 
     public String assignedPlayer;
-
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
-            targetEntity = AbstractResolvedToken.class
-    )
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    public List<ResolvedToken> tokens;
     public GameTask() {}
 
     @Override
     public ResolvedTask resolve(ResolutionContext context) {
-        return new ResolvedTask();
+        return ResolvedTask.resolve(this, context);
     }
 
     @Override

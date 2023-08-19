@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.TokenResolver;
-import com.thehuginn.token.resolved.LocaleText;
+import com.thehuginn.token.LocaleText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
-import com.thehuginn.token.unresolved.Token;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Task extends PanacheEntity {
+public class Task extends PanacheEntity implements Resolvable<GameTask> {
 
     public enum Repeat {ALWAYS, PER_PLAYER, NEVER}
 
@@ -38,7 +38,7 @@ public class Task extends PanacheEntity {
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
             targetEntity = AbstractUnresolvedToken.class
     )
-    public List<Token> tokens = new ArrayList<>();
+    public List<Resolvable<ResolvedToken>> tokens = new ArrayList<>();
 
     @JsonProperty
     public Type type = Type.SINGLE;
@@ -60,7 +60,7 @@ public class Task extends PanacheEntity {
     @JsonIgnore
     public Category category = Category.getDefaultInstance();
 
-    public List<Token> getTokens() {
+    public List<Resolvable<ResolvedToken>> getTokens() {
         return tokens;
     }
 
@@ -77,8 +77,6 @@ public class Task extends PanacheEntity {
             this.price = price;
         }
     }
-
-    public Task() {}
 
     public static class Builder {
 
@@ -149,6 +147,8 @@ public class Task extends PanacheEntity {
         }
     }
 
+    public Task() {}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -170,6 +170,11 @@ public class Task extends PanacheEntity {
 
     public GameTask resolve(ResolutionContext context) {
         return null;
+    }
+
+    @Override
+    public boolean isResolvable(ResolutionContext context) {
+        return tokens.stream().allMatch(resolvedTokenResolvable -> resolvedTokenResolvable.isResolvable(context));
     }
 
 

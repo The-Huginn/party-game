@@ -4,7 +4,7 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.ResolvedResult;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.resolved.LocaleText;
+import com.thehuginn.token.LocaleText;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -85,8 +85,7 @@ public class UnresolvedTaskService {
         return Task.<Task>findById(id)
                 .onItem()
                 .call(task -> {
-                    ResolvedResult resolvedResult = new ResolvedResult();
-                    resolvedResult = task.task.resolve(resolutionContext, resolvedResult);
+                    ResolvedResult resolvedResult = task.task.resolve(resolutionContext);
                     return resolvedResult.resolve()
                             .onItem()
                             .invoke(resolvedResult1 -> {

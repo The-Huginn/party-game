@@ -21,6 +21,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 @Entity
 public class GameSession extends PanacheEntityBase {
@@ -28,11 +29,12 @@ public class GameSession extends PanacheEntityBase {
     @Id
     public String gameId;
 
+    @JsonIgnore
     @OneToOne(
             fetch = FetchType.EAGER,
-            cascade = CascadeType.REMOVE,
+            cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     public ResolvedTask currentTask = null;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -44,9 +46,11 @@ public class GameSession extends PanacheEntityBase {
     public GameSession() {}
 
     public Uni<ResolvedTask> nextTask(ResolutionContext resolutionContext) {
-        if (currentTask != null) {
-            return Uni.createFrom().item(currentTask);
-        }
+        Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
+                .onItem()
+                .invoke(gameSession -> gameSession.currentTask = resolvedTask)
+                .onItem()
+                .call(gameSession -> gameSession.persist());
         return GameTask.count("game = :game", Parameters.with("game", gameId))
                 .onItem()
                 .transformToUni(count -> {
@@ -56,6 +60,8 @@ public class GameSession extends PanacheEntityBase {
 
                     return nextTaskUni(resolutionContext);
                 })
+                .onItem()
+                .call(updateResolvedTask)
                 .onFailure()
                 .recoverWithNull();
     }

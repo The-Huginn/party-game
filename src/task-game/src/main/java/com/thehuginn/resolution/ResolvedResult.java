@@ -10,11 +10,9 @@ import java.util.Map;
 public class ResolvedResult {
 
     private boolean resolved = false;
-    private String resolvedMessage;
 
-    private Uni<StringBuilder> message = Uni.createFrom().item(StringBuilder::new);
     // This needs to be ordered map see #resolve()
-    private Map<String, Object> data = new LinkedHashMap<>();
+    private final Map<String, Object> data = new LinkedHashMap<>();
     private String title = null;
 
     public Uni<ResolvedResult> resolve() {
@@ -25,8 +23,6 @@ public class ResolvedResult {
                 .toList();
         return Uni.createFrom()
                 .item(this)
-                .onItem()
-                .invoke(stringBuilder -> resolvedMessage = stringBuilder.toString())
                 .onItem()
                 .call(() -> Uni.combine()
                         .all()
@@ -46,11 +42,9 @@ public class ResolvedResult {
                 .invoke(resolvedResult -> resolvedResult.resolved = true);
     }
 
-    public String getMessage() {
-        if (!resolved) {
-            throw new IllegalStateException("First call " + ResolvedResult.class + "#resolve() method to resolve unis");
-        }
-        return resolvedMessage;
+    public ResolvedResult addResolvedResult(ResolvedResult other) {
+        data.putAll(other.data);
+        return this;
     }
 
     public Map<String, Object> getData() {
@@ -58,14 +52,6 @@ public class ResolvedResult {
             throw new IllegalStateException("First call " + ResolvedResult.class + "#resolve() method to resolve unis");
         }
         return data;
-    }
-
-    public ResolvedResult appendMessage(Uni<String> message) {
-        this.message = this.message
-                .onItem()
-                .call(stringBuilder -> message.onItem()
-                        .invoke(stringBuilder::append));
-        return this;
     }
 
     public ResolvedResult appendData(Map.Entry<String, Uni<?>> entry) {
