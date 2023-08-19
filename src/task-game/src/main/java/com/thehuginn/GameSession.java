@@ -94,7 +94,7 @@ public class GameSession extends PanacheEntityBase {
                         return nextTaskUni(resolutionContext);
                     }
 
-                    return Uni.createFrom().item(gameTask.resolve(resolutionContext));
+                    return gameTask.resolve(resolutionContext).persist();
                 });
     }
 }

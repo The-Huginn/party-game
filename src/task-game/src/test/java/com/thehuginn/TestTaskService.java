@@ -444,19 +444,6 @@ public class TestTaskService extends AbstractTest{
                     .statusCode(RestResponse.StatusCode.OK);
         });
 
-//        asserter.execute(() -> {
-//            Boolean result = given()
-//                    .pathParam("id", asserter.getData("id"))
-//                    .pathParam("locale", "sk")
-//                    .when().delete("/{id}/{locale}")
-//                    .then()
-//                    .statusCode(RestResponse.StatusCode.OK)
-//                    .extract()
-//                    .as(Boolean.class);
-//
-//            Assertions.assertTrue(result);
-//        });
-
         asserter.execute(() -> {
             given()
                     .contentType(MediaType.APPLICATION_JSON)

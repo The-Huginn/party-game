@@ -371,6 +371,90 @@ public class TestGameService extends AbstractTest {
                         .extract()
                         .asPrettyString()));
 
+        asserter.execute(() -> Assertions.assertEquals(asserter.getData("resolvedTask"),
+                given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/current")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asPrettyString()));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(11)
+    void testDeleteCurrentTask(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task1", task)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder("{player_c} with a simple task")
+                        .repeat(Task.Repeat.NEVER)
+                        .type(Task.Type.ALL)
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task2", task)));
+        asserter.execute(() -> {
+            List<Task> tasks = List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2"));
+            asserter.putData("tasks", tasks);
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        asserter.execute(() -> {
+            String task = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
+            //noinspection unchecked
+            List<Task> tasks = (List<Task>) asserter.getData("tasks");
+            if (task.contains("simple task for")) {
+                tasks.remove((Task) asserter.getData("task1"));
+                asserter.putData("other", asserter.getData("task2"));
+            } else {
+                tasks.remove((Task) asserter.getData("task2"));
+                asserter.putData("other", asserter.getData("task1"));
+            }
+            asserter.putData("tasks", tasks);
+        });
+
+        asserter.execute(() -> {
+            String task = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
+            //noinspection unchecked
+            List<Task> tasks = (List<Task>) asserter.getData("tasks");
+            Assertions.assertTrue(tasks.contains((Task) asserter.getData("other")));
+        });
+
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 }

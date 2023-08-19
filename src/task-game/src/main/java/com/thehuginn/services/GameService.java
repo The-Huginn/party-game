@@ -59,8 +59,7 @@ public class GameService {
                         .ifNull()
                         .switchTo(gameSession.nextTask(resolutionContext))
                 )
-                .onItem().ifNotNull().call(resolvedTask -> resolvedTask.persist())
-                .chain(resolvedTask ->
+                .onItem().ifNotNull().transformToUni(resolvedTask ->
                         resolvedTask.resolve(resolutionContext).resolve())
                 .onItem().ifNull().fail()
                 .onFailure().recoverWithNull();
