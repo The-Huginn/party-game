@@ -554,12 +554,8 @@ public class TestGameService extends AbstractTest {
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
                     .asString();
-            asserter.putData("taskResult", task);
-        });
 
-        asserter.execute(() -> {
             int count = 0;
-            String task = (String) asserter.getData("taskResult");
             while (count++ < 10) {
                 String nextTask = given()
                         .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -580,6 +576,51 @@ public class TestGameService extends AbstractTest {
         });
 
         asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(2, aLong));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(14)
+    void testCurrentPlayerGetsUpdatedAndCycles(UniAsserter asserter) {
+        String task = "simple task for %s";
+        asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}"))
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task1 -> asserter.putData("task1", task1)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}"))
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task1 -> asserter.putData("task2", task1)));
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        asserter.execute(() -> {
+            for (int i = 0; i <= 2 * PLAYERS.size(); i++) {
+                String result = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asString();
+                Assertions.assertTrue(result.contains(task.formatted(PLAYERS.get(i % PLAYERS.size()))));
+            }
+        });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

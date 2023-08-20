@@ -2,6 +2,7 @@ package com.thehuginn.resolution;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nonnull;
+import jakarta.ws.rs.WebApplicationException;
 
 import java.util.Collections;
 import java.util.List;
@@ -80,8 +81,15 @@ public class ResolutionContext {
         }
 
         public Builder players(@Nonnull List<String> players) {
+            if (players.isEmpty()) {
+                throw new WebApplicationException("Received no players for this game");
+            }
             this.players = players;
             return this;
+        }
+
+        public List<String> getPlayers() {
+            return players;
         }
 
         public ResolutionContext build() {

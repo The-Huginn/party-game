@@ -21,6 +21,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
@@ -44,6 +46,8 @@ public class GameSession extends PanacheEntityBase {
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     public Set<Category> categories = new HashSet<>();
+
+    public String currentPlayer = null;
 
     public GameSession() {}
 
@@ -71,11 +75,39 @@ public class GameSession extends PanacheEntityBase {
                 });
     }
 
-    public Uni<ResolvedTask> nextTask(ResolutionContext resolutionContext) {
+    public Uni<ResolvedTask> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
+        resolutionContextBuilder = resolutionContextBuilder.player(this.currentPlayer);
+        return Uni.createFrom()
+                .item(this.currentTask)
+                .onItem().ifNull().switchTo(nextTask(resolutionContextBuilder));
+    }
+
+    public Uni<ResolvedTask> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
+        List<String> players = resolutionContextBuilder.getPlayers();
+        if (this.currentPlayer == null) {
+            this.currentPlayer = players.get(0);
+        } else {
+            Iterator<String> iterator = players.iterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().equals(this.currentPlayer)) {
+                    break;
+                }
+            }
+            this.currentPlayer = iterator.hasNext() ? iterator.next() : players.get(0);
+        }
+
+        ResolutionContext resolutionContext = resolutionContextBuilder.player(this.currentPlayer).build();
+
         Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
                 .invoke(gameSession -> gameSession.currentTask = resolvedTask)
                 .call(gameSession -> gameSession.persist());
-        return GameTask.count("game = :game", Parameters.with("game", gameId))
+
+        Uni<Void> deleteCurrentTask = Uni.createFrom().voidItem();
+        if (this.currentTask != null) {
+            deleteCurrentTask = deleteCurrentTask.call(resolvedTask -> this.currentTask.remove());
+        }
+
+        Uni<ResolvedTask> nextTask = GameTask.count("game = :game", Parameters.with("game", gameId))
                 .chain(count -> {
                     if (count.equals(0L)) {
                         return Uni.createFrom().failure(new IllegalStateException("No more tasks remain for current game"));
@@ -85,6 +117,9 @@ public class GameSession extends PanacheEntityBase {
                 })
                 .call(updateResolvedTask)
                 .onFailure().recoverWithNull();
+
+        return deleteCurrentTask
+                .chain(() -> nextTask);
     }
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {

@@ -3,6 +3,7 @@ package com.thehuginn.services;
 import com.thehuginn.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
+import com.thehuginn.task.ResolvedTask;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.DELETE;
@@ -14,6 +15,8 @@ import jakarta.ws.rs.WebApplicationException;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
+
+import java.util.function.Function;
 
 @Path("/game")
 public class GameService {
@@ -50,36 +53,24 @@ public class GameService {
     @GET
     @WithTransaction
     @Path("/task/current")
-    public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
-        return GameSession.<GameSession>findById(gameId)
-                .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))
-                .onItem().ifNotNull().transformToUni(gameSession -> Uni.createFrom()
-                        .item(gameSession.currentTask)
-                        .onItem()
-                        .ifNull()
-                        .switchTo(gameSession.nextTask(resolutionContext))
-                )
-                .onItem().ifNotNull().transformToUni(resolvedTask ->
-                        resolvedTask.resolve(resolutionContext).resolve())
-                .onItem().ifNull().fail()
-                .onFailure().recoverWithNull();
+    public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext) {
+        return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.currentTask(resolutionContext));
     }
 
     @GET
     @WithTransaction
     @Path("/task/next")
-    public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId, @RestQuery ResolutionContext resolutionContext) {
+    public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext) {
+        return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.nextTask(resolutionContext));
+    }
+
+    private Uni<UnresolvedResult.ResolvedResult> getTaskUni(ResolutionContext.Builder resolutionContext,
+                                                            String gameId, Function<? super GameSession, Uni<? extends ResolvedTask>> taskUni) {
         return GameSession.<GameSession>findById(gameId)
                 .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))
-                .onItem().ifNotNull().call(gameSession -> Uni.createFrom()
-                        .item(gameSession.currentTask)
-                        .onItem()
-                        .ifNotNull()
-                        .call(resolvedTask -> gameSession.currentTask.remove())
-                )
-                .chain(gameSession -> gameSession.nextTask(resolutionContext))
+                .onItem().ifNotNull().transformToUni(taskUni)
                 .onItem().ifNotNull().transformToUni(resolvedTask ->
-                        resolvedTask.resolve(resolutionContext).resolve())
+                        resolvedTask.resolve(resolutionContext.build()).resolve())
                 .onItem().ifNull().fail()
                 .onFailure().recoverWithNull();
     }

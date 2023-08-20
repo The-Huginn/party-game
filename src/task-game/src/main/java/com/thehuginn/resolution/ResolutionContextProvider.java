@@ -20,7 +20,7 @@ public class ResolutionContextProvider implements ParamConverterProvider {
     @Inject
     ContainerRequestContext containerRequestContext;
 
-    public static class ResolutionContextConverter implements ParamConverter<ResolutionContext> {
+    public static class ResolutionContextConverter implements ParamConverter<ResolutionContext.Builder> {
         private final ContainerRequestContext containerRequestContext;
 
         public ResolutionContextConverter(ContainerRequestContext containerRequestContext) {
@@ -28,36 +28,33 @@ public class ResolutionContextProvider implements ParamConverterProvider {
         }
 
         @Override
-        public ResolutionContext fromString(String value) {
+        public ResolutionContext.Builder fromString(String value) {
             String gameId = containerRequestContext.getCookies().get("gameId").getValue();
             String locale = containerRequestContext.getCookies().get("locale").getValue();
             try {
                 JsonNode root = new ObjectMapper().readTree(value);
-                if (!root.has("player") || !root.has("players") || !root.get("players").isArray()) {
+                if (!root.has("players") || !root.get("players").isArray()) {
                     throw new IllegalArgumentException("Resolution Context can not be created due to missing fields");
                 }
-                String player = root.get("player").asText();
                 List<String> players = new ArrayList<>();
                 root.get("players").elements().forEachRemaining(jsonNode -> players.add(jsonNode.asText()));
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
-                        .players(players)
-                        .player(player)
-                        .build();
+                        .players(players);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
 
         @Override
-        public String toString(ResolutionContext value) {
+        public String toString(ResolutionContext.Builder value) {
             return null;
         }
     }
 
     @Override
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
-        if (rawType.equals(ResolutionContext.class)) {
+        if (rawType.equals(ResolutionContext.Builder.class)) {
             //noinspection unchecked
             return (ParamConverter<T>) new ResolutionContextConverter(containerRequestContext);
         }
