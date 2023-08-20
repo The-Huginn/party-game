@@ -1,12 +1,15 @@
 package com.thehuginn;
 
+import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.services.CategoryService;
 import com.thehuginn.services.GameTaskService;
 import com.thehuginn.services.TaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
@@ -87,6 +90,149 @@ public class TestGameService extends AbstractTest {
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("gameId", is(GAME),
                                 "categories.size()", is(0)));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(3)
+    void testAddingAndRemovingCategories(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id1", category.id)));
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category>persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("id2", category.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", 0)
+                    .when()
+                    .put("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", asserter.getData("id1"))
+                    .when()
+                    .put("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", asserter.getData("id2"))
+                    .when()
+                    .put("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .when()
+                    .get("/game")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("categories.size()", is(3));
+        });
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", 0)
+                    .when()
+                    .delete("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", asserter.getData("id2"))
+                    .when()
+                    .delete("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .when()
+                    .get("/game")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("categories.size()", is(1));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(4)
+    void testAddingCategoriesWithTasksAndStartingGame(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task1", task.id)));
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task2", task.id)));
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly_please>").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task3", task.id)));
+        asserter.execute(() -> EntityCreator.createTask("{player_1}").<Task>persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData("task4", task.id)));
+
+        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
+                .onItem()
+                .invoke(category -> asserter.putData("id1", category.id)));
+        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task3")))
+                .onItem()
+                .invoke(category -> asserter.putData("id2", category.id)));
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", 0)
+                    .when()
+                    .put("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .pathParam("id", asserter.getData("id2"))
+                    .when()
+                    .put("/game/category/{id}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body(is("true"));
+        });
+
+        asserter.execute(() ->
+                given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("game/start")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .body(is("true")));
+
+        asserter.assertThat(() -> GameTask.<GameTask>find("game = :game", Parameters.with("game", GAME))
+                .list(), gameTasks -> Assertions.assertEquals(gameTasks.size(), 18));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.services.GameTaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.ResolvedTask;
+import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
@@ -15,6 +17,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.OnDelete;
@@ -26,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Entity
 public class GameSession extends PanacheEntityBase {
@@ -42,6 +47,11 @@ public class GameSession extends PanacheEntityBase {
     public ResolvedTask currentTask;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "GameSession_Category",
+            joinColumns = @JoinColumn(name = "gameSession_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
@@ -73,6 +83,37 @@ public class GameSession extends PanacheEntityBase {
                     }
                     return Uni.createFrom().item(Boolean.FALSE);
                 });
+    }
+
+    public Uni<Boolean> start(ResolutionContext.Builder resolutionContext) {
+        if (this.categories.isEmpty()) {
+            return Uni.createFrom().item(Boolean.FALSE);
+        }
+
+        this.currentPlayer = resolutionContext.getPlayers().get(0);
+        resolutionContext = resolutionContext.player(this.currentPlayer);
+
+        ResolutionContext context = resolutionContext.build();
+
+        List<Uni<Set<Task>>> tasks = categories.stream()
+                .map(category -> Category.getTasks(category.id))
+                .toList();
+        Uni<Set<Task>> tasksUni = Uni.combine().all()
+                .<Set<Task>>unis(tasks)
+                .usingConcurrencyOf(1)
+                .combinedWith(objects -> objects.stream()
+                        .flatMap(collectedTasks -> ((Set<Task>)collectedTasks).stream())
+                        .collect(Collectors.toSet()));
+
+        return this.<GameSession>persist()
+                .call(() -> tasksUni.call(allTasks -> {
+                    try {
+                        return GameTaskService.gameTasks(allTasks, context);
+                    } catch (CloneNotSupportedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }))
+                .replaceWith(Boolean.TRUE);
     }
 
     public Uni<ResolvedTask> currentTask(ResolutionContext.Builder resolutionContextBuilder) {

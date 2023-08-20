@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 @RequestScoped
 public class GameTaskService {
 
+    // TODO update this in correspondence with GameSession#start
+    public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
+        return new GameTaskService().generateGameTasks(allTasks, resolutionContext);
+    }
+
     /**
      * Change with caution from Uni, such as internally we use shallow-copy,
      *  and we persist all objects right away

@@ -2,6 +2,7 @@ package com.thehuginn.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thehuginn.GameSession;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
@@ -10,7 +11,10 @@ import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +36,10 @@ public class Category extends PanacheEntity {
     @JsonProperty
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.MERGE)
     public Set<Task> tasks = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    Set<GameSession> gameSessions;
 
     public Category() {}
 

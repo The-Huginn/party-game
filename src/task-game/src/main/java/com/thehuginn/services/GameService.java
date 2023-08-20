@@ -38,7 +38,7 @@ public class GameService {
     @WithTransaction
     @Path("/category/{categoryId}")
     public Uni<Boolean> addCategory(@RestCookie String gameId, @RestPath Long categoryId) {
-        return GameSession.<GameSession>findById(gameId)
+        return findGameSession(gameId)
                 .chain(gameSession -> gameSession.addCategory(categoryId));
     }
 
@@ -46,8 +46,16 @@ public class GameService {
     @WithTransaction
     @Path("/category/{categoryId}")
     public Uni<Boolean> removeCategory(@RestCookie String gameId, @RestPath Long categoryId) {
-        return GameSession.<GameSession>findById(gameId)
+        return findGameSession(gameId)
                 .chain(gameSession -> gameSession.removeCategory(categoryId));
+    }
+
+    @PUT
+    @Path("/start")
+    @WithTransaction
+    public Uni<Boolean> startGame(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext) {
+        return findGameSession(gameId)
+                .chain(gameSession -> gameSession.start(resolutionContext));
     }
 
     @GET
@@ -66,12 +74,17 @@ public class GameService {
 
     private Uni<UnresolvedResult.ResolvedResult> getTaskUni(ResolutionContext.Builder resolutionContext,
                                                             String gameId, Function<? super GameSession, Uni<? extends ResolvedTask>> taskUni) {
-        return GameSession.<GameSession>findById(gameId)
-                .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))
+        return findGameSession(gameId)
                 .onItem().ifNotNull().transformToUni(taskUni)
                 .onItem().ifNotNull().transformToUni(resolvedTask ->
                         resolvedTask.resolve(resolutionContext.build()).resolve())
                 .onItem().ifNull().fail()
                 .onFailure().recoverWithNull();
     }
+
+    private Uni<GameSession> findGameSession(String gameId) {
+        return GameSession.<GameSession>findById(gameId)
+                .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"));
+    }
+
 }
