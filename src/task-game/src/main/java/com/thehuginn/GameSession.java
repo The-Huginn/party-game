@@ -21,6 +21,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -80,18 +81,20 @@ public class GameSession extends PanacheEntityBase {
                         return Uni.createFrom().failure(new IllegalStateException("No more tasks remain for current game"));
                     }
 
-                    return nextTaskUni(resolutionContext);
+                    return nextTaskUni(resolutionContext, count);
                 })
                 .call(updateResolvedTask)
                 .onFailure().recoverWithNull();
     }
 
-    private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext) {
+    private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
         return GameTask.<GameTask>find("game = :game", Parameters.with("game", gameId))
+                .page((int) ((new Random()).nextLong(count)), 1)
                 .firstResult()
                 .chain(gameTask -> {
-                    if (!gameTask.isResolvable(resolutionContext)) {
-                        return nextTaskUni(resolutionContext);
+                    if (!gameTask.isResolvable(resolutionContext) ||
+                            (currentTask != null && currentTask.gameTask.equals(gameTask))) {
+                        return nextTaskUni(resolutionContext, count);
                     }
 
                     return Uni.createFrom().item(gameTask.resolve(resolutionContext));

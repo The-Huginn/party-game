@@ -3,6 +3,7 @@ package com.thehuginn;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.services.GameTaskService;
 import com.thehuginn.services.TaskService;
+import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -12,6 +13,7 @@ import io.quarkus.test.vertx.UniAsserter;
 import io.restassured.http.Cookie;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
+import org.hibernate.AssertionFailure;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -389,7 +391,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void testDeleteCurrentTask(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
                         .repeat(Task.Repeat.NEVER)
@@ -454,11 +456,13 @@ public class TestGameService extends AbstractTest {
             Assertions.assertTrue(task.contains((String) asserter.getData("other")));
         });
 
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(1, aLong));
+
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     void testGetCurrentTask(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
                         .repeat(Task.Repeat.NEVER)
@@ -509,10 +513,73 @@ public class TestGameService extends AbstractTest {
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body(is(asserter.getData("task")));
-//                    .extract()
-//                    .asString();
-//            Assertions.assertTrue(task.contains((String) asserter.getData("other")));
         });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(14)
+    void testRepeatingTaskNotRemoved(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task -> asserter.putData("task1", task)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task -> asserter.putData("task2", task)));
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        asserter.execute(() -> {
+            String task = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
+            asserter.putData("taskResult", task);
+        });
+
+        asserter.execute(() -> {
+            int count = 0;
+            String task = (String) asserter.getData("taskResult");
+            while (count++ < 10) {
+                String nextTask = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .get("game/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asString();
+                if (!task.equals(nextTask)) {
+                    return;
+                }
+            }
+            throw new AssertionFailure("Expected different resolution at least once. Rerunning the test might help");
+        });
+
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(2, aLong));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
