@@ -3,7 +3,6 @@ package com.thehuginn;
 import com.thehuginn.entities.Game;
 import com.thehuginn.service.GameService;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.panache.mock.PanacheMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
@@ -19,20 +18,17 @@ import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 @TestHTTPEndpoint(GameService.class)
-public class TestNonExistingGame {
+@RunOnVertxContext
+public class TestNonExistingGame extends AbstractTest {
 
     private static final String ID = "foo";
 
     @BeforeEach
-    @RunOnVertxContext
     public void setup(UniAsserter asserter) {
-        asserter.execute(() -> {
-            PanacheMock.mock(Game.class);
-        });
+        super.setup(asserter);
     }
 
     @Test
-    @RunOnVertxContext
     public void testCreatingGame(UniAsserter asserter) {
         asserter.execute(() -> {
             given()
@@ -42,14 +38,13 @@ public class TestNonExistingGame {
                     .post()
             .then()
                     .cookie("gameId", is(ID))
-                    .statusCode(201);
+                    .statusCode(RestResponse.StatusCode.CREATED);
 
         });
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
-    @RunOnVertxContext
     public void testMissingGame(UniAsserter asserter) {
         asserter.execute(() -> {
             given()
@@ -63,7 +58,6 @@ public class TestNonExistingGame {
     }
 
     @Test
-    @RunOnVertxContext
     public void testMissingCookie(UniAsserter asserter) {
 
         asserter.execute(() ->

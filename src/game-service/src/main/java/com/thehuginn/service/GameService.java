@@ -30,12 +30,12 @@ public class GameService {
     @WithTransaction
     public Uni<RestResponse<Game>> createGame(String gameId) {
         AtomicBoolean created = new AtomicBoolean(false);
-        return Panache.withTransaction(() -> Game.<Game>findById(gameId).replaceIfNullWith(() -> {
-                created.set(true);
-                Game game = new Game(gameId);
-                game.persist();
-                return game;
-                }))
+        return Panache.withTransaction(() -> Game.<Game>findById(gameId)
+                .onItem().ifNull().switchTo(() -> {
+                    created.set(true);
+                    Game game = new Game(gameId);
+                    return game.persist();
+                    }))
                 .onItem()
                 .transform(game -> RestResponse.ResponseBuilder.ok(game)
                         .status(created.get() ? RestResponse.Status.CREATED : RestResponse.Status.NOT_MODIFIED)
@@ -54,9 +54,20 @@ public class GameService {
     @Path("/status")
     public Uni<Void> updateStatus(@RestCookie String gameId, Game.State newState) {
         return Game.<Game>findById(gameId)
-                .onItem()
-                .ifNotNull()
-                .invoke(game -> game.state = newState)
-                .replaceWithVoid();
+                .onItem().ifNotNull().call(game -> {
+                    game.state = newState;
+                    return game.persist();
+                }).replaceWithVoid();
+    }
+
+    @PUT
+    @WithTransaction
+    @Path("/type")
+    public Uni<Void> updateType(@RestCookie String gameId, Game.Type newType) {
+        return Game.<Game>findById(gameId)
+                .onItem().ifNotNull().call(game -> {
+                    game.type = newType;
+                    return game.persist();
+                }).replaceWithVoid();
     }
 }

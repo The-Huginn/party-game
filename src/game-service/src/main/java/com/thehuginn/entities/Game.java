@@ -9,9 +9,14 @@ import jakarta.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Game extends PanacheEntityBase {
+
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+    public enum State {CREATED, READY, STARTED, ONGOING, FINISHING, COMPLETED}
+    public enum Type {NONE, TASK}
 
     @Id
     public String gameId;
@@ -19,9 +24,9 @@ public class Game extends PanacheEntityBase {
     @OneToMany(fetch = FetchType.EAGER)
     public List<Player> team;
 
-    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-    public enum State {CREATED, READY, STARTED, ONGOING, FINISHING, COMPLETED}
     public State state;
+
+    public Type type;
 
     public Game() {}
 
@@ -29,6 +34,7 @@ public class Game extends PanacheEntityBase {
         gameId = id;
         team = new ArrayList<>();
         state = State.CREATED;
+        type = Type.NONE;
     }
 
     public boolean addPlayer(Player player) {
@@ -42,7 +48,7 @@ public class Game extends PanacheEntityBase {
 
     public void removePlayer(Long playerId) {
         team = team.stream()
-                .filter(player -> player.id != playerId)
+                .filter(player -> !Objects.equals(player.id, playerId))
                 .toList();
     }
 }
