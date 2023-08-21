@@ -15,10 +15,8 @@
     <quarkus.platform.version>3.2.0.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
-
     <version.checkstyle>3.3.0</version.checkstyle>
     <version.org.wildfly.checkstyle>1.0.8.Final</version.org.wildfly.checkstyle>
-
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -55,6 +53,10 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-openapi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

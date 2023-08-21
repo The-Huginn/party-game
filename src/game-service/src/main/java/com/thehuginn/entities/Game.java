@@ -51,4 +51,8 @@ public class Game extends PanacheEntityBase {
                 .filter(player -> !Objects.equals(player.id, playerId))
                 .toList();
     }
+
+    public GameContext gameContext() {
+        return new GameContext(this);
+    }
 }

@@ -1,6 +1,9 @@
 package com.thehuginn.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.Game;
+import com.thehuginn.entities.GameContext;
+import com.thehuginn.external.GameRestClientTask;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -14,6 +17,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -25,6 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
 public class GameService {
+
+    @RestClient
+    GameRestClientTask taskRestClient;
 
     @POST
     @WithTransaction
@@ -69,5 +76,29 @@ public class GameService {
                     game.type = newType;
                     return game.persist();
                 }).replaceWithVoid();
+    }
+
+    public Uni<Boolean> startGame(String gameId, GameContext game) {
+        return Game.<Game>findById(gameId)
+                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
+                    case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
+                    case NONE -> Uni.createFrom().item(Boolean.FALSE);
+                });
+    }
+
+    public Uni<JsonNode> currentTask(String gameId, GameContext game) {
+        return Game.<Game>findById(gameId)
+                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
+                    case TASK -> taskRestClient.currentTask(gameId, game1.gameContext());
+                    case NONE -> Uni.createFrom().nullItem();
+                });
+    }
+
+    public Uni<JsonNode> nextTask(String gameId, Game game) {
+        return Game.<Game>findById(gameId)
+                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
+                    case TASK -> taskRestClient.nextTask(gameId, game1.gameContext());
+                    case NONE -> Uni.createFrom().nullItem();
+                });
     }
 }
