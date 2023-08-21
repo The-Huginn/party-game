@@ -1,6 +1,5 @@
 package com.thehuginn.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +13,6 @@ import java.util.Objects;
 @Entity
 public class Game extends PanacheEntityBase {
 
-    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum State {CREATED, READY, STARTED, ONGOING, FINISHING, COMPLETED}
     public enum Type {NONE, TASK}
 
