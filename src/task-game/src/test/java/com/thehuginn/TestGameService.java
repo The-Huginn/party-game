@@ -2,9 +2,9 @@ package com.thehuginn;
 
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.services.CategoryService;
-import com.thehuginn.services.GameTaskService;
-import com.thehuginn.services.TaskService;
+import com.thehuginn.services.hidden.CategoryService;
+import com.thehuginn.services.hidden.GameTaskService;
+import com.thehuginn.services.hidden.TaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;

@@ -1,4 +1,4 @@
-package com.thehuginn.services;
+package com.thehuginn.services.hidden;
 
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;

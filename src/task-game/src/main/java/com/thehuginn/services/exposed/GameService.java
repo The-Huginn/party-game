@@ -1,4 +1,4 @@
-package com.thehuginn.services;
+package com.thehuginn.services.exposed;
 
 import com.thehuginn.GameSession;
 import com.thehuginn.resolution.ResolutionContext;

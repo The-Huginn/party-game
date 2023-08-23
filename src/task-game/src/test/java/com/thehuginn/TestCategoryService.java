@@ -2,7 +2,7 @@ package com.thehuginn;
 
 import com.thehuginn.category.Category;
 import com.thehuginn.category.LocaleCategory;
-import com.thehuginn.services.CategoryService;
+import com.thehuginn.services.hidden.CategoryService;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;

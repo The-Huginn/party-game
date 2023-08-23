@@ -1,6 +1,6 @@
 package com.thehuginn;
 
-import com.thehuginn.services.TaskService;
+import com.thehuginn.services.hidden.TaskService;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
