@@ -4,8 +4,6 @@ import com.thehuginn.AbstractTest;
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.services.hidden.CategoryService;
-import com.thehuginn.services.hidden.GameTaskService;
-import com.thehuginn.services.hidden.TaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
@@ -15,7 +13,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
 import io.restassured.http.Cookie;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -44,12 +41,6 @@ public class TestGameCreationService extends AbstractTest {
             .player(PLAYER)
             .players(PLAYERS)
             .locale(LOCALE).build();
-
-    @Inject
-    GameTaskService gameTaskService;
-
-    @Inject
-    TaskService taskService;
 
     @BeforeEach
     @AfterEach

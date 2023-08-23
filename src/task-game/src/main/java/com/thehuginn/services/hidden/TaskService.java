@@ -12,6 +12,7 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.groups.UniAndGroupIterable;
+import jakarta.annotation.security.DenyAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -33,6 +34,7 @@ import java.util.function.Function;
 @Path("/task")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@DenyAll
 @RequestScoped
 public class TaskService {
 

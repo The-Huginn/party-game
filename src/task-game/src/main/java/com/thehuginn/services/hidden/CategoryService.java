@@ -8,10 +8,10 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.security.DenyAll;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -21,21 +21,14 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestPath;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+@DenyAll
 @Path("/category")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
 public class CategoryService {
-
-    @GET
-    @WithTransaction
-    public Uni<List<Category.CategoryDto>> getCategories() {
-        return Category.findAll().project(Category.CategoryDto.class).list();
-    }
 
     @POST
     @WithTransaction
@@ -82,12 +75,6 @@ public class CategoryService {
     @Path("/{id}")
     public Uni<Set<Task>> getTasks(@RestPath long id) {
         return Category.getTasks(id);
-    }
-
-    @GET
-    @Path("/translation/{id}/{locale}")
-    public Uni<Map<String, String>> getTranslation(@RestPath long id, @RestPath @DefaultValue("en") String locale) {
-        return LocaleCategory.translation(id, locale);
     }
 
     @POST

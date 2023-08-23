@@ -142,7 +142,7 @@ public class TestCategoryService extends AbstractTest {
         asserter.execute(() -> {
             Set<?> categories = given()
                     .when()
-                    .get("/category")
+                    .get("/task-mode/category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
@@ -224,7 +224,7 @@ public class TestCategoryService extends AbstractTest {
 
         asserter.execute(() -> given()
                 .when()
-                .get("/category")
+                .get("/task-mode/category")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("$.size()", is(3),
@@ -359,7 +359,7 @@ public class TestCategoryService extends AbstractTest {
                 .pathParam("id", asserter.getData("id1"))
                 .pathParam("locale", "en")
                 .when()
-                .get("/category/translation/{id}/{locale}")
+                .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
@@ -371,7 +371,7 @@ public class TestCategoryService extends AbstractTest {
                 .pathParam("id", asserter.getData("id2"))
                 .pathParam("locale", "sk")
                 .when()
-                .get("/category/translation/{id}/{locale}")
+                .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
@@ -420,7 +420,7 @@ public class TestCategoryService extends AbstractTest {
                 .pathParam("id", asserter.getData("id"))
                 .pathParam("locale", "en")
                 .when()
-                .get("/category/translation/{id}/{locale}")
+                .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is("Východzia Kategória"),
@@ -491,7 +491,7 @@ public class TestCategoryService extends AbstractTest {
                 .pathParam("id", asserter.getData("id"))
                 .pathParam("locale", "sk")
                 .when()
-                .get("/category/translation/{id}/{locale}")
+                .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
