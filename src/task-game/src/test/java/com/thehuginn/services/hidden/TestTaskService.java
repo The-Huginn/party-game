@@ -1,6 +1,6 @@
-package com.thehuginn;
+package com.thehuginn.services.hidden;
 
-import com.thehuginn.services.hidden.TaskService;
+import com.thehuginn.AbstractTest;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -26,7 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 @TestHTTPEndpoint(TaskService.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TestTaskService extends AbstractTest{
+public class TestTaskService extends AbstractTest {
 
     @BeforeEach
     @AfterEach

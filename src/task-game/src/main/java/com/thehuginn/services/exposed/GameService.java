@@ -6,14 +6,12 @@ import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.ResolvedTask;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.WebApplicationException;
 import org.jboss.resteasy.reactive.RestCookie;
-import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
 import java.util.function.Function;
@@ -21,33 +19,12 @@ import java.util.function.Function;
 @Path("/game")
 public class GameService {
 
-    @GET
-    public Uni<GameSession> getGame(@RestCookie String gameId) {
-        return GameSession.findById(gameId);
-    }
-
     @POST
     @WithTransaction
     public Uni<GameSession> createGame(@RestCookie String gameId) {
         GameSession gameSession = new GameSession();
         gameSession.gameId = gameId;
         return gameSession.persist();
-    }
-
-    @PUT
-    @WithTransaction
-    @Path("/category/{categoryId}")
-    public Uni<Boolean> addCategory(@RestCookie String gameId, @RestPath Long categoryId) {
-        return findGameSession(gameId)
-                .chain(gameSession -> gameSession.addCategory(categoryId));
-    }
-
-    @DELETE
-    @WithTransaction
-    @Path("/category/{categoryId}")
-    public Uni<Boolean> removeCategory(@RestCookie String gameId, @RestPath Long categoryId) {
-        return findGameSession(gameId)
-                .chain(gameSession -> gameSession.removeCategory(categoryId));
     }
 
     @PUT
@@ -86,5 +63,4 @@ public class GameService {
         return GameSession.<GameSession>findById(gameId)
                 .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"));
     }
-
 }

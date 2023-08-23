@@ -1,15 +1,14 @@
-package com.thehuginn;
+package com.thehuginn.services.exposed;
 
-import com.thehuginn.category.Category;
+import com.thehuginn.AbstractTest;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.services.hidden.CategoryService;
 import com.thehuginn.services.hidden.GameTaskService;
 import com.thehuginn.services.hidden.TaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.panache.common.Parameters;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
@@ -36,6 +35,7 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 @RunOnVertxContext
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestHTTPEndpoint(GameService.class)
 public class TestGameService extends AbstractTest {
 
     private static final String GAME = "game";
@@ -67,7 +67,7 @@ public class TestGameService extends AbstractTest {
                 given()
                         .cookie(new Cookie.Builder("gameId", GAME).build())
                         .when()
-                        .post("/game")
+                        .post()
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("gameId", is(GAME),
@@ -78,167 +78,6 @@ public class TestGameService extends AbstractTest {
 
     @Test
     @Order(2)
-    void testGettingGameSession(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
-
-        asserter.execute(() ->
-                given()
-                        .cookie(new Cookie.Builder("gameId", GAME).build())
-                        .when()
-                        .get("/game")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.OK)
-                        .body("gameId", is(GAME),
-                                "categories.size()", is(0)));
-
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @Test
-    @Order(3)
-    void testAddingAndRemovingCategories(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
-        asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
-                .onItem()
-                .invoke(category -> asserter.putData("id1", category.id)));
-        asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
-                .onItem()
-                .invoke(category -> asserter.putData("id2", category.id)));
-
-        asserter.execute(() -> {
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", 0)
-                    .when()
-                    .put("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", asserter.getData("id1"))
-                    .when()
-                    .put("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", asserter.getData("id2"))
-                    .when()
-                    .put("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .when()
-                    .get("/game")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("categories.size()", is(3));
-        });
-
-        asserter.execute(() -> {
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", 0)
-                    .when()
-                    .delete("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", asserter.getData("id2"))
-                    .when()
-                    .delete("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .when()
-                    .get("/game")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("categories.size()", is(1));
-        });
-
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @Test
-    @Order(4)
-    void testAddingCategoriesWithTasksAndStartingGame(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
-                .onItem()
-                .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
-                .onItem()
-                .invoke(task -> asserter.putData("task2", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly_please>").<Task>persistAndFlush()
-                .onItem()
-                .invoke(task -> asserter.putData("task3", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("{player_1}").<Task>persistAndFlush()
-                .onItem()
-                .invoke(task -> asserter.putData("task4", task.id)));
-
-        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
-                .onItem()
-                .invoke(category -> asserter.putData("id1", category.id)));
-        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task3")))
-                .onItem()
-                .invoke(category -> asserter.putData("id2", category.id)));
-
-        asserter.execute(() -> {
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", 0)
-                    .when()
-                    .put("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-
-            given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .pathParam("id", asserter.getData("id2"))
-                    .when()
-                    .put("/game/category/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body(is("true"));
-        });
-
-        asserter.execute(() ->
-                given()
-                        .cookie(new Cookie.Builder("gameId", GAME).build())
-                        .cookie(new Cookie.Builder("locale", "en").build())
-                        .queryParam("resolutionContext", resolutionContext)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .when()
-                        .put("game/start")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.OK)
-                        .body(is("true")));
-
-        asserter.assertThat(() -> GameTask.<GameTask>find("game = :game", Parameters.with("game", GAME))
-                .list(), gameTasks -> Assertions.assertEquals(gameTasks.size(), 18));
-
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @Test
-    @Order(5)
     void testStartingEmptyGame(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
@@ -249,7 +88,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.NO_CONTENT));
 
@@ -257,7 +96,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(6)
+    @Order(3)
     void testStartingGameWithOneTask(UniAsserter asserter) {
         asserter.execute(() -> new Task.Builder("simple task")
                 .repeat(Task.Repeat.NEVER)
@@ -283,7 +122,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task"),
@@ -293,7 +132,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(7)
+    @Order(4)
     void testStartingGameWithOneTaskWithRandomPlayer(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
                         .repeat(Task.Repeat.NEVER)
@@ -318,7 +157,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
@@ -329,7 +168,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(8)
+    @Order(5)
     void testStartingGameWithOneTaskWithOneTimer(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {timer_30}")
                         .repeat(Task.Repeat.NEVER)
@@ -354,7 +193,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task for 30s"),
@@ -364,7 +203,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(9)
+    @Order(6)
     void testStartingGameWithOneTaskWithCurrentPlayerRandomPlayerOneTimer(UniAsserter asserter) {
         String task = "%s has to laugh with %s for %s";
         asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}", "{player_1}", "{timer_42}"))
@@ -390,7 +229,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
@@ -401,7 +240,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(9)
+    @Order(7)
     void testStartingGameWithOneTaskWithCurrentPlayerAllRandomPlayer(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("{player_c}{player_1}{player_2}")
                         .repeat(Task.Repeat.NEVER)
@@ -426,7 +265,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
@@ -437,7 +276,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(10)
+    @Order(8)
     void testStartingGameWithOneTaskWithCurrentPlayerAllRandomPlayerTranslated(UniAsserter asserter) {
         String task = "%s sa musí s hráčom %s smiať %s";
         asserter.execute(() -> taskService.createTask(new Task.Builder("{player_c} has to laugh with {player_1} for {timer_42}")
@@ -465,7 +304,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("data." + ((Task) asserter.getData("task")).getKey(),
@@ -476,7 +315,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(11)
+    @Order(9)
     void testGetCurrentTaskTwice(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
                         .repeat(Task.Repeat.NEVER)
@@ -501,7 +340,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
@@ -514,7 +353,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
@@ -527,7 +366,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/current")
+                        .get("/task/current")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
@@ -537,7 +376,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(12)
+    @Order(10)
     void testDeleteCurrentTask(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
                         .repeat(Task.Repeat.NEVER)
@@ -570,7 +409,7 @@ public class TestGameService extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .get("game/task/next")
+                    .get("/task/next")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
@@ -594,7 +433,7 @@ public class TestGameService extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .get("game/task/next")
+                    .get("/task/next")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
@@ -608,7 +447,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(13)
+    @Order(11)
     void testGetCurrentTask(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_c}")
                         .repeat(Task.Repeat.NEVER)
@@ -640,7 +479,7 @@ public class TestGameService extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .get("game/task/next")
+                    .get("/task/next")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
@@ -655,7 +494,7 @@ public class TestGameService extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .get("game/task/current")
+                    .get("/task/current")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body(is(asserter.getData("task")));
@@ -665,7 +504,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(14)
+    @Order(12)
     void testRepeatingTaskNotRemoved(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
                         .repeat(Task.Repeat.ALWAYS)
@@ -695,7 +534,7 @@ public class TestGameService extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .get("game/task/next")
+                    .get("/task/next")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .extract()
@@ -709,7 +548,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/next")
+                        .get("/task/next")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
@@ -727,7 +566,7 @@ public class TestGameService extends AbstractTest {
     }
 
     @Test
-    @Order(14)
+    @Order(13)
     void testCurrentPlayerGetsUpdatedAndCycles(UniAsserter asserter) {
         String task = "simple task for %s";
         asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}"))
@@ -759,7 +598,7 @@ public class TestGameService extends AbstractTest {
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .get("game/task/next")
+                        .get("/task/next")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()

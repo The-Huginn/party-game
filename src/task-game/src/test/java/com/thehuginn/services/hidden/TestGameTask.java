@@ -1,7 +1,7 @@
-package com.thehuginn;
+package com.thehuginn.services.hidden;
 
+import com.thehuginn.AbstractTest;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.services.hidden.GameTaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
@@ -26,7 +26,7 @@ import java.util.List;
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @RunOnVertxContext
-public class TestGameTask extends AbstractTest{
+public class TestGameTask extends AbstractTest {
 
     private static final String GAME = "game";
     private static final String PLAYER = "player1";

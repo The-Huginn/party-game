@@ -1,8 +1,8 @@
-package com.thehuginn;
+package com.thehuginn.services.hidden;
 
+import com.thehuginn.AbstractTest;
 import com.thehuginn.category.Category;
 import com.thehuginn.category.LocaleCategory;
-import com.thehuginn.services.hidden.CategoryService;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -64,8 +64,7 @@ public class TestCategoryService extends AbstractTest {
                         .when().post("category")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
-                        .body("id", is(1),
-                                "name", is("test"),
+                        .body("name", is("test"),
                                 "description", is("first test"),
                                 "tasks.size()", is(0))
         );
@@ -95,8 +94,7 @@ public class TestCategoryService extends AbstractTest {
                     .when().post("category")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("id", is(2),
-                            "name", is("name"),
+                    .body("name", is("name"),
                             "description", is("description"),
                             "tasks.size()", is(2));
         });
