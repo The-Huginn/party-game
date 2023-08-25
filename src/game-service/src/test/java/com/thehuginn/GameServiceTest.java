@@ -41,7 +41,7 @@ public class GameServiceTest extends AbstractTest {
                     .post()
                     .then()
                     .cookie("gameId", is(ID))
-                    .statusCode(RestResponse.StatusCode.NOT_MODIFIED);
+                    .statusCode(RestResponse.StatusCode.CONFLICT);
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

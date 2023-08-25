@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.Game;
 import com.thehuginn.external.GameRestClientTask;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -21,6 +20,7 @@ import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
 
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Path("/game")
@@ -44,15 +44,29 @@ public class GameService {
                     }))
                 .onItem()
                 .transform(game -> RestResponse.ResponseBuilder.ok(game)
-                        .status(created.get() ? RestResponse.Status.CREATED : RestResponse.Status.NOT_MODIFIED)
+                        .status(created.get() ? RestResponse.Status.CREATED : RestResponse.Status.CONFLICT)
                         .cookie(new NewCookie.Builder("gameId").value(gameId).build())
                         .build());
     }
 
     @GET
-    @WithSession
     public Uni<Game> getGame(@RestQuery String gameId) {
         return Game.findById(gameId);
+    }
+
+    @GET
+    @Path("/random")
+    public String randomGameId() {
+        long time = Instant.now().getEpochSecond();
+        StringBuilder gameId = new StringBuilder();
+        for (int i = 0; i < 6; i++){
+            gameId.append((char) ('A' + (time % 26)));
+            time /= 26;
+            if (i == 2) {
+                gameId.append('-');
+            }
+        }
+        return gameId.toString();
     }
 
     @PUT
