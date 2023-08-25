@@ -36,16 +36,16 @@ public class GameService {
     @WithTransaction
     public Uni<RestResponse<Game>> createGame(String gameId) {
         AtomicBoolean created = new AtomicBoolean(false);
-        return Panache.withTransaction(() -> Game.<Game>findById(gameId)
+        return Game.<Game>findById(gameId)
                 .onItem().ifNull().switchTo(() -> {
                     created.set(true);
                     Game game = new Game(gameId);
                     return game.persist();
-                    }))
+                    })
                 .onItem()
                 .transform(game -> RestResponse.ResponseBuilder.ok(game)
                         .status(created.get() ? RestResponse.Status.CREATED : RestResponse.Status.CONFLICT)
-                        .cookie(new NewCookie.Builder("gameId").value(gameId).build())
+                        .cookie(new NewCookie.Builder("gameId").value(gameId).sameSite(NewCookie.SameSite.NONE).path("/").secure(true).build())
                         .build());
     }
 

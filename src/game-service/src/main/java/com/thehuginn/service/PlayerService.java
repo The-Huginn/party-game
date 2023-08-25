@@ -19,7 +19,7 @@ public class PlayerService {
     @Path("/team")
     public Uni<List<Player>> getTeam(@RestCookie String gameId) {
         if (gameId == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Missing Cookie");
         }
 
         return Game.<Game>findById(gameId)

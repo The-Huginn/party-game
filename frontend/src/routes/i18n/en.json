@@ -1,0 +1,13 @@
+{
+    "page": {
+        "disclaimer": {
+            "text": "Bonjour in English",
+            "accept_btn": "I accept"
+        },
+        "game": {
+            "choose_name": "Please pick a unique name",
+            "game_name": "Game Name",
+            "confirm": "Confirm"
+        }
+    }
+}
