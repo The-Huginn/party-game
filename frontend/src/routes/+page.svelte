@@ -8,7 +8,7 @@
 
 	export let data: PageData;
 
-	$header_text = 'Party Game';
+	$header_text = 'page.disclaimer.title';
 </script>
 
 <svelte:head>

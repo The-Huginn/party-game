@@ -1,28 +1,75 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
 	import type { PageData } from './$types';
-	import { header_text } from '../../../store';
+	import { game_url, header_text } from '../../../store';
+	import { _, isLoading } from 'svelte-i18n';
 
 	export let data: PageData;
-	const {players} = data
+	let { players } = data;
 
-	console.log(players)
+	console.log(players);
 
-	function add() {
-		// children = [...children, children.length + 1];
+	async function handleSubmit(event) {
+		const formDatam = new FormData(this);
+		const newPlayer = formDatam.get('new-player');
+
+		const response = await fetch(`${game_url}/player`, {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json'
+			},
+			credentials: 'include',
+			body: JSON.stringify({ name: newPlayer })
+		});
+
+		class Player {
+			id: number;
+			name: string;
+
+			public constructor(init?:Partial<Player>) {
+				Object.assign(this, init);
+			}
+		};
+
+		if (response.status == 200) {
+			const player = (await response.json()) as Player;
+			players = [...players, new Player(player)]
+			return {
+				success: true,
+			};
+		}
 	}
 
-	export const ssr = false
-	$header_text = 'Lobby';
+	export const ssr = false;
+	$header_text = 'page.game.lobby.title';
 </script>
 
-	<div class="parent" transition:fade>
-		<span>Lobby</span>
-		{#each players as player}
-			<div class="child" transition:slide|local>Child</div>
-		{/each}
-		<button on:click={add}>Add</button>
-	</div>
+<div class="parent" transition:fade>
+	<span>Lobby</span>
+	{#each players as player}
+		<div class="child" transition:slide|local>{player.name}</div>
+	{/each}
+	<form
+		class="w-full flex flex-col max-w-xs space-y-5"
+		method="POST"
+		on:submit|preventDefault={handleSubmit}
+	>
+		<div class="child w-full form-control max-w-xs" transition:slide|local>
+			<input
+				type="text"
+				name="new-player"
+				class="input input-primary input-bordered w-full max-w-xs"
+			/>
+		</div>
+		<button class="btn btn-primary w-full max-w-xs transition duration-300">
+			{#if $isLoading}
+				Loading
+			{:else}
+				{$_('page.game.lobby.add_player')}
+			{/if}
+		</button>
+	</form>
+</div>
 
 <style lang="css">
 	.parent {

@@ -1,10 +1,14 @@
-<script>
-	import { page } from '$app/stores';
-	import home from '$lib/images/home-button.svg';
+<script lang="ts">
 	import github from '$lib/images/github.svg';
+	import home from '$lib/images/home-button.svg';
+	import { _, isLoading } from 'svelte-i18n';
+	import { fade, slide, type EasingFunction } from 'svelte/transition';
+	import * as eases from 'svelte/easing';
 	import { header_text } from '../store';
-	import { onDestroy } from 'svelte';
 
+	export let duration: number = 300;
+	export let axis = 'x';
+	export let easing: EasingFunction = eases.quartInOut;
 </script>
 
 <header>
@@ -34,7 +38,18 @@
 		</svg>
 	</nav> -->
 	<div class="corner flex-1 px-10">
-		<h1>{$header_text}</h1>
+		{#key $header_text}
+			<h1
+				in:slide={{ duration, delay: duration, easing }}
+				out:slide={{ duration, easing, axis: 'x' }}
+			>
+				{#if $isLoading}
+					Loading
+				{:else}
+					{$_(`${$header_text}`)}
+				{/if}
+			</h1>
+		{/key}
 	</div>
 
 	<div class="corner">
@@ -68,6 +83,16 @@
 		width: 3em;
 		height: 3em;
 		object-fit: contain;
+	}
+
+	h1 {
+		display: flex;
+		position: relative;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		inset: 0;
 	}
 
 	/* nav {

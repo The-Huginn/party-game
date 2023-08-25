@@ -75,8 +75,7 @@ public class GameServiceTest extends AbstractTest {
                 given()
                         .cookie(new Cookie.Builder("gameId", ID).build())
                         .contentType(ContentType.JSON)
-
-                        .body("\"TASK\"")
+                            .body("\"TASK\"")
                         .when()
                         .put("/type")
                         .then()

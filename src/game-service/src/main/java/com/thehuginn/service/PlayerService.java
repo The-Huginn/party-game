@@ -30,7 +30,7 @@ public class PlayerService {
     @POST
     @Path("/player")
     @WithTransaction
-    public Uni<Boolean> addPlayer(@RestCookie String gameId, Player newPlayer) {
+    public Uni<Player> addPlayer(@RestCookie String gameId, Player newPlayer) {
         return Game.<Game>findById(gameId)
                 .onItem()
                 .ifNotNull()
@@ -40,14 +40,10 @@ public class PlayerService {
     @DELETE
     @Path("/player")
     @WithTransaction
-    public Uni<Void> removePlayer(@RestCookie String gameId, Long playerId) {
+    public Uni<Boolean> removePlayer(@RestCookie String gameId, Long playerId) {
         return Game.<Game>findById(gameId)
                 .onItem()
-                .invoke(game -> {
-                    game.removePlayer(playerId);
-                    game.persist();
-                })
-                .replaceWithVoid();
+                .transform(game -> game.removePlayer(playerId));
 
     }
 }

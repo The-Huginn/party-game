@@ -25,7 +25,7 @@
 			return { success: true };
 		}
 	}
-	$header_text = 'Game Creation';
+	$header_text = 'page.game.create.title';
 </script>
 
 <svelte:head>
@@ -37,7 +37,7 @@
 	{#if $isLoading}
 		<p>Loading</p>
 	{:else}
-		<h1>{$_('page.game.choose_name')}</h1>
+		<h1>{$_('page.game.create.choose_name')}</h1>
 	{/if}
 
 	<!-- <a href="/lobby">click me</a> -->
@@ -49,7 +49,7 @@
 		>
 			<div class="w-full form-control max-w-xs">
 				<label for="gameId" class="label">
-					<span class="label-text">{$_('page.game.game_name')}</span>
+					<span class="label-text">{$_('page.game.create.game_name')}</span>
 				</label>
 				<input
 					type="text"
@@ -61,7 +61,7 @@
 				{#if $isLoading}
 					Loading
 				{:else}
-					{$_('page.game.game_name')}
+					{$_('page.game.create.game_name')}
 				{/if}
 			</button>
 		</form>

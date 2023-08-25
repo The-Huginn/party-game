@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Entity
 public class Player extends PanacheEntity {
-    String name;
+    public String name;
 
     @Override
     public boolean equals(Object o) {

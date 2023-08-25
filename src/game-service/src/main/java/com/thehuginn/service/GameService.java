@@ -3,7 +3,6 @@ package com.thehuginn.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.Game;
 import com.thehuginn.external.GameRestClientTask;
-import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;

@@ -1,13 +1,22 @@
 {
     "page": {
         "disclaimer": {
+            "title": "Welcome!",
             "text": "Bonjour in English",
             "accept_btn": "I accept"
         },
+        
         "game": {
-            "choose_name": "Please pick a unique name",
-            "game_name": "Game Name",
-            "confirm": "Confirm"
+            "create": {
+                "choose_name": "Please pick a unique name",
+                "game_name": "Game Name",
+                "confirm": "Confirm",
+                "title": "Game Creation"
+            },
+            "lobby": {
+                "title": "Lobby",
+                "add_player": "Add"
+            }
         }
     }
 }

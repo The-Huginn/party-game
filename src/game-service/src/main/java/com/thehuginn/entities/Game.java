@@ -1,6 +1,7 @@
 package com.thehuginn.entities;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -19,7 +20,9 @@ public class Game extends PanacheEntityBase {
     @Id
     public String gameId;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,
+    cascade = CascadeType.ALL,
+    orphanRemoval = true)
     public List<Player> team;
 
     public State state;
@@ -35,19 +38,17 @@ public class Game extends PanacheEntityBase {
         type = Type.NONE;
     }
 
-    public boolean addPlayer(Player player) {
+    public Player addPlayer(Player player) {
         if (team.contains(player)) {
-            return false;
+            return null;
         }
 
         team.add(player);
-        return true;
+        return player;
     }
 
-    public void removePlayer(Long playerId) {
-        team = team.stream()
-                .filter(player -> !Objects.equals(player.id, playerId))
-                .toList();
+    public boolean removePlayer(Long playerId) {
+        return team.removeIf(player -> Objects.equals(player.id, playerId));
     }
 
     public GameContext gameContext() {
