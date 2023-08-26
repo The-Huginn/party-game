@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { _, isLoading } from 'svelte-i18n';
-	import type { PageData } from './$types';
-	import { game_url, header_text } from '../../store';
 	import { goto } from '$app/navigation';
+	import Alert from '$lib/components/Alert.svelte';
+	import { _, isLoading } from 'svelte-i18n';
+	import { game_url, header_text } from '../../store';
 
-	export let data: PageData;
+	// export let data: PageData;
+	export let formSuccess: boolean = true;
 	export const ssr = false;
 
 	async function handleSubmit(event) {
@@ -19,10 +20,12 @@
 			credentials: 'include',
 			body: gameId
 		});
-		console.log(response);
+
 		if (response.status == 201) {
 			goto('/game/lobby');
-			return { success: true };
+			formSuccess = true;
+		} else {
+			formSuccess = false;
 		}
 	}
 	$header_text = 'page.game.create.title';
@@ -40,13 +43,8 @@
 		<h1>{$_('page.game.create.choose_name')}</h1>
 	{/if}
 
-	<!-- <a href="/lobby">click me</a> -->
 	<div class="flex flex-col justify-center items-center w-full">
-		<form
-			class="w-full flex flex-col max-w-xs space-y-5"
-			method="POST"
-			on:submit|preventDefault={handleSubmit}
-		>
+		<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control max-w-xs">
 				<label for="gameId" class="label">
 					<span class="label-text">{$_('page.game.create.game_name')}</span>
@@ -64,9 +62,11 @@
 					{$_('page.game.create.game_name')}
 				{/if}
 			</button>
+			{#if !formSuccess}
+				<Alert message="page.game.create.submit_error" />
+			{/if}
 		</form>
 	</div>
-	<!-- on:click|preventDefault={() => window.location.href='/lobby'}  -->
 </section>
 
 <style>

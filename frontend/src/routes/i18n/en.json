@@ -11,11 +11,13 @@
                 "choose_name": "Please pick a unique name",
                 "game_name": "Game Name",
                 "confirm": "Confirm",
-                "title": "Game Creation"
+                "title": "Game Creation",
+                "submit_error": "Game Already exists"
             },
             "lobby": {
                 "title": "Lobby",
-                "add_player": "Add"
+                "add_player": "Add",
+                "submit_error": "Player already exists"
             }
         }
     }

@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
-	import type { PageData } from './$types';
-	import { game_url, header_text } from '../../../store';
+	import Alert from '$lib/components/Alert.svelte';
 	import { _, isLoading } from 'svelte-i18n';
+	import { fade, slide } from 'svelte/transition';
+	import { game_url, header_text } from '../../../store';
+	import type { PageData } from './$types';
 
 	export let data: PageData;
-	let { players } = data;
+	export let formSuccess: boolean = true;
 
-	console.log(players);
+	let { players } = data;
 
 	async function handleSubmit(event) {
 		const formDatam = new FormData(this);
@@ -26,17 +27,18 @@
 			id: number;
 			name: string;
 
-			public constructor(init?:Partial<Player>) {
+			public constructor(init?: Partial<Player>) {
 				Object.assign(this, init);
 			}
-		};
+		}
 
 		if (response.status == 200) {
 			const player = (await response.json()) as Player;
-			players = [...players, new Player(player)]
-			return {
-				success: true,
-			};
+			players = [...players, new Player(player)];
+			event.target.reset();
+			formSuccess = true;
+		} else {
+			formSuccess = false;
 		}
 	}
 
@@ -68,6 +70,9 @@
 				{$_('page.game.lobby.add_player')}
 			{/if}
 		</button>
+		{#if !formSuccess}
+			<Alert message="page.game.lobby.submit_error" />
+		{/if}
 	</form>
 </div>
 
