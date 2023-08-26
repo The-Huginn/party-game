@@ -33,14 +33,14 @@ public class TestPlayerService extends AbstractTest {
 
     @BeforeEach
     @AfterEach
+    @RunOnVertxContext
     void setup(UniAsserter asserter) {
         super.setup(asserter);
+        asserter.execute(() -> gameService.createGame(ID));
     }
 
     @Test
     void addPlayer(UniAsserter asserter) {
-        asserter.execute(() -> gameService.createGame(ID));
-
         asserter.execute(() -> {
             given()
                     .cookie(new Cookie.Builder("gameId", ID).build())
@@ -60,7 +60,6 @@ public class TestPlayerService extends AbstractTest {
     void addSamePlayer(UniAsserter asserter) {
         Player player = new Player();
         player.name = "Player";
-        asserter.execute(() -> gameService.createGame(ID));
         asserter.execute(() -> playerService.addPlayer(ID, player)
                 .onItem().invoke(player1 -> Assertions.assertEquals(player.name, player1.name)));
 
@@ -82,7 +81,6 @@ public class TestPlayerService extends AbstractTest {
     void removePlayer(UniAsserter asserter) {
         Player player = new Player();
         player.name = "Player";
-        asserter.execute(() -> gameService.createGame(ID));
         asserter.execute(() -> playerService.addPlayer(ID, player)
                 .onItem().invoke(player1 -> asserter.putData("id", player1.id)));
         asserter.assertThat(() -> playerService.getTeam(ID), players -> Assertions.assertFalse(players.isEmpty()));
