@@ -17,6 +17,7 @@
             "lobby": {
                 "title": "Lobby",
                 "add_player": "Add",
+                "delete_player": "Delete",
                 "submit_error": "Player already exists"
             }
         }

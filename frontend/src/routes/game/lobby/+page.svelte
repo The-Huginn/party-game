@@ -4,6 +4,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
+	import LobbyTable from './LobbyTable.svelte';
 
 	export let data: PageData;
 	export let formSuccess: boolean = true;
@@ -48,24 +49,22 @@
 
 <div class="parent" transition:fade>
 	<span>Lobby</span>
-	{#each players as player}
-		<div class="child" transition:slide|local>{player.name}</div>
-	{/each}
+	<LobbyTable players={players} />
 	<form
-		class="w-full flex flex-col max-w-xs space-y-5"
+		class="w-full flex flex-col space-y-5"
 		method="POST"
 		on:submit|preventDefault={handleSubmit}
 	>
-		<div class="child w-full form-control max-w-xs" transition:slide|local>
+		<div class="w-full form-control" transition:slide|local>
 			<input
 				type="text"
 				name="new-player"
-				class="input input-primary input-bordered w-full max-w-xs"
+				class="input input-primary input-bordered w-full"
 			/>
 		</div>
-		<button class="btn btn-primary w-full max-w-xs transition duration-300">
+		<button class="btn btn-primary w-full transition duration-300">
 			{#if $isLoading}
-				Loading
+				<span class="loading loading-spinner text-info" />
 			{:else}
 				{$_('page.game.lobby.add_player')}
 			{/if}
@@ -79,7 +78,7 @@
 <style lang="css">
 	.parent {
 		position: relative;
-		width: 400px;
+		width: 40%;
 		display: grid;
 		gap: 1rem;
 		margin-bottom: 1rem;
@@ -94,13 +93,5 @@
 	span {
 		font-weight: 700;
 		font-size: 2rem;
-	}
-
-	.child {
-		padding: 1rem;
-		background-color: hsl(220 20% 28%);
-		box-shadow: 0 0 10px hsl(0 0% 0% / 10%);
-		border: 1px solid hsl(220 20% 32%);
-		border-radius: 1rem;
 	}
 </style>
