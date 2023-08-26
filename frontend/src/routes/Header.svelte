@@ -12,9 +12,9 @@
 </script>
 
 <header>
-	<div class="corner">
+	<div class="corner hover:shadow-lg">
 		<a href="/">
-			<img src={home} alt="SvelteKit" />
+			<img src={home} alt="Home" />
 		</a>
 	</div>
 
@@ -52,7 +52,7 @@
 		{/key}
 	</div>
 
-	<div class="corner">
+	<div class="corner hover:shadow-lg">
 		<a href="https://github.com/The-Huginn/party-game">
 			<img src={github} alt="GitHub" />
 		</a>
