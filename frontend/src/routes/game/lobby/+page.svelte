@@ -5,6 +5,7 @@
 	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
 	import LobbyTable from './LobbyTable.svelte';
+	import Player from './Player';
 
 	export let data: PageData;
 	export let formSuccess: boolean = true;
@@ -24,15 +25,6 @@
 			body: JSON.stringify({ name: newPlayer })
 		});
 
-		class Player {
-			id: number;
-			name: string;
-
-			public constructor(init?: Partial<Player>) {
-				Object.assign(this, init);
-			}
-		}
-
 		if (response.status == 200) {
 			const player = (await response.json()) as Player;
 			players = [...players, new Player(player)];
@@ -49,10 +41,9 @@
 
 <div class="parent" transition:fade>
 	<span>Lobby</span>
-	<LobbyTable players={players} />
+	<LobbyTable bind:players={players} />
 	<form
 		class="w-full flex flex-col space-y-5"
-		method="POST"
 		on:submit|preventDefault={handleSubmit}
 	>
 		<div class="w-full form-control" transition:slide|local>
