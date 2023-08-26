@@ -7,8 +7,10 @@
 	import LobbyTable from './LobbyTable.svelte';
 	import Player from './Player';
 
+	export const ssr = false;
 	export let data: PageData;
 	export let formSuccess: boolean = true;
+	$header_text = 'page.game.lobby.title';
 
 	let { players } = data;
 
@@ -34,14 +36,13 @@
 			formSuccess = false;
 		}
 	}
-
-	export const ssr = false;
-	$header_text = 'page.game.lobby.title';
 </script>
 
 <div class="flex flex-col w-full items-center space-y-5">
-	<div class="parent">
-		<span>{$_(`page.game.lobby.table_name`)}</span>
+	<div
+		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
+	>
+		<span class="font-bold font-4xl">{$_(`page.game.lobby.table_name`)}</span>
 		<LobbyTable bind:players />
 		<form class="w-full flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control" transition:slide|local>
@@ -63,31 +64,10 @@
 	<form method="GET" action="/task-mode">
 		<button class="btn btn-primary transition duration-300">
 			{#if $isLoading}
-				<p>Loading</p>
+				<span class="loading loading-spinner text-info" />
 			{:else}
 				{$_('page.game.lobby.confirm')}
 			{/if}
 		</button>
 	</form>
 </div>
-
-<style lang="css">
-	.parent {
-		position: relative;
-		width: 40%;
-		display: grid;
-		gap: 1rem;
-		margin-bottom: 1rem;
-		padding: 1rem;
-		background-color: hsl(220 20% 24%);
-		box-shadow: 0 0 10px hsl(0 0% 0% / 10%);
-		border: 1px solid hsl(220 20% 28%);
-		border-radius: 1rem;
-		overflow: hidden;
-	}
-
-	span {
-		font-weight: 700;
-		font-size: 2rem;
-	}
-</style>

@@ -4,7 +4,6 @@
 	import { _, isLoading } from 'svelte-i18n';
 	import { game_url, header_text } from '../../store';
 
-	// export let data: PageData;
 	export let formSuccess: boolean = true;
 	export const ssr = false;
 
@@ -36,11 +35,11 @@
 	<meta name="description" content="Creation of a game session" />
 </svelte:head>
 
-<section>
+<section class="flex flex-col justify-center items-center w-3/5">
 	{#if $isLoading}
-		<p>Loading</p>
+		<span class="loading loading-spinner text-info" />
 	{:else}
-		<h1>{$_('page.game.create.choose_name')}</h1>
+		<h1 class="w-full">{$_('page.game.create.choose_name')}</h1>
 	{/if}
 
 	<div class="flex flex-col justify-center items-center w-full">
@@ -57,7 +56,7 @@
 			</div>
 			<button class="btn btn-primary w-full max-w-xs transition duration-300">
 				{#if $isLoading}
-					Loading
+					<span class="loading loading-spinner text-info" />
 				{:else}
 					{$_('page.game.create.game_name')}
 				{/if}
@@ -68,17 +67,3 @@
 		</form>
 	</div>
 </section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-</style>

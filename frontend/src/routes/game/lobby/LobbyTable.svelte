@@ -2,13 +2,13 @@
 	import { _, isLoading } from 'svelte-i18n';
 	import { slide } from 'svelte/transition';
 	import { game_url } from '../../../store';
-    import type Player from './Player';
+	import type Player from './Player';
 
 	export let players: Player[] = [];
 
 	async function handleSubmit(event) {
 		const formDatam = new FormData(this);
-		const id:number = formDatam.get('id');
+		const id: number = formDatam.get('id');
 
 		const response = await fetch(`${game_url}/player`, {
 			method: 'DELETE',
@@ -21,7 +21,7 @@
 
 		const reader = response.body?.getReader();
 		let { value: chunk, done: readerDone } = await reader.read();
-        const success = new TextDecoder().decode(chunk);
+		const success = new TextDecoder().decode(chunk);
 		if (response.status == 200 && success === 'true') {
 			players = players.filter((player) => player.id != id);
 		}

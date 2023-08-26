@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { _, isLoading } from 'svelte-i18n';
-	import { slide } from 'svelte/transition';
-	import type { Category } from './Category';
-	import { task_url } from '../../store';
 	import tooltip from '$lib/images/tooltip.svg';
+	import { slide } from 'svelte/transition';
+	import { task_url } from '../../store';
+	import type { Category } from './Category';
 
 	export let categories: Category[] = [];
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { slide, type EasingFunction } from 'svelte/transition';
 	import * as eases from 'svelte/easing';
+	import { slide, type EasingFunction } from 'svelte/transition';
 
 	export let key: string;
 	export let duration: number = 300;
@@ -8,20 +8,11 @@
 </script>
 
 {#key key}
-	<div in:slide={{ duration, delay: duration, easing }}
-	out:slide={{ duration, easing, axis: 'x' }}>
+	<div
+		class="flex relative justify-center items-center w-full h-full inset-0"
+		in:slide={{ duration, delay: duration, easing }}
+		out:slide={{ duration, easing, axis: 'x' }}
+	>
 		<slot />
 	</div>
 {/key}
-
-<style>
-	div {
-		display: flex;
-		position: relative;
-		justify-content: center;
-		align-items: center;
-		width: 100%;
-		height: 100%;
-		inset: 0;
-	}
-</style>
