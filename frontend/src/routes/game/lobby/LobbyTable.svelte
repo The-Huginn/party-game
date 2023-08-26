@@ -22,10 +22,8 @@
 		const reader = response.body?.getReader();
 		let { value: chunk, done: readerDone } = await reader.read();
         const success = new TextDecoder().decode(chunk);
-        console.log(success);
 		if (response.status == 200 && success === 'true') {
 			players = players.filter((player) => player.id != id);
-            console.log(players);
 		}
 	}
 </script>

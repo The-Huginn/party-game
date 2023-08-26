@@ -15,10 +15,20 @@
                 "submit_error": "Game Already exists"
             },
             "lobby": {
-                "title": "Lobby",
+                "title": "Fill in your Lobby",
+                "table_name": "Lobby",
                 "add_player": "Add",
                 "delete_player": "Delete",
-                "submit_error": "Player already exists"
+                "submit_error": "Player already exists",
+                "confirm": "Confirm lobby"
+            }
+        },
+
+        "task": {
+            "category": {
+                "title": "Choose Categories",
+                "table_name": "Categories",
+                "confirm": "Confirm categories"
             }
         }
     }

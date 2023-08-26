@@ -35,7 +35,6 @@
 
 	<p>Current page {$location}</p>
 
-	<!-- <a href="/lobby">click me</a> -->
 	<form method="GET" action="/game">
 		<button class="btn btn-primary transition duration-300">
 			{#if $isLoading}
@@ -45,7 +44,6 @@
 			{/if}
 		</button>
 	</form>
-	<!-- on:click|preventDefault={() => window.location.href='/lobby'}  -->
 
 </section>
 

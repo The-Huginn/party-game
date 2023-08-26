@@ -4,12 +4,12 @@
 
 	export let key: string;
 	export let duration: number = 300;
-	export let axis = 'x';
-	export let easing: EasingFunction = eases.quartInOut
+	export let easing: EasingFunction = eases.quartInOut;
 </script>
 
 {#key key}
-	<div in:slide={{ duration, delay: duration, easing }} out:slide={{ duration, easing, axis: 'x' }}>
+	<div in:slide={{ duration, delay: duration, easing }}
+	out:slide={{ duration, easing, axis: 'x' }}>
 		<slot />
 	</div>
 {/key}

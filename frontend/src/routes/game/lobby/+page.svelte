@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Alert from '$lib/components/Alert.svelte';
 	import { _, isLoading } from 'svelte-i18n';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
 	import LobbyTable from './LobbyTable.svelte';
@@ -39,30 +39,35 @@
 	$header_text = 'page.game.lobby.title';
 </script>
 
-<div class="parent" transition:fade>
-	<span>Lobby</span>
-	<LobbyTable bind:players={players} />
-	<form
-		class="w-full flex flex-col space-y-5"
-		on:submit|preventDefault={handleSubmit}
-	>
-		<div class="w-full form-control" transition:slide|local>
-			<input
-				type="text"
-				name="new-player"
-				class="input input-primary input-bordered w-full"
-			/>
-		</div>
-		<button class="btn btn-primary w-full transition duration-300">
+<div class="flex flex-col w-full items-center space-y-5">
+	<div class="parent">
+		<span>{$_(`page.game.lobby.table_name`)}</span>
+		<LobbyTable bind:players />
+		<form class="w-full flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
+			<div class="w-full form-control" transition:slide|local>
+				<input type="text" name="new-player" class="input input-primary input-bordered w-full" />
+			</div>
+			<button class="btn btn-primary w-full transition duration-300">
+				{#if $isLoading}
+					<span class="loading loading-spinner text-info" />
+				{:else}
+					{$_('page.game.lobby.add_player')}
+				{/if}
+			</button>
+			{#if !formSuccess}
+				<Alert message="page.game.lobby.submit_error" />
+			{/if}
+		</form>
+	</div>
+
+	<form method="GET" action="/task-mode">
+		<button class="btn btn-primary transition duration-300">
 			{#if $isLoading}
-				<span class="loading loading-spinner text-info" />
+				<p>Loading</p>
 			{:else}
-				{$_('page.game.lobby.add_player')}
+				{$_('page.game.lobby.confirm')}
 			{/if}
 		</button>
-		{#if !formSuccess}
-			<Alert message="page.game.lobby.submit_error" />
-		{/if}
 	</form>
 </div>
 
