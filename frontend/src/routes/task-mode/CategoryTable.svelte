@@ -7,11 +7,11 @@
 	export let categories: Category[] = [];
 
 	async function handleSubmit(event) {
-		const formDatam = new FormData(this);
-		const id: number = formDatam.get('id');
+		const id: number = this.getAttribute('id');
+		const method = this.checked == true ? 'PUT' : 'DELETE';
 
 		const response = await fetch(`${task_url}/task-mode/category/${id}`, {
-			method: 'PUT',
+			method: method,
 			headers: {
 				'Content-type': 'application/json'
 			},
@@ -33,11 +33,11 @@
 			{#each categories as category}
 				<tr class="items-center" transition:slide|local>
 					<th class="nowrap">
-						<form class="w-full flex" on:submit|preventDefault={handleSubmit}>
+						<form class="w-full flex">
 							<div class="form-control">
 								<label class="cursor-pointer label">
 									<input type="hidden" name="id" hidden value={category.id} />
-									<input type="checkbox" class="checkbox checkbox-info" />
+									<input type="checkbox" id={category.id} on:click={handleSubmit} class="checkbox checkbox-info" />
 								</label>
 							</div>
 						</form>

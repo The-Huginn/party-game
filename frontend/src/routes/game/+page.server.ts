@@ -11,6 +11,6 @@ export const load: PageLoad = async ({ fetch }) => {
     const gameIdFallback = getGameId.text()
 
     return {
-        gameId: gameIdFallback
+        gameIdFallback: gameIdFallback
     };
 }

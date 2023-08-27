@@ -61,7 +61,7 @@
 		</form>
 	</div>
 
-	<form method="GET" action="/task-mode">
+	<form method="GET" action="/game/mode-selection">
 		<button class="btn btn-primary transition duration-300">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />

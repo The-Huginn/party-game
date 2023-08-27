@@ -42,6 +42,7 @@
 			formSuccess = 'page.game.create.conflict';
 		}
 	}
+	
 	$header_text = 'page.game.create.title';
 </script>
 
