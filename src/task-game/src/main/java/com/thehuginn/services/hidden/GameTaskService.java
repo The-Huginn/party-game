@@ -39,7 +39,8 @@ public class GameTaskService {
         Uni<Long> deletePrevious = GameTask.delete("game", resolutionContext.getGameId() )
                 .invoke(aLong -> {
                     if (aLong.compareTo(0L) > 0) {
-                        Log.infof("Previous game [%s] was deleted with %d tasks remaining");
+                        Log.infof("Previous game [%s] was deleted with %d tasks remaining",
+                                resolutionContext.getGameId(), aLong);
                     }
                 });
 

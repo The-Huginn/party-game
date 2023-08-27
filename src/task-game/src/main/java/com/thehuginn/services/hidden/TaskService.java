@@ -56,7 +56,7 @@ public class TaskService {
                 .item(task)
                 .call(task1 -> {
                     task1.task = new LocaleText(task1, task.task.locale, task.task.content);
-                    if (task.tokens.isEmpty()) {
+                    if (TokenResolver.translateTask(task1.task.content).isEmpty()) {
                         return Uni.createFrom().voidItem();
                     }
                     return findOrCreateTokens.apply(TokenResolver.translateTask(task1.task.content))

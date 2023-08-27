@@ -189,6 +189,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         return tokens.stream().allMatch(resolvedTokenResolvable -> resolvedTokenResolvable.isResolvable(context));
     }
 
+    @JsonIgnore
     public boolean isRemovable() {
         return repeat != Repeat.ALWAYS;
     }

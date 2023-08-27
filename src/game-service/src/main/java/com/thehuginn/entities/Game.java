@@ -35,7 +35,7 @@ public class Game extends PanacheEntityBase {
         gameId = id;
         team = new ArrayList<>();
         state = State.CREATED;
-        type = Type.NONE;
+        type = Type.TASK;
     }
 
     public Player addPlayer(Player player) {

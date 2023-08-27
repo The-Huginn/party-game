@@ -30,14 +30,16 @@ public class ResolutionContextProvider implements ParamConverterProvider {
         @Override
         public ResolutionContext.Builder fromString(String value) {
             String gameId = containerRequestContext.getCookies().get("gameId").getValue();
-            String locale = containerRequestContext.getCookies().get("locale").getValue();
+            String locale = containerRequestContext.getCookies().containsKey("locale")
+                    ? containerRequestContext.getCookies().get("locale").getValue()
+                    : "en";
             try {
                 JsonNode root = new ObjectMapper().readTree(value);
                 if (!root.has("players") || !root.get("players").isArray()) {
                     throw new IllegalArgumentException("Resolution Context can not be created due to missing fields");
                 }
                 List<String> players = new ArrayList<>();
-                root.get("players").elements().forEachRemaining(jsonNode -> players.add(jsonNode.asText()));
+                root.get("players").elements().forEachRemaining(jsonNode -> players.add(jsonNode.has("name") ? jsonNode.get("name").asText() : jsonNode.asText()));
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
                         .players(players);

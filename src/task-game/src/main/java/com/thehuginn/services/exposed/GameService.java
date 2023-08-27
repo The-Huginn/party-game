@@ -42,7 +42,7 @@ public class GameService {
         return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.currentTask(resolutionContext));
     }
 
-    @GET
+    @PUT
     @WithTransaction
     @Path("/task/next")
     public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext) {
