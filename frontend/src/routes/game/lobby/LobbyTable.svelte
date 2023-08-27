@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { _, isLoading } from 'svelte-i18n';
+	import { isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
 	import { slide } from 'svelte/transition';
 	import { game_url } from '../../../store';
 	import type Player from './Player';

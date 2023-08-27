@@ -12,7 +12,8 @@
                 "game_name": "Game Name",
                 "confirm": "Confirm",
                 "title": "Game Creation",
-                "submit_error": "Game Already exists"
+                "conflict": "Game Already exists",
+                "missing_value": "Game Name can not be empty"
             },
             "lobby": {
                 "title": "Fill in your Lobby",

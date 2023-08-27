@@ -1,14 +1,16 @@
+import { getCookie } from "$lib/common/cookies";
 import { game_url } from "../../store";
-import type { PageServerLoad } from "./$types";
+import type { PageLoad } from "./lobby/$types";
 
 export const prerender = true;
+export const ssr = false;
 
-export const load: PageServerLoad = async ({ fetch, cookies }) => {
+export const load: PageLoad = async ({ fetch }) => {
     const getGameId = await fetch(`${game_url}/game/random`)
 
-    const gameId = cookies.get('gameId') ?? getGameId.text()
+    const gameIdFallback = getGameId.text()
 
     return {
-        gameId: gameId
+        gameId: gameIdFallback
     };
 }

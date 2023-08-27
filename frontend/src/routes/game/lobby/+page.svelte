@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Alert from '$lib/components/Alert.svelte';
-	import { _, isLoading } from 'svelte-i18n';
+	import { isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
 	import { slide } from 'svelte/transition';
 	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
 	import LobbyTable from './LobbyTable.svelte';
 	import Player from './Player';
 
-	export const ssr = false;
 	export let data: PageData;
 	export let formSuccess: boolean = true;
 	$header_text = 'page.game.lobby.title';

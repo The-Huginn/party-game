@@ -1,7 +1,8 @@
 <script lang="ts">
 	import github from '$lib/images/github.svg';
 	import home from '$lib/images/home-button.svg';
-	import { _, isLoading } from 'svelte-i18n';
+	import { isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
 	import * as eases from 'svelte/easing';
 	import { slide, type EasingFunction } from 'svelte/transition';
 	import { header_text } from '../store';

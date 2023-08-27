@@ -1,16 +1,31 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Alert from '$lib/components/Alert.svelte';
-	import { _, isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
+	import { isLoading } from 'svelte-i18n';
 	import { game_url, header_text } from '../../store';
+	import type { PageData } from './$types';
+	import { onMount } from 'svelte';
+	import { getCookie } from '$lib/common/cookies';
 
-	export let formSuccess: boolean = true;
-	export const ssr = false;
+	export let formSuccess: string = '';
+
+	export let data: PageData;
+	let { gameIdFallback } = data;
+	let gameId: string;
+
+	onMount(() => {
+    	gameId = getCookie('gameId') ?? gameIdFallback;
+	})
 
 	async function handleSubmit(event) {
 		const formDatam = new FormData(this);
 		const gameId = formDatam.get('gameId');
 
+		if (gameId?.toString().length == 0) {
+			formSuccess = 'page.game.create.missing_value';
+			return;
+		}
 		const response = await fetch(`${game_url}/game`, {
 			method: 'POST',
 			headers: {
@@ -19,12 +34,12 @@
 			credentials: 'include',
 			body: gameId
 		});
-
+		
 		if (response.status == 201) {
 			goto('/game/lobby');
-			formSuccess = true;
-		} else {
-			formSuccess = false;
+			formSuccess = '';
+		} else if (response.status == 409) {
+			formSuccess = 'page.game.create.conflict';
 		}
 	}
 	$header_text = 'page.game.create.title';
@@ -51,6 +66,7 @@
 				<input
 					type="text"
 					name="gameId"
+					value={gameId}
 					class="input input-primary input-bordered w-full max-w-xs"
 				/>
 			</div>
@@ -61,8 +77,8 @@
 					{$_('page.game.create.game_name')}
 				{/if}
 			</button>
-			{#if !formSuccess}
-				<Alert message="page.game.create.submit_error" />
+			{#if formSuccess != ''}
+				<Alert message={formSuccess} />
 			{/if}
 		</form>
 	</div>

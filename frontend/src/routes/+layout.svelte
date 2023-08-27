@@ -1,17 +1,7 @@
 <script lang="ts">
-	import App from '../app.svelte';
+	import App from '../App.svelte';
 	import Header from './Header.svelte';
 	import './styles.css';
-
-	import { getLocaleFromNavigator, init, register } from 'svelte-i18n';
-
-	register('en', () => import('./i18n/en.json'));
-	register('en', () => import('./i18n/sk.json'));
-
-	init({
-		fallbackLocale: 'en',
-		initialLocale: getLocaleFromNavigator()
-	});
 
 	import type { PageData } from './$types';
 	import PageTransition from './transition.svelte';
@@ -32,6 +22,7 @@
 	<li />
 </ul>
 <div class="flex flex-col min-h-screen">
+	<App />
 	<Header />
 
 	<main class="flex flex-1 flex-col justify-center items-center p-1 w-full max-w-64 m-0 box-border">
@@ -40,7 +31,6 @@
 		</PageTransition>
 	</main>
 
-	<App />
 	<footer class="flex flex-col justify-center items-center p-3">
 		<p class="font-bold">&copy; 2023 Huginn</p>
 	</footer>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import welcome from '$lib/images/svelte-welcome.webp';
-	import { _, isLoading } from 'svelte-i18n';
+	import { isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
 	import { location } from 'svelte-spa-router';
 	import { header_text } from '../store';
 

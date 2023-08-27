@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { _, isLoading } from 'svelte-i18n';
+	import { isLoading } from 'svelte-i18n';
+	import { _ } from '$lib/i18n/i18n-init';
 	import { header_text } from '../../store';
 	import type { PageData } from './$types';
 	import CategoryTable from './CategoryTable.svelte';
@@ -8,8 +9,6 @@
 
 	let { categories } = data;
 
-	export const ssr = false;
-	
 	$header_text = 'page.task.category.title';
 </script>
 
