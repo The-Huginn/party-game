@@ -85,6 +85,7 @@ public class UnresolvedResult {
                 }
             }
             this.data.put(task.getKey(), resolvedTask);
+            this.data.put("task", task.getKey());
         }
 
         public Map<String, Object> getData() {

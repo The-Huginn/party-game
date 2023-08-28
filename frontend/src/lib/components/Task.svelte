@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
@@ -33,7 +33,7 @@
 		>
 			<h1 id={task.task}>{rawTask[task.task]}</h1>
 		</div>
-		<form on:submit|preventDefault={handleSubmit}>
+		<!-- <form on:submit|preventDefault={handleSubmit}>
 			<button class="btn btn-primary transition duration-300">
 				{#if $isLoading}
 					<span class="loading loading-spinner text-info" />
@@ -44,6 +44,6 @@
 			{#if formSuccess != ''}
 				<Alert message={formSuccess} />
 			{/if}
-		</form>
+		</form> -->
 	</div>
-{/if}
+{/if} -->

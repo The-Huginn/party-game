@@ -8,9 +8,5 @@ export const load: PageLoad = async ({ fetch, params }) => {
         credentials: 'include'
     });
 
-    const data = (await response.json()).data;
-    return {
-        rawTask: data,
-        task: data as Task
-    };
+    return { data: (await response.json()).data };
 }
