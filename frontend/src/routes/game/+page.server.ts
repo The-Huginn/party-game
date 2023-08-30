@@ -1,4 +1,3 @@
-import { getCookie } from "$lib/common/cookies";
 import { game_url } from "../../store";
 import type { PageLoad } from "./lobby/$types";
 

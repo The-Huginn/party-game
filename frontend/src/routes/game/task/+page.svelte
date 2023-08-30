@@ -6,25 +6,50 @@
 	import { isLoading } from 'svelte-i18n';
 	import { Sound } from 'svelte-sound';
 	import type { PageData } from './$types';
-	import type { Task } from './Task';
+	import type { Task, Timer } from './Task';
 
 	export let data: PageData;
 	let formSuccess: string = '';
 
 	const taskData = data.data as Task;
 	$: rawTask = data.data;
-	$: task = taskData;
+	$: task = rawTask as Task;
+	$: timer = data.data.timer as Timer;
+	$: initialLoad = data.initialLoad;
 
-	let timerDuration = -1;
 	const beepSound = new Sound(beep_mp4);
-	if (taskData.timer) {
-		timerDuration = taskData.timer.duration;
-		setInterval(() => {
-			if (timer > 0) timer--;
-		}, 10);
+
+	let timerInterval: ReturnType<typeof setTimeout>;
+	let timerTimeout: ReturnType<typeof setTimeout>;
+	$: if (initialLoad) {
+		initialLoad = false;
+		if (timer) {
+			timer.duration *= 100;
+			timer.initialDuration = timer.duration;
+			if (timer.delay > 0) {
+				timerTimeout = setTimeout(() => {
+					timerInterval = setInterval(() => {
+						if (timer.duration > 0) timer.duration--;
+					}, 10);
+				}, timer.delay * 1000);
+			} else {
+				timerInterval = setInterval(() => {
+					if (timer.duration > 0) timer.duration--;
+				}, 10);
+			}
+		}
 	}
-	
-	$: timer = timerDuration * 100;
+
+	async function submitHandler(event) {
+		clearInterval(timerInterval);
+		clearTimeout(timerTimeout);
+		await invalidateAll();
+	}
+
+	function beep() {
+		beepSound.play();
+		return '';
+	}
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
@@ -32,16 +57,23 @@
 		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
 		<h1 id={task.task}>{rawTask[task.task]}</h1>
-		<progress value={timer / timerDuration / 100} />
+		{#if !initialLoad && timer}
+			<progress value={timer.duration / timer.initialDuration} />
+		{/if}
 	</div>
-	{#if timer > 0}
-		<div class="radial-progress text-primary" style="--value:{timer / timerDuration};">
-			{timer / 100}%
-		</div>
-	{:else if timer == 0}
-		{beepSound.play()}
+	{#if timer}
+		{#if timer.duration > 0}
+			<div
+				class="radial-progress text-primary"
+				style="--value:{Math.round((timer.duration / timer.initialDuration) * 100)};"
+			>
+				{Math.round((timer.duration / timer.initialDuration) * 100)}%
+			</div>
+		{:else if Math.round(timer.duration) == 0}
+			{beep()}
+		{/if}
 	{/if}
-	<form on:submit|preventDefault={invalidateAll}>
+	<form on:submit|preventDefault={submitHandler}>
 		<button class="btn btn-primary transition duration-300">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />

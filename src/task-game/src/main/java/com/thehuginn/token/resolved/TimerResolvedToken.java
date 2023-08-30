@@ -15,6 +15,8 @@ import java.util.Map;
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class TimerResolvedToken extends AbstractResolvedToken {
 
+    private static final String TIMER_KEY = "timer";
+
     String timerTag;
 
     public TimerResolvedToken() {}
@@ -29,17 +31,27 @@ public class TimerResolvedToken extends AbstractResolvedToken {
         if (args.isEmpty()) {
             throw new IllegalStateException(TimerResolvedToken.class + "#resolve requires at least one parameter");
         }
-        // TODO add delay for autostarted timer
         String duration = args.get(0);
         if (!duration.matches("\\d+")) {
             throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
         }
         int durationValue = Integer.parseInt(duration);
-        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(durationValue + "s")));
+        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(durationValue + "s")))
+                .appendData(Map.entry(TIMER_KEY, Uni.createFrom().item(new Timer(durationValue, 0))));
     }
 
     @Override
     public boolean isResolvable(ResolutionContext context) {
         return true;
+    }
+
+    private static class Timer {
+        public int duration;
+        public int delay;
+
+        private Timer(int duration, int delay) {
+            this.duration = duration;
+            this.delay = delay;
+        }
     }
 }

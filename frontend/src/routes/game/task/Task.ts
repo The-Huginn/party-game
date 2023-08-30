@@ -1,10 +1,10 @@
 export type Task = {
     task: string;
-    timer: Timer;
+    timer?: Timer;
 }
 
-type Timer = {
+export type Timer = {
     duration: number;
     delay: number;
-    autostart: boolean;
+    initialDuration: number;
 }
