@@ -3,6 +3,7 @@ package com.thehuginn.token.resolved;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
 import org.hibernate.annotations.OnDelete;
@@ -29,15 +30,31 @@ public class TimerResolvedToken extends AbstractResolvedToken {
     public UnresolvedResult resolve(ResolutionContext context) {
         List<String> args = TokenResolver.resolveToken(timerTag).getItem2();
         if (args.isEmpty()) {
+            Log.error(TimerResolvedToken.class + "#resolve requires at least one parameter");
             throw new IllegalStateException(TimerResolvedToken.class + "#resolve requires at least one parameter");
         }
-        String duration = args.get(0);
-        if (!duration.matches("\\d+")) {
+        String durationString = args.get(0);
+        if (!durationString.matches("\\d+")) {
+            Log.error(TimerResolvedToken.class + "#resolve expects integer");
             throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
         }
-        int durationValue = Integer.parseInt(duration);
-        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(durationValue + "s")))
-                .appendData(Map.entry(TIMER_KEY, Uni.createFrom().item(new Timer(durationValue, 0))));
+        int duration = Integer.parseInt(durationString);
+        int delay = 0;
+        if (args.size() == 2) {
+            String delayString = args.get(1);
+
+            if (!delayString.matches("\\d+")) {
+                Log.error(TimerResolvedToken.class + "#resolve expects integer");
+                throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
+            }
+
+            delay = Integer.parseInt(delayString);
+        } else if (args.size() > 2) {
+            Log.error("Timer with unexpected argument [%s].".formatted(timerTag));
+            throw new IllegalArgumentException("Timer with unexpected argument [%s].".formatted(timerTag));
+        }
+        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(duration + "s")))
+                .appendData(Map.entry(TIMER_KEY, Uni.createFrom().item(new Timer(duration, delay))));
     }
 
     @Override
