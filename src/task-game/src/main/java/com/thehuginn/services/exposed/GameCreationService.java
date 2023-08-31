@@ -20,6 +20,8 @@ import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/task-mode")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,6 +39,15 @@ public class GameCreationService {
     @WithTransaction
     public Uni<List<Category.CategoryDto>> getCategories() {
         return Category.findAll().project(Category.CategoryDto.class).list();
+    }
+
+    @GET
+    @Path("/category/selected")
+    @WithTransaction
+    public Uni<Set<Category.CategoryDto>> getSelectedCategories(@RestCookie String gameId) {
+        return findGameSession(gameId).map(gameSession -> gameSession.categories.stream()
+                .map(Category.CategoryDto::new)
+                .collect(Collectors.toSet()));
     }
 
     @GET

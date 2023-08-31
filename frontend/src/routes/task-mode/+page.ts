@@ -5,11 +5,18 @@ import type { Category } from "./Category";
 export const ssr = false;
 
 export const load: PageLoad = async ({ fetch }) => {
-    const response = await fetch(`${task_url}/task-mode/category`, {
+    const allCategories = await fetch(`${task_url}/task-mode/category`, {
         method: 'GET',
         credentials: 'include'
     });
+
+    const selectedCategories = await fetch(`${task_url}/task-mode/category/selected`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
     return {
-        categories: await response.json() as Category[],
+        categories: await allCategories.json() as Category[],
+        selected: await selectedCategories.json(),
     };
 }

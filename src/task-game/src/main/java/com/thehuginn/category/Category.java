@@ -62,6 +62,9 @@ public class Category extends PanacheEntity {
         return Category.<Category>find("from Category i left join fetch i.tasks where i.id = :id", Parameters.with("id",id)).firstResult();
     }
 
+    /**
+     * Keep the order of constructors for hibernate DTO projection
+     */
     @RegisterForReflection
     public static class CategoryDto {
         public Long id;
@@ -73,5 +76,11 @@ public class Category extends PanacheEntity {
             this.name = name;
             this.description = description;
         }
+        public CategoryDto(Category category) {
+            this.id = category.id;
+            this.name = category.name;
+            this.description = category.description;
+        }
+
     }
 }

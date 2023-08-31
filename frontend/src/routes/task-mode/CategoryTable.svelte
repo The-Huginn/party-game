@@ -5,6 +5,8 @@
 	import type { Category } from './Category';
 
 	export let categories: Category[] = [];
+	export let selected: Category[] = [];
+	console.log(selected);
 
 	async function handleSubmit(event) {
 		const id: number = this.getAttribute('id');
@@ -37,7 +39,22 @@
 							<div class="form-control">
 								<label class="cursor-pointer label">
 									<input type="hidden" name="id" hidden value={category.id} />
-									<input type="checkbox" id={category.id} on:click={handleSubmit} class="checkbox checkbox-info" />
+									{#if selected.filter((e) => e.id === category.id).length > 0}
+										<input
+											type="checkbox"
+											id={category.id.toString()}
+											on:click={handleSubmit}
+											checked
+											class="checkbox checkbox-info"
+										/>
+									{:else}
+										<input
+											type="checkbox"
+											id={category.id.toString()}
+											on:click={handleSubmit}
+											class="checkbox checkbox-info"
+										/>
+									{/if}
 								</label>
 							</div>
 						</form>
