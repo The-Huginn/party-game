@@ -23,7 +23,10 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
     @Override
     public ResolvedToken resolve(ResolutionContext context) {
         Integer playerIndex = getPlayerIndex();
-        return new PlayerResolvedToken(key, context.getRandomPlayer(playerIndex));
+        if (playerIndex.equals(0)) {
+            return new PlayerResolvedToken(key, context.getPlayer());
+        }
+        return new PlayerResolvedToken(key, context.getRandomPlayer(playerIndex - 1));
     }
 
     @Override
@@ -41,8 +44,8 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
         if (player.equals("c")) {
             return 0;
         }
-        if (!player.matches("\\d+")) {
-            throw new IllegalArgumentException(PlayerUnresolvedToken.class + "#resolve expects integer or 'c' argument");
+        if (!player.matches("[1-9]\\d*")) {
+            throw new IllegalArgumentException(PlayerUnresolvedToken.class + "#resolve expects integer higher than 1 or 'c' argument");
         }
 
         return Integer.valueOf(player);

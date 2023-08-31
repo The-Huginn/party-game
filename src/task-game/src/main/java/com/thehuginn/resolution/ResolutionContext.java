@@ -114,12 +114,9 @@ public class ResolutionContext {
     }
 
     public String getRandomPlayer(Integer index) {
-        if (index.compareTo(0) == 0) {
-            return getPlayer();
-        }
-        if (index < 1 || index > shuffledPlayers.size()) {
+        if (index < 0 || index >= shuffledPlayers.size()) {
             throw new ArrayIndexOutOfBoundsException("Not enough players to resolve this task");
         }
-        return shuffledPlayers.get(index - 1);
+        return shuffledPlayers.get(index);
     }
 }
