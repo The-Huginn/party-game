@@ -24,7 +24,6 @@
 	let timerInterval: ReturnType<typeof setTimeout>;
 	let timerTimeout: ReturnType<typeof setTimeout>;
 	$: if (initialLoad) {
-		console.log('hi');
 		locale.set('en-US');
 		locale.set('sk-SK');
 		initialLoad = false;

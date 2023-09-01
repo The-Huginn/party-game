@@ -6,7 +6,6 @@
 
 	export let categories: Category[] = [];
 	export let selected: Category[] = [];
-	console.log(selected);
 
 	async function handleSubmit(event) {
 		const id: number = this.getAttribute('id');
