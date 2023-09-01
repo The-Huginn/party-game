@@ -4,7 +4,9 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.LocaleText;
+import com.thehuginn.token.translation.LocaleText;
+import com.thehuginn.token.translation.TaskText;
+import com.thehuginn.token.translation.Translatable;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.token.unresolved.UnresolvedToken;
 import com.thehuginn.util.Helper;
@@ -55,7 +57,7 @@ public class TaskService {
         return Uni.createFrom()
                 .item(task)
                 .call(task1 -> {
-                    task1.task = new LocaleText(task1, task.task.locale, task.task.content);
+                    task1.task = new TaskText(task1, task.task.locale, task.task.content);
                     if (TokenResolver.translateTask(task1.task.content).isEmpty()) {
                         return Uni.createFrom().voidItem();
                     }
@@ -112,7 +114,7 @@ public class TaskService {
                             .onItem()
                             .invoke(resolvedResult1 -> {
                                 Map<String, Object> map = resolvedResult1.getData();
-                                task.task = new LocaleText((String) map.get("locale"), (String) map.get(task.getKey()));
+                                task.task = new TaskText((String) map.get("locale"), (String) map.get(task.getKey()));
                             });
                 });
     }
@@ -120,15 +122,12 @@ public class TaskService {
     @POST
     @Path("/{id}/{locale}")
     @WithTransaction
-    public Uni<LocaleText> createLocale(@RestPath Long id, @RestPath String locale, String content) {
+    public Uni<? extends Translatable> createLocale(@RestPath Long id, @RestPath String locale, String content) {
         Helper.checkLocale(locale);
         return Task.<Task>findById(id)
                 .invoke(task -> preservesTokens(task.task, content))
                 .chain(task -> {
-                    LocaleText newLocale = new LocaleText();
-                    newLocale.task = task;
-                    newLocale.locale = locale;
-                    newLocale.content = content;
+                    LocaleText newLocale = new LocaleText(task.task, locale, content);
                     return newLocale.persist();
                 });
     }
@@ -136,17 +135,29 @@ public class TaskService {
     @PUT
     @Path("/{id}/{locale}")
     @WithTransaction
-    public Uni<LocaleText> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
-        return LocaleText.<LocaleText>findById(new LocaleText.LocaleTextPK(id, locale))
-                .invoke(task -> preservesTokens(task, newContent))
-                .onItem().ifNotNull().<LocaleText>transformToUni(localeText -> {
+    public Uni<? extends Translatable> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
+        Function<TaskText, Uni<LocaleText>> translation = taskText -> LocaleText
+                .<LocaleText>findById(new LocaleText.LocaleTextPK(taskText, locale))
+                .onItem().ifNotNull().transformToUni(localeText -> {
                     localeText.content = newContent;
                     return localeText.persist();
+                });
+        return Task.<Task>findById(id)
+                .map(task -> task.task)
+                .invoke(task -> preservesTokens(task, newContent))
+                .onItem().ifNotNull().transformToUni(taskText -> {
+                    // our TaskText is being changed
+                    if (taskText.locale.equals(locale)) {
+                        taskText.content = newContent;
+                        return taskText.persist();
+                    }
+                    // one of the translations is being changed
+                    return translation.apply(taskText);
                 })
                 .onFailure().invoke(Log::error);
     }
 
-    private void preservesTokens(LocaleText task, String content) {
+    private void preservesTokens(TaskText task, String content) {
         if (!TokenResolver.translateTask(task.content).equals(TokenResolver.translateTask(content))) {
             Log.warnf("Trying to create or update locale without preserving tokens in their respective order");
             throw new WebApplicationException("Trying to create or update locale without preserving tokens in their respective order", RestResponse.StatusCode.BAD_REQUEST);

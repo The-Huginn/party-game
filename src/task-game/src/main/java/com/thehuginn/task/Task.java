@@ -6,7 +6,7 @@ import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.TokenResolver;
-import com.thehuginn.token.LocaleText;
+import com.thehuginn.token.translation.TaskText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.token.unresolved.UnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
@@ -54,7 +54,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
     public Price price = new Price();
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "task")
-    public LocaleText task;
+    public TaskText task;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -132,7 +132,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
             if (setId) {
                 builtTask.id = this.id;
             }
-            builtTask.task = new LocaleText(builtTask, locale, task);
+            builtTask.task = new TaskText(builtTask, locale, task);
             builtTask.tokens = TokenResolver.translateTask(task);
             builtTask.type = type;
             builtTask.repeat = repeat;

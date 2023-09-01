@@ -1,4 +1,4 @@
-package com.thehuginn.token;
+package com.thehuginn.token.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -21,23 +21,23 @@ import java.util.Map;
 import java.util.Objects;
 
 @Entity
-@IdClass(LocaleText.LocaleTextPK.class)
-public class LocaleText extends PanacheEntityBase implements ResolvedToken {
+@IdClass(TaskText.TaskTextPK.class)
+public class TaskText extends PanacheEntityBase implements ResolvedToken, Translatable {
 
-    public static class LocaleTextPK {
+    public static class TaskTextPK {
         public Long task;
         public String locale;
 
-        public LocaleTextPK() {}
+        public TaskTextPK() {}
 
-        public LocaleTextPK(Long task, String locale) {
+        public TaskTextPK(Long task, String locale) {
             this.task = task;
             this.locale = locale;
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (! (obj instanceof LocaleTextPK pk)) {
+            if (! (obj instanceof TaskTextPK pk)) {
                 return false;
             } else {
                 return Objects.equals(task, pk.task) && locale.equals(pk.locale);
@@ -51,7 +51,7 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
     }
 
     @Id
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id")
     @JsonIgnore
@@ -64,30 +64,42 @@ public class LocaleText extends PanacheEntityBase implements ResolvedToken {
     @JsonProperty
     public String content = "<missing_value>";
 
-    public LocaleText() {}
+    public TaskText() {}
 
-    public LocaleText(String locale, String content) {
+    public TaskText(String locale, String content) {
         this.locale = locale;
         this.content = content;
     }
 
-    public LocaleText(Task task,  String locale, String content) {
+    public TaskText(Task task, String locale, String content) {
         this.task = task;
         this.locale = locale;
         this.content = content;
     }
 
     @Override
+    public String getContent() {
+        return this.content;
+    }
+
+    @Override
+    public String getLocale() {
+        return this.locale;
+    }
+
+    @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        Uni<LocaleText> localeTextUni = LocaleText
-                .<LocaleText>findById(new LocaleTextPK(task.id, context.getLocale()))
-                .replaceIfNullWith(this);
+        Uni<? extends Translatable> localeTextUni = LocaleText
+                .findById(new LocaleText.LocaleTextPK(this, context.getLocale()))
+                .replaceIfNullWith(this)
+                // we will receive either LocaleText or a fallback of TaskText, both are Translatable
+                .map(panacheEntityBase -> (Translatable) panacheEntityBase);
         return new UnresolvedResult().task(Map.entry(task.getKey(),
                         localeTextUni
-                                .map(localeText -> localeText.content)))
+                                .map(Translatable::getContent)))
                 .appendData(Map.entry("locale",
                         localeTextUni
-                                .map(localeText -> localeText.locale)));
+                                .map(Translatable::getLocale)));
     }
 
     @Override
