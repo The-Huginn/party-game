@@ -114,20 +114,20 @@ public class GameService {
 
     @GET
     @Path("/current")
-    public Uni<JsonNode> currentTask(@RestCookie String gameId) {
+    public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie String locale) {
         return Game.<Game>findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.currentTask(gameId, game1.gameContext());
+                    case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
                     case NONE -> Uni.createFrom().nullItem();
                 });
     }
 
     @PUT
     @Path("/next")
-    public Uni<JsonNode> nextTask(@RestCookie String gameId) {
+    public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale) {
         return Game.<Game>findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.nextTask(gameId, game1.gameContext());
+                    case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
                     case NONE -> Uni.createFrom().nullItem();
                 });
     }

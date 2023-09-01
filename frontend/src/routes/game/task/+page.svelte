@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
 	import beep_mp4 from '$lib/sounds/beep.mp4';
-	import { isLoading } from 'svelte-i18n';
+	import { onDestroy } from 'svelte';
+	import { isLoading, locale } from 'svelte-i18n';
 	import { Sound } from 'svelte-sound';
+	import { game_url } from '../../../store';
 	import type { PageData } from './$types';
 	import type { Task, Timer } from './Task';
 
 	export let data: PageData;
 	let formSuccess: string = '';
 
-	const taskData = data.data as Task;
 	$: rawTask = data.data;
 	$: task = rawTask as Task;
 	$: timer = data.data.timer as Timer;
@@ -22,6 +24,9 @@
 	let timerInterval: ReturnType<typeof setTimeout>;
 	let timerTimeout: ReturnType<typeof setTimeout>;
 	$: if (initialLoad) {
+		console.log('hi');
+		locale.set('en-US');
+		locale.set('sk-SK');
 		initialLoad = false;
 		if (timer) {
 			timer.duration *= 100;
@@ -43,13 +48,40 @@
 	async function submitHandler(event) {
 		clearInterval(timerInterval);
 		clearTimeout(timerTimeout);
-		await invalidateAll();
+		const response = await fetch(`${game_url}/game/next`, {
+			method: 'PUT',
+			credentials: 'include'
+		});
+
+		data = {
+			url: $page.url.toString(),
+			data: (await response.json()).data,
+			initialLoad: true
+		};
 	}
 
 	function beep() {
 		beepSound.play();
 		return '';
 	}
+
+	$: subscription = locale.subscribe(async (newLocale) => {
+		if (newLocale == null) {
+			return;
+		}
+
+		if (typeof window !== 'undefined') {
+			setCookie('locale', newLocale.substring(0, 2));
+			const response = await fetch(`${game_url}/game/current`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			rawTask = (await response.json()).data as Task;
+		}
+	});
+
+	$: onDestroy(subscription);
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">

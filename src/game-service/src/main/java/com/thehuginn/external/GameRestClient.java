@@ -27,9 +27,9 @@ public interface GameRestClient {
 
     @GET
     @Path("/task/current")
-    Uni<JsonNode> currentTask(@RestCookie String gameId, @RestQuery GameContext resolutionContext);
+    Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie String locale, @RestQuery GameContext resolutionContext);
 
     @PUT
     @Path("/task/next")
-    Uni<JsonNode> nextTask(@RestCookie String gameId, @RestQuery GameContext resolutionContext);
+    Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale, @RestQuery GameContext resolutionContext);
 }
