@@ -7,6 +7,7 @@
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { getCookie } from '$lib/common/cookies';
+	import Modal from './Modal.svelte';
 
 	export let formSuccess: string = '';
 
@@ -15,10 +16,10 @@
 	let gameId: string;
 
 	onMount(() => {
-    	gameId = getCookie('gameId') ?? gameIdFallback;
-	})
+		gameId = getCookie('gameId') ?? gameIdFallback;
+	});
 
-	async function handleSubmit(event) {
+	async function handleSubmit(event: SubmitEvent) {
 		const formDatam = new FormData(this);
 		const gameId = formDatam.get('gameId');
 
@@ -34,7 +35,7 @@
 			credentials: 'include',
 			body: gameId
 		});
-		
+
 		if (response.status == 201) {
 			goto('/game/lobby');
 			formSuccess = '';
@@ -42,7 +43,7 @@
 			formSuccess = 'page.game.create.conflict';
 		}
 	}
-	
+
 	$header_text = 'page.game.create.title';
 </script>
 
@@ -57,7 +58,7 @@
 	{:else}
 		<h1 class="w-full">{$_('page.game.create.choose_name')}</h1>
 	{/if}
-
+	<Modal/>
 	<div class="flex flex-col justify-center items-center w-full">
 		<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control max-w-xs">

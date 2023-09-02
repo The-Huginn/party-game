@@ -14,7 +14,7 @@ import java.util.Objects;
 @Entity
 public class Game extends PanacheEntityBase {
 
-    public enum State {CREATED, READY, STARTED, ONGOING, FINISHING, COMPLETED}
+    public enum State {CREATED, LOBBY, READY, STARTED, ONGOING, FINISHING, COMPLETED}
     public enum Type {NONE, TASK}
 
     @Id

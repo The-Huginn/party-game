@@ -13,7 +13,10 @@
                 "confirm": "Confirm",
                 "title": "Game Creation",
                 "conflict": "Game Already exists",
-                "missing_value": "Game Name can not be empty"
+                "missing_value": "Game Name can not be empty",
+                "game_exists": "Game in progress found, would you like to continue?",
+                "game_continue": "Hell Yeah!",
+                "game_recreate": "Not so quick"
             },
             "lobby": {
                 "title": "Fill in your Lobby",
