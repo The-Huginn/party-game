@@ -7,7 +7,7 @@
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { Sound } from 'svelte-sound';
-	import { game_url } from '../../../store';
+	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
 	import type { Task, Timer } from './Task';
 
@@ -81,6 +81,7 @@
 	});
 
 	$: onDestroy(subscription);
+	$header_text = 'page.game.task.title';
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">

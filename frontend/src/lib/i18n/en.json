@@ -32,6 +32,7 @@
                 "task": "Task Mode"
             },
             "task": {
+                "title": "Task",
                 "next": "Next"
             }
         },

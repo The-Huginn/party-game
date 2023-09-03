@@ -32,6 +32,7 @@
                 "task": "Mód úloh"
             },
             "task": {
+                "title": "Úloha",
                 "next": "Ďalej"
             }
         },
