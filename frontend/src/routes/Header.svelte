@@ -20,7 +20,7 @@
 	<div class="w-16 h-16 flex-1 px-10">
 		{#key $header_text}
 			<h1
-				class="flex relative justify-center items-center w-full h-full inset-0"
+				class="flex relative justify-center items-center w-full h-full inset-0 text-6xl mt-2"
 				in:slide={{ duration, delay: duration, easing }}
 				out:slide={{ duration, easing, axis: 'x' }}
 			>

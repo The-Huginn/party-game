@@ -14,7 +14,7 @@
 	<meta name="description" content="Disclaimer for accessing this page" />
 </svelte:head>
 
-<section class="flex flex-col justify-center items-center w-3/5">
+<section class="flex flex-col justify-center items-center w-4/5 m-5">
 	<h1 class="w-full">
 		<span class="block relative w-full h-full welcome">
 			<picture>
@@ -27,10 +27,8 @@
 	{#if $isLoading}
 		<span class="loading loading-spinner text-info" />
 	{:else}
-		<h1>{$_('page.disclaimer.text')}</h1>
+		<h1>{@html $_('page.disclaimer.text')}</h1>
 	{/if}
-
-	<p>Current page {$location}</p>
 
 	<form method="GET" action="/game">
 		<button class="btn btn-primary transition duration-300">

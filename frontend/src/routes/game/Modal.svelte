@@ -1,27 +1,31 @@
 <script lang="ts">
-	import { getCookie } from '$lib/common/cookies';
-	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
-	import { game_url } from '../../store';
 	import { goto } from '$app/navigation';
+	import { setCookie } from '$lib/common/cookies';
+	import { onMount } from 'svelte';
+	import { _, isLoading } from 'svelte-i18n';
+	import { game_url } from '../../store';
 
-	$: gameExists = false;
-	let gameState: string;
+	export let cookie: string;
+    type modalType = 'continue' | 'conflict';
+    export let type: modalType = 'continue';
+	$: modalShow = true;
+	let gameState: string = "CREATED";
+
 	onMount(async () => {
-		const response = await fetch(`${game_url}/game?gameId=${getCookie('gameId')}`);
+		const response = await fetch(`${game_url}/game?gameId=${cookie}`);
 
 		if (response.status == 200) {
 			gameState = (await response.json()).state;
-			gameExists = true;
 		}
 	});
 
 	function handleSubmit(event: SubmitEvent) {
-        gameExists = false;
+		modalShow = false;
 		if (event.submitter?.id == 'continue') {
+			setCookie('gameId', cookie);
 			switch (gameState) {
 				case 'CREATED':
-                    goto('/game/lobby');
+					goto('/game/lobby');
 					break;
 				case 'LOBBY':
 				case 'READY':
@@ -34,20 +38,28 @@
 		}
 	}
 
-    function keyPress(ev: KeyboardEvent) {
+	function keyPress(ev: KeyboardEvent) {
 		if (ev.key == 'Escape') {
-			gameExists = false;
+			modalShow = false;
 		}
 	}
 	window.addEventListener('keydown', keyPress);
 </script>
 
-{#if true}
+{#if modalShow}
 	<input type="checkbox" id="modal" class="modal-toggle" checked />
 	<div class="modal">
 		<div class="modal-box">
 			<p>
-				{$_('page.game.create.game_exists')}
+                {#if $isLoading}
+		            <span class="loading loading-spinner text-info" />
+                {:else}
+                    {#if type == 'continue'}
+                        {$_('page.game.create.game_exists')}
+                    {:else}
+                        {$_('page.game.create.game_conflicts')}
+                    {/if}
+                {/if}
 			</p>
 			<form on:submit|preventDefault={handleSubmit}>
 				<div class="modal-action">

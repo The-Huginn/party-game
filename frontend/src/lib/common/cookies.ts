@@ -11,7 +11,7 @@ export function getCookie(cname: string) {
             return c.substring(name.length, c.length);
         }
     }
-    return undefined;
+    return "";
 }
 
 export function setCookie(name: string, value: any, options = {}) {

@@ -9,19 +9,23 @@
 	import { getCookie } from '$lib/common/cookies';
 	import Modal from './Modal.svelte';
 
-	export let formSuccess: string = '';
+	$: formSuccess = '';
 
 	export let data: PageData;
 	let { gameIdFallback } = data;
 	let gameId: string;
+	let gameIdCookie: string;
 
 	onMount(() => {
-		gameId = getCookie('gameId') ?? gameIdFallback;
+		gameIdCookie = getCookie('gameId');
+		gameId = gameIdCookie ?? gameIdFallback;
 	});
 
 	async function handleSubmit(event: SubmitEvent) {
+		formSuccess = '';
+
 		const formDatam = new FormData(this);
-		const gameId = formDatam.get('gameId');
+		gameId = formDatam.get('gameId')?.toString() ?? "";
 
 		if (gameId?.toString().length == 0) {
 			formSuccess = 'page.game.create.missing_value';
@@ -38,7 +42,6 @@
 
 		if (response.status == 201) {
 			goto('/game/lobby');
-			formSuccess = '';
 		} else if (response.status == 409) {
 			formSuccess = 'page.game.create.conflict';
 		}
@@ -58,7 +61,9 @@
 	{:else}
 		<h1 class="w-full">{$_('page.game.create.choose_name')}</h1>
 	{/if}
-	<Modal/>
+	{#if gameIdCookie != ""}
+		<Modal cookie={gameIdCookie}/>
+	{/if}
 	<div class="flex flex-col justify-center items-center w-full">
 		<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control max-w-xs">
@@ -79,8 +84,10 @@
 					{$_('page.game.create.game_name')}
 				{/if}
 			</button>
-			{#if formSuccess != ''}
+			{#if formSuccess == 'page.game.create.missing_value'}
 				<Alert message={formSuccess} />
+			{:else if formSuccess == 'page.game.create.conflict'}
+				<Modal cookie={gameId} type='conflict'/>
 			{/if}
 		</form>
 	</div>

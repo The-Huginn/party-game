@@ -15,6 +15,7 @@
                 "conflict": "Hra s týmto menom už existuje",
                 "missing_value": "Meno hry nemôže byť prázdne",
                 "game_exists": "Rozohratá hra nájdená, chceš pokračovať?",
+                "game_conflicts": "Hra s týmto menom už existuje, chceš pokračovať v nej?",
                 "game_continue": "Samozrejme!",
                 "game_recreate": "Nie tak rýchlo"
             },
