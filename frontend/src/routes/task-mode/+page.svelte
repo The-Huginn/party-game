@@ -41,11 +41,11 @@
 	<div
 		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
-		<span class="font-bold font-4xl">{$_(`page.task.category.table_name`)}</span>
+		<span class="font-bold text-3xl">{$_(`page.task.category.table_name`)}</span>
 		<CategoryTable bind:categories selected={selected}/>
 	</div>
 	<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
-		<button class="btn btn-primary transition duration-300">
+		<button class="btn btn-primary transition duration-300 min-h-16 text-xl">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />
 			{:else}

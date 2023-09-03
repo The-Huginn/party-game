@@ -55,29 +55,29 @@
 	<meta name="description" content="Creation of a game session" />
 </svelte:head>
 
-<section class="flex flex-col justify-center items-center w-3/5">
+<section class="flex flex-col justify-center items-center w-3/5 text-xl">
 	{#if $isLoading}
 		<span class="loading loading-spinner text-info" />
 	{:else}
-		<h1 class="w-full">{$_('page.game.create.choose_name')}</h1>
+		<h1 class="w-full m-10 text-4xl font-bold">{$_('page.game.create.choose_name')}</h1>
 	{/if}
 	{#if gameIdCookie != ""}
 		<Modal cookie={gameIdCookie}/>
 	{/if}
-	<div class="flex flex-col justify-center items-center w-full">
-		<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
-			<div class="w-full form-control max-w-xs">
+	<div class="flex flex-col w-full gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl justify-center items-center">
+		<form class="w-4/5 flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
+			<div class="w-full form-control">
 				<label for="gameId" class="label">
-					<span class="label-text">{$_('page.game.create.game_name')}</span>
+					<span class="font-bold text-3xl w-full">{$_('page.game.create.game_name')}</span>
 				</label>
 				<input
 					type="text"
 					name="gameId"
 					value={gameId}
-					class="input input-primary input-bordered w-full max-w-xs"
+					class="input input-primary input-bordered w-full min-h-16 text-3xl"
 				/>
 			</div>
-			<button class="btn btn-primary w-full max-w-xs transition duration-300">
+			<button class="btn btn-primary w-full min-h-16 text-xl transition duration-300">
 				{#if $isLoading}
 					<span class="loading loading-spinner text-info" />
 				{:else}

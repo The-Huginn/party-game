@@ -59,7 +59,7 @@
 						</form>
 					</th>
 					<th class="w-full">
-						<div class="w-full flex align-left space-x-3">
+						<div class="w-full flex align-left space-x-3 text-3xl">
 							<div class="font-bold">{category.name}</div>
 						</div>
 					</th>

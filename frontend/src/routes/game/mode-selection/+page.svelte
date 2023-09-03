@@ -28,7 +28,7 @@
 
 <div class="flex flex-col w-2/5 items-center space-y-5">
 	<form class="w-full flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
-		<button class="btn btn-primary transition duration-300">
+		<button class="btn btn-primary transition duration-300 min-h-16 text-xl">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />
 			{:else}

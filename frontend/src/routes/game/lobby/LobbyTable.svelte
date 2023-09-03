@@ -36,13 +36,13 @@
 				<tr class="items-center" transition:slide|local>
 					<th class="w-full">
 						<div class="w-full flex items-center justify-center space-x-3">
-							<div class="font-bold">{player.name}</div>
+							<div class="font-bold text-2xl">{player.name}</div>
 						</div>
 					</th>
 					<th class="float-right nowrap">
 						<form class="w-full flex" on:submit|preventDefault={handleSubmit}>
 							<input type="hidden" name="id" hidden value={player.id} />
-							<button class="btn btn-error text-white btn-xs float-right">
+							<button class="btn btn-error text-xl text-white float-right">
 								{#if $isLoading}
 									<span class="loading loading-spinner text-info" />
 								{:else}

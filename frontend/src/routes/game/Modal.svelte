@@ -49,8 +49,8 @@
 {#if modalShow}
 	<input type="checkbox" id="modal" class="modal-toggle" checked />
 	<div class="modal">
-		<div class="modal-box">
-			<p>
+		<div class="modal-box items-center justify-center">
+			<p class="text-xl text-center font-medium">
                 {#if $isLoading}
 		            <span class="loading loading-spinner text-info" />
                 {:else}
@@ -63,8 +63,8 @@
 			</p>
 			<form on:submit|preventDefault={handleSubmit}>
 				<div class="modal-action">
-					<button class="btn btn-primary" id="continue">yes</button>
-					<button class="btn" id="recreate">no</button>
+					<button class="btn btn-primary text-xl" id="continue">yes</button>
+					<button class="btn text-xl" id="recreate">no</button>
 				</div>
 			</form>
 		</div>

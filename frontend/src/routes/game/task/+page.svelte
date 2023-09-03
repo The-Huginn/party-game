@@ -87,7 +87,11 @@
 	<div
 		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
-		<h1 id={task.task}>{rawTask[task.task]}</h1>
+		<h1>
+			<span class="font-bold text-4xl">
+				{rawTask[task.task]}
+			</span>
+		</h1>
 		{#if !initialLoad && timer}
 			<progress value={timer.duration / timer.initialDuration} />
 		{/if}
@@ -105,7 +109,7 @@
 		{/if}
 	{/if}
 	<form on:submit|preventDefault={submitHandler}>
-		<button class="btn btn-primary transition duration-300">
+		<button class="btn btn-primary transition duration-300 min-h-16 text-3xl">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />
 			{:else}

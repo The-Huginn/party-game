@@ -25,7 +25,7 @@
 	<App />
 	<Header />
 
-	<main class="flex flex-1 flex-col justify-center items-center p-1 w-full max-w-64 m-0 box-border">
+	<main class="flex flex-1 flex-col justify-center items-center p-1 w-full max-w-64 m-0 box-border mt-10">
 		<PageTransition key={data.url} duration={600}>
 			<slot />
 		</PageTransition>
