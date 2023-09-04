@@ -16,7 +16,7 @@
 	async function handleSubmit(event) {
 		const formDatam = new FormData(this);
 
-		const response = await fetch(`${game_url}/game/start`, {
+		const response = await fetch(`${game_url}/mode/start`, {
 			method: 'PUT',
 			headers: {
 				'Content-type': 'application/json'

@@ -47,7 +47,7 @@
 	async function submitHandler(event) {
 		clearInterval(timerInterval);
 		clearTimeout(timerTimeout);
-		const response = await fetch(`${game_url}/game/next`, {
+		const response = await fetch(`${game_url}/mode/next`, {
 			method: 'PUT',
 			credentials: 'include'
 		});
@@ -71,7 +71,7 @@
 
 		if (typeof window !== 'undefined') {
 			setCookie('locale', newLocale.substring(0, 2));
-			const response = await fetch(`${game_url}/game/current`, {
+			const response = await fetch(`${game_url}/mode/current`, {
 				method: 'GET',
 				credentials: 'include'
 			});

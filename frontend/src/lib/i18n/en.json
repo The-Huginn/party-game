@@ -29,7 +29,8 @@
             },
             "mode-selection": {
                 "title": "Choose game mode",
-                "task": "Task Mode"
+                "task": "Task Mode",
+                "game_continue": "Would you like to continue previous game?"
             },
             "task": {
                 "title": "Task",

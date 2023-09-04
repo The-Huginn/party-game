@@ -29,7 +29,8 @@
             },
             "mode-selection": {
                 "title": "Vyber si môd hry",
-                "task": "Mód úloh"
+                "task": "Mód úloh",
+                "game_continue": "Chcel by si pokračovať v predošlej hre?"
             },
             "task": {
                 "title": "Úloha",

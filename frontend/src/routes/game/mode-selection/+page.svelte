@@ -1,16 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Modal from '$lib/components/Modal.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
 	import { isLoading } from 'svelte-i18n';
 	import { game_url, header_text } from '../../../store';
+	import type { PageData } from './$types';
 
 	export let formSuccess: boolean = true;
+	export let data: PageData;
+	console.log(data.status)
 	$header_text = 'page.game.mode-selection.title';
 
-	async function handleSubmit(event) {
+	async function handleSubmit(event: SubmitEvent) {
 		const formDatam = new FormData(this);
 
-		const response = await fetch(`${game_url}/game/create`, {
+		const response = await fetch(`${game_url}/mode/create`, {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json'
@@ -26,6 +30,14 @@
 	}
 </script>
 
+{#if data.status == 200}
+	<Modal
+		onMountCallback={() => {}}
+		yesCallback={() => goto('/task-mode')}
+		noCallback={() => {}}
+		question="page.game.mode-selection.game_continue"
+	/>
+{/if}
 <div class="flex flex-col w-2/5 items-center space-y-5">
 	<form class="w-full flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
 		<button class="btn btn-primary transition duration-300 min-h-16 text-xl">

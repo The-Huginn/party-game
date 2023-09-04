@@ -1,31 +1,31 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { getCookie, setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
+	import { onMount } from 'svelte';
 	import { isLoading } from 'svelte-i18n';
+	import Modal from '../../lib/components/Modal.svelte';
 	import { game_url, header_text } from '../../store';
 	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
-	import { getCookie } from '$lib/common/cookies';
-	import Modal from './Modal.svelte';
 
 	$: formSuccess = '';
 
 	export let data: PageData;
 	let { gameIdFallback } = data;
 	let gameId: string;
-	let gameIdCookie: string;
+	let cookie: string;
 
 	onMount(() => {
-		gameIdCookie = getCookie('gameId');
-		gameId = gameIdCookie ?? gameIdFallback;
+		cookie = getCookie('gameId');
+		gameId = cookie ?? gameIdFallback;
 	});
 
 	async function handleSubmit(event: SubmitEvent) {
 		formSuccess = '';
 
 		const formDatam = new FormData(this);
-		gameId = formDatam.get('gameId')?.toString() ?? "";
+		gameId = formDatam.get('gameId')?.toString() ?? '';
 
 		if (gameId?.toString().length == 0) {
 			formSuccess = 'page.game.create.missing_value';
@@ -48,6 +48,34 @@
 	}
 
 	$header_text = 'page.game.create.title';
+
+	let gameState: string = 'CREATED';
+
+	async function onMountCallback() {
+		const response = await fetch(`${game_url}/game?gameId=${cookie}`);
+
+		if (response.status == 200) {
+			gameState = (await response.json()).state;
+		}
+	}
+
+	function yesCallback() {
+		setCookie('gameId', cookie);
+		switch (gameState) {
+			case 'CREATED':
+				goto('/game/lobby');
+				break;
+			case 'LOBBY':
+			case 'READY':
+				// TODO update based on game type
+				// TODO add mode-selection route
+				break;
+			case 'ONGOING':
+				break;
+		}
+	}
+
+	function noCallback() {}
 </script>
 
 <svelte:head>
@@ -61,10 +89,12 @@
 	{:else}
 		<h1 class="w-full m-10 text-4xl font-bold">{$_('page.game.create.choose_name')}</h1>
 	{/if}
-	{#if gameIdCookie != ""}
-		<Modal cookie={gameIdCookie}/>
+	{#if cookie != ''}
+		<Modal {onMountCallback} {yesCallback} {noCallback} question="page.game.create.game_exists" />
 	{/if}
-	<div class="flex flex-col w-full gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl justify-center items-center">
+	<div
+		class="flex flex-col w-full gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl justify-center items-center"
+	>
 		<form class="w-4/5 flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control">
 				<label for="gameId" class="label">
@@ -87,7 +117,12 @@
 			{#if formSuccess == 'page.game.create.missing_value'}
 				<Alert message={formSuccess} />
 			{:else if formSuccess == 'page.game.create.conflict'}
-				<Modal cookie={gameId} type='conflict'/>
+				<Modal
+					{onMountCallback}
+					{yesCallback}
+					{noCallback}
+					question="page.game.create.game_conflicts"
+				/>
 			{/if}
 		</form>
 	</div>

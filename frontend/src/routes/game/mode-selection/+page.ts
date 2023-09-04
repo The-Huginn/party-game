@@ -1,15 +1,16 @@
 import { game_url } from "../../../store";
 import type { PageLoad } from "./$types";
 
+export const prerender = true;
+export const ssr = false;
+
 export const load: PageLoad = async ({ fetch }) => {
-    const response = await fetch(`${game_url}/mode/current`, {
+    const response = await fetch(`${game_url}/mode/exists`, {
         method: 'GET',
         credentials: 'include'
     });
-    console.log(response.status);
 
-    return { 
-        data: (await response.json()).data,
-        initialLoad: true satisfies boolean
+    return {
+        status: response.status,
     };
 }
