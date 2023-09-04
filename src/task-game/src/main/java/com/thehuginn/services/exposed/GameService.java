@@ -19,12 +19,18 @@ import java.util.function.Function;
 @Path("/game")
 public class GameService {
 
+    @GET
+    public Uni<GameSession> getGame(@RestCookie String gameId) {
+        return GameSession.findById(gameId);
+    }
+
     @POST
     @WithTransaction
     public Uni<GameSession> createGame(@RestCookie String gameId) {
         GameSession gameSession = new GameSession();
         gameSession.gameId = gameId;
-        return gameSession.persist();
+        return GameSession.deleteById(gameId)
+                .chain(gameSession::persist);
     }
 
     @PUT

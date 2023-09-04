@@ -105,14 +105,17 @@ public class GameSession extends PanacheEntityBase {
                         .flatMap(collectedTasks -> ((Set<Task>)collectedTasks).stream())
                         .collect(Collectors.toSet()));
 
-        return this.<GameSession>persist()
-                .call(() -> tasksUni.call(allTasks -> {
+        return tasksUni.call(allTasks -> {
                     try {
                         return GameTaskService.gameTasks(allTasks, context);
                     } catch (CloneNotSupportedException e) {
                         throw new RuntimeException(e);
                     }
-                }))
+                })
+                .chain(() -> {
+                    this.currentTask = null;
+                    return this.persist();
+                })
                 .replaceWith(Boolean.TRUE);
     }
 
@@ -143,10 +146,8 @@ public class GameSession extends PanacheEntityBase {
                 .invoke(gameSession -> gameSession.currentTask = resolvedTask)
                 .call(gameSession -> gameSession.persist());
 
-        Uni<Void> deleteCurrentTask = Uni.createFrom().voidItem();
-        if (this.currentTask != null) {
-            deleteCurrentTask = deleteCurrentTask.call(resolvedTask -> this.currentTask.remove());
-        }
+        Uni<Void> deleteCurrentTask = Uni.createFrom().item(this.currentTask)
+                .onItem().ifNotNull().transformToUni(ResolvedTask::remove);
 
         Uni<ResolvedTask> nextTask = GameTask.count("game = :game", Parameters.with("game", gameId))
                 .chain(count -> {

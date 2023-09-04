@@ -58,7 +58,7 @@ public class TestGameCreationService extends AbstractTest {
                 given()
                         .cookie(new Cookie.Builder("gameId", GAME).build())
                         .when()
-                        .get("/task-mode")
+                        .get("/game")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .body("gameId", is(GAME),
@@ -111,7 +111,7 @@ public class TestGameCreationService extends AbstractTest {
             given()
                     .cookie(new Cookie.Builder("gameId", GAME).build())
                     .when()
-                    .get("/task-mode")
+                    .get("/game")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("categories.size()", is(3));
@@ -139,7 +139,7 @@ public class TestGameCreationService extends AbstractTest {
             given()
                     .cookie(new Cookie.Builder("gameId", GAME).build())
                     .when()
-                    .get("/task-mode")
+                    .get("/game")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("categories.size()", is(1));

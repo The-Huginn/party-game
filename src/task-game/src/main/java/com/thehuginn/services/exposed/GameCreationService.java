@@ -30,11 +30,6 @@ import java.util.stream.Collectors;
 public class GameCreationService {
 
     @GET
-    public Uni<GameSession> getGame(@RestCookie String gameId) {
-        return GameSession.findById(gameId);
-    }
-
-    @GET
     @Path("/category")
     @WithTransaction
     public Uni<List<Category.CategoryDto>> getCategories() {
