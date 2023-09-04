@@ -1,8 +1,6 @@
 package com.thehuginn.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.Game;
-import com.thehuginn.external.GameRestClientTask;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -14,7 +12,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -27,9 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
 public class GameService {
-
-    @RestClient
-    GameRestClientTask taskRestClient;
 
     @POST
     @WithTransaction
@@ -88,47 +82,5 @@ public class GameService {
                     game.type = newType;
                     return game.persist();
                 }).replaceWithVoid();
-    }
-
-    @POST
-    @Path("/create")
-    public Uni<JsonNode> createGameMode(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
-                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.createGame(gameId);
-                    case NONE -> Uni.createFrom().nullItem();
-                });
-    }
-
-
-    @PUT
-    @Path("/start")
-    public Uni<Boolean> startGame(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
-                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
-                    case NONE -> Uni.createFrom().item(Boolean.FALSE);
-                })
-                .onItem().ifNull().continueWith(Boolean.FALSE);
-    }
-
-    @GET
-    @Path("/current")
-    public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie String locale) {
-        return Game.<Game>findById(gameId)
-                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
-                    case NONE -> Uni.createFrom().nullItem();
-                });
-    }
-
-    @PUT
-    @Path("/next")
-    public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale) {
-        return Game.<Game>findById(gameId)
-                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
-                    case NONE -> Uni.createFrom().nullItem();
-                });
     }
 }

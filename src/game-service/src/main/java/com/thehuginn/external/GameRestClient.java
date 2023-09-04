@@ -18,6 +18,9 @@ import org.jboss.resteasy.reactive.RestQuery;
 @Produces(MediaType.APPLICATION_JSON)
 public interface GameRestClient {
 
+    @GET
+    Uni<JsonNode> getGame(@RestCookie String gameId);
+
     @POST
     Uni<JsonNode> createGame(@RestCookie String gameId);
 
