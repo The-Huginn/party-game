@@ -5,7 +5,6 @@
             "text": "<b>Ahoj 👋<br><br>Vitaj na druhej verzií 🥃 hry. Dúfam, že si ju užiješ ešte viac ako predtým 😍 Avšak buď 😎 a nie že budeš 🔍 hry ostatných 😈<br>Táto stránka má rada 🍪, tak sa s tým zmier 😏 Nezabudni, 🍺 zodpovedne a hlavne mysli na svoju maminu 👩<br>Nazdravie 🍻!</b>",
             "accept_btn": "Prijímam"
         },
-        
         "game": {
             "create": {
                 "choose_name": "Vyber si názov hry prosím",
@@ -15,9 +14,7 @@
                 "conflict": "Hra s týmto menom už existuje",
                 "missing_value": "Meno hry nemôže byť prázdne",
                 "game_exists": "Rozohratá hra nájdená, chceš pokračovať?",
-                "game_conflicts": "Hra s týmto menom už existuje, chceš pokračovať v nej?",
-                "game_continue": "Samozrejme!",
-                "game_recreate": "Nie tak rýchlo"
+                "game_conflicts": "Hra s týmto menom už existuje, chceš pokračovať v nej?"
             },
             "lobby": {
                 "title": "Vyplňte si lobby",
@@ -37,7 +34,6 @@
                 "next": "Ďalej"
             }
         },
-
         "task": {
             "category": {
                 "title": "Vyber si kategórie",
@@ -49,5 +45,9 @@
                 "missing_tasks": "V hre neboli nájdené žiadne úlohy"
             }
         }
+    },
+    "button": {
+        "yes": "Samozrejme!",
+        "no": "Nie tak rýchlo"
     }
 }

@@ -5,7 +5,6 @@
             "text": "<b>Hello 👋<br><br>Welcome to the second version of 🥃 game. I hope you will enjoy it even more then before 😍 However, be 😎 and do not 🔍 other's games 😈<br>This website likes 🍪, deal with it 😏 Don't forget to 🍺 responsibly and think about your moms 👩<br>Cheers 🍻!</b>",
             "accept_btn": "I accept"
         },
-        
         "game": {
             "create": {
                 "choose_name": "Please pick a unique name",
@@ -15,9 +14,7 @@
                 "conflict": "Game Already exists",
                 "missing_value": "Game Name can not be empty",
                 "game_exists": "Game in progress found, would you like to continue?",
-                "game_conflicts": "Game with this name exists, would you like to continue it?",
-                "game_continue": "Hell Yeah!",
-                "game_recreate": "Not so quick"
+                "game_conflicts": "Game with this name exists, would you like to continue it?"
             },
             "lobby": {
                 "title": "Fill in your Lobby",
@@ -37,7 +34,6 @@
                 "next": "Next"
             }
         },
-
         "task": {
             "category": {
                 "title": "Choose Categories",
@@ -49,5 +45,9 @@
                 "missing_tasks": "Game does not have any tasks associated"
             }
         }
+    },
+    "button": {
+        "yes": "Hell Yeah!",
+        "no": "Not so quick"
     }
 }

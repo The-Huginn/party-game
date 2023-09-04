@@ -33,7 +33,7 @@
 {#if data.status == 200}
 	<Modal
 		onMountCallback={() => {}}
-		yesCallback={() => goto('/task-mode')}
+		yesCallback={() => goto('/game/task')}
 		noCallback={() => {}}
 		question="page.game.mode-selection.game_continue"
 	/>

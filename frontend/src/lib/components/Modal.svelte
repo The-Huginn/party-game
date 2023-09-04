@@ -43,8 +43,8 @@
 			</p>
 			<form on:submit|preventDefault={handleSubmit}>
 				<div class="modal-action">
-					<button class="btn btn-primary text-xl" id="yes">yes</button>
-					<button class="btn text-xl" id="no">no</button>
+					<button class="btn btn-primary text-xl" id="yes">{$_('button.yes')}</button>
+					<button class="btn text-xl" id="no">{$_('button.no')}</button>
 				</div>
 			</form>
 		</div>
