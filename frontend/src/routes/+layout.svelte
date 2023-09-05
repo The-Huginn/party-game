@@ -10,16 +10,16 @@
 </script>
 
 <ul class="circles">
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
-	<li />
+	<li class="bg-primary"/>
+	<li class="bg-secondary"/>
+	<li class="bg-accent"/>
+	<li class="bg-neutral"/>
+	<li class="bg-primary"/>
+	<li class="bg-secondary"/>
+	<li class="bg-accent"/>
+	<li class="bg-neutral"/>
+	<li class="bg-primary"/>
+	<li class="bg-secondary"/>
 </ul>
 <div class="flex flex-col min-h-screen">
 	<App />
@@ -58,7 +58,7 @@
 		list-style: none;
 		width: 20px;
 		height: 20px;
-		background: rgba(255, 255, 255, 0.2);
+		/* background: rgba(255, 255, 255, 0.2); */
 		animation: animate 25s linear infinite;
 		bottom: -150px;
 	}

@@ -33,6 +33,21 @@
 		{/key}
 	</div>
 
+	<div class="h-16 flex items-center justify-center hover:shadow-lg">
+		<select class="items-center justify-center select bg-opacity-30" data-choose-theme>
+			<option disabled value=""> Pick a theme </option>
+			<option value="">Default</option>
+			<option value="light">Light</option>
+			<option value="dark">Dark</option>
+			<option value="cyberpunk">Cyberpunk</option>
+			<option value="valentine">Valentine</option>
+			<option value="lofi">Lofi</option>
+			<option value="retro">Retro</option>
+			<option value="dracula">Dracula</option>
+			<option value="night">Night</option>
+			<option value="halloween">Halloween</option>
+		</select>
+	</div>
 	<div class="w-16 h-16 hover:shadow-lg">
 		<a
 			class="flex items-center justify-center w-full h-full"
