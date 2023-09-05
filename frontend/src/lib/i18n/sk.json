@@ -49,5 +49,9 @@
     "button": {
         "yes": "Samozrejme!",
         "no": "Nie tak rýchlo"
+    },
+    "settings": {
+        "language": "Jazyk",
+        "theme": "Téma"
     }
 }

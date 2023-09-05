@@ -10,22 +10,23 @@
 </script>
 
 <ul class="circles">
-	<li class="bg-primary"/>
-	<li class="bg-secondary"/>
-	<li class="bg-accent"/>
-	<li class="bg-neutral"/>
-	<li class="bg-primary"/>
-	<li class="bg-secondary"/>
-	<li class="bg-accent"/>
-	<li class="bg-neutral"/>
-	<li class="bg-primary"/>
-	<li class="bg-secondary"/>
+	<li class="bg-primary" />
+	<li class="bg-secondary" />
+	<li class="bg-accent" />
+	<li class="bg-neutral" />
+	<li class="bg-primary" />
+	<li class="bg-secondary" />
+	<li class="bg-accent" />
+	<li class="bg-neutral" />
+	<li class="bg-primary" />
+	<li class="bg-secondary" />
 </ul>
 <div class="flex flex-col min-h-screen">
 	<App />
 	<Header />
-
-	<main class="flex flex-1 flex-col justify-center items-center p-1 w-full max-w-64 m-0 box-border mt-10">
+	<main
+		class="flex flex-1 flex-col justify-center items-center p-1 w-full max-w-64 m-0 box-border mt-10"
+	>
 		<PageTransition key={data.url} duration={600}>
 			<slot />
 		</PageTransition>

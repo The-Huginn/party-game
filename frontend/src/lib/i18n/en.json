@@ -49,5 +49,9 @@
     "button": {
         "yes": "Hell Yeah!",
         "no": "Not so quick"
+    },
+    "settings": {
+        "language": "Language",
+        "theme": "Theme"
     }
 }
