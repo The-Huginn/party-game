@@ -31,7 +31,8 @@
             },
             "task": {
                 "title": "Task",
-                "next": "Next"
+                "next": "Next",
+                "start_timer": "Start Timer"
             }
         },
         "task": {

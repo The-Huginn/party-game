@@ -31,7 +31,8 @@
             },
             "task": {
                 "title": "Úloha",
-                "next": "Ďalej"
+                "next": "Ďalej",
+                "start_timer": "Spustiť Časovač"
             }
         },
         "task": {

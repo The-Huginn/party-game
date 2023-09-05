@@ -5,6 +5,7 @@ export type Task = {
 
 export type Timer = {
     duration: number;
-    delay: number;
+    delay?: number;
+    autostart: boolean;
     initialDuration: number;
 }

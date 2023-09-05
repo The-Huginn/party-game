@@ -10,6 +10,8 @@
 	import { game_url, header_text } from '../../../store';
 	import type { PageData } from './$types';
 	import type { Task, Timer } from './Task';
+	import { crossfade, fade, fly, slide } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -28,18 +30,20 @@
 		if (timer) {
 			timer.duration *= 100;
 			timer.initialDuration = timer.duration;
-			if (timer.delay > 0) {
+			if (timer.autostart) {
 				timerTimeout = setTimeout(() => {
-					timerInterval = setInterval(() => {
-						if (timer.duration > 0) timer.duration--;
-					}, 10);
-				}, timer.delay * 1000);
-			} else {
-				timerInterval = setInterval(() => {
-					if (timer.duration > 0) timer.duration--;
-				}, 10);
+					startTimer();
+				}, (timer.delay ?? 0) * 1000); // this should be always defined
 			}
 		}
+	}
+
+	function startTimer() {
+		// remove the button
+		timer.autostart = true;
+		timerInterval = setInterval(() => {
+			if (timer.duration > 0) timer.duration--;
+		}, 10);
 	}
 
 	async function submitHandler(event) {
@@ -80,6 +84,11 @@
 
 	$: onDestroy(subscription);
 	$header_text = 'page.game.task.title';
+
+	const [send, receive] = crossfade({
+		duration: 1500,
+		easing: quintOut
+	});
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
@@ -96,16 +105,36 @@
 		{/if}
 	</div>
 	{#if timer}
-		{#if timer.duration > 0}
-			<div
-				class="radial-progress text-primary"
-				style="--value:{Math.round((timer.duration / timer.initialDuration) * 100)};"
-			>
-				{Math.round((timer.duration / timer.initialDuration) * 100)}%
-			</div>
-		{:else if Math.round(timer.duration) == 0}
-			{beep()}
-		{/if}
+		<div class="w-full flex flex-col items-center justify-center p-8">
+			{#if timer.duration > 0 && timer.autostart}
+				<div
+					out:send={{ key: 'a' }}
+					in:receive={{ key: 'a' }}
+					class="absolute radial-progress text-primary"
+					style="--value:{Math.round((timer.duration / timer.initialDuration) * 100)};"
+				>
+					{Math.round(timer.duration / 10) / 10}s
+				</div>
+			{:else if Math.round(timer.duration) == 0}
+				{beep()}
+			{/if}
+			{#if !timer.autostart}
+				<form
+					class="absolute"
+					out:send={{ key: 'a' }}
+					in:receive={{ key: 'a' }}
+					on:submit|preventDefault={startTimer}
+				>
+					<button class="btn btn-secondary transition duration-300 min-h-16 text-3xl">
+						{#if $isLoading}
+							<span class="loading loading-spinner text-info" />
+						{:else}
+							{$_('page.game.task.start_timer')}
+						{/if}
+					</button>
+				</form>
+			{/if}
+		</div>
 	{/if}
 	<form on:submit|preventDefault={submitHandler}>
 		<button class="btn btn-primary transition duration-300 min-h-16 text-3xl">

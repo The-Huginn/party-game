@@ -6,7 +6,6 @@ export const load: PageLoad = async ({ fetch }) => {
         method: 'GET',
         credentials: 'include'
     });
-    console.log(response.status);
 
     return { 
         data: (await response.json()).data,

@@ -46,7 +46,7 @@
 	<div class="h-16 flex items-center justify-center hover:shadow-lg">
 		<div class="dropdown dropdown-hover dropdown-end">
 			<img class="object-contain w-12 h-12" src={settings} alt="GitHub" />
-			<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 space-y-3">
+			<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 space-y-3">
 				<li>
 					{$_(`settings.theme`)}
 					<select class="items-center justify-center select bg-opacity-30" data-choose-theme>
