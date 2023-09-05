@@ -24,8 +24,6 @@
 	let timerInterval: ReturnType<typeof setTimeout>;
 	let timerTimeout: ReturnType<typeof setTimeout>;
 	$: if (initialLoad) {
-		locale.set('en-US');
-		locale.set('sk-SK');
 		initialLoad = false;
 		if (timer) {
 			timer.duration *= 100;

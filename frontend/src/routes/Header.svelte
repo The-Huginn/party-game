@@ -6,12 +6,14 @@
 	import * as eases from 'svelte/easing';
 	import { slide, type EasingFunction } from 'svelte/transition';
 	import { header_text } from '../store';
+	import { locale, locales } from 'svelte-i18n';
+	import { get } from 'svelte/store';
 
 	export let duration: number = 300;
 	export let easing: EasingFunction = eases.quartInOut;
 </script>
 
-<header class="flex justify-between z-10">
+<header class="flex justify-between space-x-2 z-10">
 	<div class="w-16 h-16 hover:shadow-lg">
 		<a class="flex items-center justify-center w-full h-full" href="/">
 			<img class="object-contain w-12 h-12" src={home} alt="Home" />
@@ -33,6 +35,17 @@
 		{/key}
 	</div>
 
+	<div class="h-16 flex items-center justify-center hover:shadow-lg">
+		<select class="items-center justify-center select bg-opacity-30" bind:value={$locale}>
+			{#each $locales as value}
+				{#if $locale == value}
+					<option {value} selected>{value.substring(0, 2)}</option>
+				{:else}
+					<option {value}>{value.substring(0, 2)}</option>
+				{/if}
+			{/each}
+		</select>
+	</div>
 	<div class="h-16 flex items-center justify-center hover:shadow-lg">
 		<select class="items-center justify-center select bg-opacity-30" data-choose-theme>
 			<option disabled value=""> Pick a theme </option>

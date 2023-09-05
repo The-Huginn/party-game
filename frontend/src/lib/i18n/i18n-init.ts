@@ -6,11 +6,11 @@ function setupI18n({ withLocale: _locale } = { withLocale: getLocaleFromNavigato
     // register('en', () => import('./en.json'));
     // register('en', () => import('./sk.json'));
     
-    addMessages('en', en);
-    addMessages('sk', sk);
+    addMessages('en-US', en);
+    addMessages('sk-SK', sk);
     
     init({
-        fallbackLocale: 'en',
+        fallbackLocale: 'en-US',
         initialLocale: _locale
     });
 }
