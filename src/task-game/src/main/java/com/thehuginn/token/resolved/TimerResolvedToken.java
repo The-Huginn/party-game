@@ -1,5 +1,6 @@
 package com.thehuginn.token.resolved;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
@@ -43,7 +44,7 @@ public class TimerResolvedToken extends AbstractResolvedToken {
         if (args.size() == 2) {
             String delayString = args.get(1);
 
-            if (!delayString.matches("\\d+")) {
+            if (!delayString.matches("-?\\d+")) {
                 Log.error(TimerResolvedToken.class + "#resolve expects integer");
                 throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
             }
@@ -62,13 +63,19 @@ public class TimerResolvedToken extends AbstractResolvedToken {
         return true;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class Timer {
         public int duration;
-        public int delay;
+        public Integer delay;
+        public boolean autostart = true;
 
         private Timer(int duration, int delay) {
             this.duration = duration;
-            this.delay = delay;
+            if (delay >= 0) {
+                this.delay = delay;
+            } else {
+                autostart = false;
+            }
         }
     }
 }

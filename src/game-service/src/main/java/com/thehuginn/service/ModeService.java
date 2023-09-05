@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.Game;
 import com.thehuginn.external.GameRestClientTask;
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.net.impl.pool.Task;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
