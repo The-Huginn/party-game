@@ -3,13 +3,12 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
 	import { isLoading } from 'svelte-i18n';
-	import { game_url, header_text } from '../../../store';
+	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
 
 	export let formSuccess: boolean = true;
 	export let data: PageData;
-	console.log(data.status)
-	$header_text = 'page.game.mode-selection.title';
+	$header = { text: 'page.game.mode-selection.title', append: '' };
 
 	async function handleSubmit(event: SubmitEvent) {
 		const formDatam = new FormData(this);

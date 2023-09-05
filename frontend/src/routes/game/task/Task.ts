@@ -1,5 +1,8 @@
+export type taskType = 'SINGLE' | 'DUO' | 'ALL';
 export type Task = {
     task: string;
+    task_type: taskType;
+    player: string;
     timer?: Timer;
 }
 

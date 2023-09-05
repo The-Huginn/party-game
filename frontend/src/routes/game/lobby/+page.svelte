@@ -1,16 +1,16 @@
 <script lang="ts">
 	import Alert from '$lib/components/Alert.svelte';
-	import { isLoading } from 'svelte-i18n';
 	import { _ } from '$lib/i18n/i18n-init';
+	import { isLoading } from 'svelte-i18n';
 	import { slide } from 'svelte/transition';
-	import { game_url, header_text } from '../../../store';
+	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
 	import LobbyTable from './LobbyTable.svelte';
 	import Player from './Player';
 
 	export let data: PageData;
 	export let formSuccess: boolean = true;
-	$header_text = 'page.game.lobby.title';
+	$header = { text: 'page.game.lobby.title', append: '' };
 
 	let { players } = data;
 
@@ -46,7 +46,11 @@
 		<LobbyTable bind:players />
 		<form class="w-full flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control" transition:slide|local>
-				<input type="text" name="new-player" class="input input-primary input-bordered w-full min-h-16 text-3xl" />
+				<input
+					type="text"
+					name="new-player"
+					class="input input-primary input-bordered w-full min-h-16 text-3xl"
+				/>
 			</div>
 			<button class="btn btn-primary w-full transition duration-300 min-h-16 text-xl">
 				{#if $isLoading}

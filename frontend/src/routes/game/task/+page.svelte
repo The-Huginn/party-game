@@ -7,7 +7,7 @@
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { Sound } from 'svelte-sound';
-	import { game_url, header_text } from '../../../store';
+	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
 	import type { Task, Timer } from './Task';
 	import { crossfade, fade, fly, slide } from 'svelte/transition';
@@ -83,7 +83,15 @@
 	});
 
 	$: onDestroy(subscription);
-	$header_text = 'page.game.task.title';
+	$: {
+		console.log(task);
+		$header.text = 'page.game.task.' + task.task_type.toLowerCase();
+		if (task.task_type == 'SINGLE') {
+			$header.append = task.player;
+		} else {
+			$header.append = '';
+		}
+	}
 
 	const [send, receive] = crossfade({
 		duration: 1500,

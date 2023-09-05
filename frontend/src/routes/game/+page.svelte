@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import { isLoading } from 'svelte-i18n';
 	import Modal from '../../lib/components/Modal.svelte';
-	import { game_url, header_text } from '../../store';
+	import { game_url, header } from '../../store';
 	import type { PageData } from './$types';
 
 	$: formSuccess = '';
@@ -47,7 +47,7 @@
 		}
 	}
 
-	$header_text = 'page.game.create.title';
+	$header = { text: 'page.game.create.title', append: '' };
 
 	let gameState: string = 'CREATED';
 

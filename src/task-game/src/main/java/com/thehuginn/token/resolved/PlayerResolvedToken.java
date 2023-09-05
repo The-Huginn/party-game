@@ -23,6 +23,10 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
         this.player = player;
     }
 
+    public static PlayerResolvedToken getPlayer(ResolutionContext resolutionContext) {
+        return new PlayerResolvedToken("player", resolutionContext.getPlayer());
+    }
+
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
         return new UnresolvedResult().appendData(Map.entry(playerTag, Uni.createFrom().item(player)));

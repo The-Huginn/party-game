@@ -1,14 +1,12 @@
 <script lang="ts">
+	import { _ } from '$lib/i18n/i18n-init';
 	import github from '$lib/images/github.svg';
 	import home from '$lib/images/home-button.svg';
 	import settings from '$lib/images/settings.svg';
-	import { isLoading } from 'svelte-i18n';
-	import { _ } from '$lib/i18n/i18n-init';
+	import { isLoading, locale, locales } from 'svelte-i18n';
 	import * as eases from 'svelte/easing';
 	import { slide, type EasingFunction } from 'svelte/transition';
-	import { header_text } from '../store';
-	import { locale, locales } from 'svelte-i18n';
-	import { get } from 'svelte/store';
+	import { header } from '../store';
 
 	export let duration: number = 300;
 	export let easing: EasingFunction = eases.quartInOut;
@@ -21,7 +19,7 @@
 		</a>
 	</div>
 	<div class="w-16 h-16 flex-1 px-10">
-		{#key $header_text}
+		{#key $header.text}
 			<h1
 				class="flex relative justify-center items-center w-full h-full inset-0 text-6xl mt-2"
 				in:slide={{ duration, delay: duration, easing }}
@@ -30,7 +28,7 @@
 				{#if $isLoading}
 					<span class="loading loading-spinner text-info" />
 				{:else}
-					{$_(`${$header_text}`)}
+					{$_(`${$header.text}`)} {$header.append != '' ? ' ' + $header.append : ''}
 				{/if}
 			</h1>
 		{/key}

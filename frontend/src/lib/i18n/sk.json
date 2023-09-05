@@ -32,7 +32,10 @@
             "task": {
                 "title": "Úloha",
                 "next": "Ďalej",
-                "start_timer": "Spustiť Časovač"
+                "start_timer": "Spustiť Časovač",
+                "single": "Je tvoj čas",
+                "duo": "Úloha pre dvojice!",
+                "all": "Pripravte sa všetci!"
             }
         },
         "task": {

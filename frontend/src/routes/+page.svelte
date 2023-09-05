@@ -4,9 +4,9 @@
 	import { isLoading } from 'svelte-i18n';
 	import { _ } from '$lib/i18n/i18n-init';
 	import { location } from 'svelte-spa-router';
-	import { header_text } from '../store';
+	import { header } from '../store';
 
-	$header_text = 'page.disclaimer.title';
+	$header = {text: 'page.disclaimer.title', append: ''};
 </script>
 
 <svelte:head>
