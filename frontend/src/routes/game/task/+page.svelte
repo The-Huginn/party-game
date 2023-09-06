@@ -3,15 +3,12 @@
 	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
-	import beep_mp4 from '$lib/sounds/beep.mp4';
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
-	import { Sound } from 'svelte-sound';
 	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
 	import type { Task, Timer } from './Task';
-	import { crossfade, fade, fly, slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import TimerComponent from './TimerComponent.svelte';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -21,34 +18,7 @@
 	$: timer = data.data.timer as Timer;
 	$: initialLoad = data.initialLoad;
 
-	const beepSound = new Sound(beep_mp4);
-
-	let timerInterval: ReturnType<typeof setTimeout>;
-	let timerTimeout: ReturnType<typeof setTimeout>;
-	$: if (initialLoad) {
-		initialLoad = false;
-		if (timer) {
-			timer.duration *= 100;
-			timer.initialDuration = timer.duration;
-			if (timer.autostart) {
-				timerTimeout = setTimeout(() => {
-					startTimer();
-				}, (timer.delay ?? 0) * 1000); // this should be always defined
-			}
-		}
-	}
-
-	function startTimer() {
-		// remove the button
-		timer.autostart = true;
-		timerInterval = setInterval(() => {
-			if (timer.duration > 0) timer.duration--;
-		}, 10);
-	}
-
 	async function submitHandler(event) {
-		clearInterval(timerInterval);
-		clearTimeout(timerTimeout);
 		const response = await fetch(`${game_url}/mode/next`, {
 			method: 'PUT',
 			credentials: 'include'
@@ -59,11 +29,6 @@
 			data: (await response.json()).data,
 			initialLoad: true
 		};
-	}
-
-	function beep() {
-		beepSound.play();
-		return '';
 	}
 
 	$: subscription = locale.subscribe(async (newLocale) => {
@@ -84,7 +49,6 @@
 
 	$: onDestroy(subscription);
 	$: {
-		console.log(task);
 		$header.text = 'page.game.task.' + task.task_type.toLowerCase();
 		if (task.task_type == 'SINGLE') {
 			$header.append = task.player;
@@ -92,11 +56,6 @@
 			$header.append = '';
 		}
 	}
-
-	const [send, receive] = crossfade({
-		duration: 1500,
-		easing: quintOut
-	});
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
@@ -112,38 +71,9 @@
 			<progress value={timer.duration / timer.initialDuration} />
 		{/if}
 	</div>
-	{#if timer}
-		<div class="w-full flex flex-col items-center justify-center p-8">
-			{#if timer.duration > 0 && timer.autostart}
-				<div
-					out:send={{ key: 'a' }}
-					in:receive={{ key: 'a' }}
-					class="absolute radial-progress text-primary"
-					style="--value:{Math.round((timer.duration / timer.initialDuration) * 100)};"
-				>
-					{Math.round(timer.duration / 10) / 10}s
-				</div>
-			{:else if Math.round(timer.duration) == 0}
-				{beep()}
-			{/if}
-			{#if !timer.autostart}
-				<form
-					class="absolute"
-					out:send={{ key: 'a' }}
-					in:receive={{ key: 'a' }}
-					on:submit|preventDefault={startTimer}
-				>
-					<button class="btn btn-secondary transition duration-300 min-h-16 text-3xl">
-						{#if $isLoading}
-							<span class="loading loading-spinner text-info" />
-						{:else}
-							{$_('page.game.task.start_timer')}
-						{/if}
-					</button>
-				</form>
-			{/if}
-		</div>
-	{/if}
+	{#key timer}
+		<TimerComponent {timer} />
+	{/key}
 	<form on:submit|preventDefault={submitHandler}>
 		<button class="btn btn-primary transition duration-300 min-h-16 text-3xl">
 			{#if $isLoading}
