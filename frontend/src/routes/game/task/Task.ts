@@ -4,6 +4,12 @@ export type Task = {
     task_type: taskType;
     player: string;
     timer?: Timer;
+    pairs?: TeamPair[];
+}
+
+export type TeamPair = {
+    first: string;
+    second: string;
 }
 
 export type Timer = {

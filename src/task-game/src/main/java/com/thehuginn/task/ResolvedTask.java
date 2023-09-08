@@ -5,6 +5,7 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.token.resolved.AbstractResolvedToken;
+import com.thehuginn.token.resolved.PairsResolvedToken;
 import com.thehuginn.token.resolved.PlayerResolvedToken;
 import com.thehuginn.token.resolved.TaskTypeResolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
@@ -50,6 +51,10 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
 		tokens.add(new TaskTypeResolvedToken(gameTask.unresolvedTask));
 		tokens.add(PlayerResolvedToken.getPlayer(resolutionContext));
 
+		if (gameTask.unresolvedTask.type == Task.Type.DUO) {
+			tokens.add(new PairsResolvedToken(resolutionContext.getPlayers()));
+		}
+
 		resolvedTask.tokens.addAll(tokens.stream()
 				.peek(resolvedToken -> ((AbstractResolvedToken) resolvedToken).resolvedTask = resolvedTask)
 				.toList());
@@ -57,7 +62,6 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
 	}
 
 	@Override
-	// TODO add title, current player etc...
 	public UnresolvedResult resolve(ResolutionContext context) {
 		UnresolvedResult unresolvedResult = gameTask.unresolvedTask.task.resolve(context);
 		for (ResolvedToken token : tokens) {
