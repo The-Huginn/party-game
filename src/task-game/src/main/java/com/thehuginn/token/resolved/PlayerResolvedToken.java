@@ -14,9 +14,10 @@ import java.util.Map;
 public class PlayerResolvedToken extends AbstractResolvedToken {
 
     String playerTag;
-    String  player;
+    String player;
 
-    public PlayerResolvedToken() {}
+    public PlayerResolvedToken() {
+    }
 
     public PlayerResolvedToken(String playerTag, String player) {
         this.playerTag = playerTag;

@@ -17,7 +17,8 @@ public abstract class AbstractUnresolvedToken extends PanacheEntityBase implemen
     @JsonProperty
     String key;
 
-    public AbstractUnresolvedToken() {}
+    public AbstractUnresolvedToken() {
+    }
 
     protected AbstractUnresolvedToken(String key) {
         this.key = key;
@@ -29,8 +30,10 @@ public abstract class AbstractUnresolvedToken extends PanacheEntityBase implemen
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         AbstractUnresolvedToken that = (AbstractUnresolvedToken) o;
         return Objects.equals(key, that.key);
     }

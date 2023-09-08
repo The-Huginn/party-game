@@ -66,15 +66,13 @@ public class TestGameTask extends AbstractTest {
     @Order(2)
     void testCreatedSingleGameTask(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createTask("task1")
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task)));
 
-
         asserter.execute(() -> {
             List<Task> tasks = List.of(
-                    (Task) asserter.getData("task1")
-            );
+                    (Task) asserter.getData("task1"));
             try {
                 return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
@@ -82,7 +80,8 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.count("game = :game", Parameters.with("game", GAME)), aLong -> Assertions.assertEquals(aLong, 9L));
+        asserter.assertThat(() -> GameTask.count("game = :game", Parameters.with("game", GAME)),
+                aLong -> Assertions.assertEquals(aLong, 9L));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -94,21 +93,21 @@ public class TestGameTask extends AbstractTest {
                 .repeat(Task.Repeat.NEVER)
                 .type(Task.Type.ALL)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task)));
         asserter.execute(() -> new Task.Builder("simple task per player")
                 .repeat(Task.Repeat.PER_PLAYER)
                 .type(Task.Type.ALL)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
         asserter.execute(() -> new Task.Builder("simple task")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.DUO)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task3", task)));
         asserter.execute(() -> new Task.Builder("simple per player task with higher frequency.")
@@ -116,7 +115,7 @@ public class TestGameTask extends AbstractTest {
                 .type(Task.Type.SINGLE)
                 .frequency((short) 2)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task4", task)));
 
@@ -133,35 +132,35 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.<GameTask>find("game = :game", Parameters.with("game", GAME))
+        asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> {
-            Assertions.assertEquals(gameTasks.size(), 11);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(0)))
-                    .count(), 1);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(1)))
-                    .count(), 3);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(2)))
-                    .count(), 1);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(3)))
-                    .count(), 6);
-            List<GameTask> task4 = gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(3)))
-                    .toList();
-            Assertions.assertEquals(task4.size(), 6);
-            Assertions.assertEquals(task4.stream()
-                    .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(0)))
-                    .count(), 2);
-            Assertions.assertEquals(task4.stream()
-                    .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(1)))
-                    .count(), 2);
-            Assertions.assertEquals(task4.stream()
-                    .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(2)))
-                    .count(), 2);
-        });
+                    Assertions.assertEquals(gameTasks.size(), 11);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(0)))
+                            .count(), 1);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(1)))
+                            .count(), 3);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(2)))
+                            .count(), 1);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(3)))
+                            .count(), 6);
+                    List<GameTask> task4 = gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(3)))
+                            .toList();
+                    Assertions.assertEquals(task4.size(), 6);
+                    Assertions.assertEquals(task4.stream()
+                            .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(0)))
+                            .count(), 2);
+                    Assertions.assertEquals(task4.stream()
+                            .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(1)))
+                            .count(), 2);
+                    Assertions.assertEquals(task4.stream()
+                            .filter(gameTask -> gameTask.assignedPlayer.equals(PLAYERS.get(2)))
+                            .count(), 2);
+                });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -173,28 +172,28 @@ public class TestGameTask extends AbstractTest {
                 .repeat(Task.Repeat.NEVER)
                 .type(Task.Type.ALL)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task)));
         asserter.execute(() -> new Task.Builder("simple task per player")
                 .repeat(Task.Repeat.PER_PLAYER)
                 .type(Task.Type.ALL)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
         asserter.execute(() -> new Task.Builder("simple task")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.DUO)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task3", task)));
         asserter.execute(() -> new Task.Builder("simple duplicate task")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.DUO)
                 .build()
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task4", task)));
 
@@ -221,19 +220,19 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.<GameTask>find("game = :game", Parameters.with("game", GAME))
+        asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> {
-            Assertions.assertEquals(gameTasks.size(), 5);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(0)))
-                    .count(), 1);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(1)))
-                    .count(), 1);
-            Assertions.assertEquals(gameTasks.stream()
-                    .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(2)))
-                    .count(), 3);
-        });
+                    Assertions.assertEquals(gameTasks.size(), 5);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(0)))
+                            .count(), 1);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(1)))
+                            .count(), 1);
+                    Assertions.assertEquals(gameTasks.stream()
+                            .filter(gameTask -> gameTask.unresolvedTask.equals(tasks.get(2)))
+                            .count(), 3);
+                });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

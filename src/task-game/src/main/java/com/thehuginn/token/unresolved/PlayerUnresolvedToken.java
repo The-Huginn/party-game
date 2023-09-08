@@ -14,7 +14,8 @@ import java.util.List;
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
 
-    public PlayerUnresolvedToken() {}
+    public PlayerUnresolvedToken() {
+    }
 
     public PlayerUnresolvedToken(String key) {
         super(key);
@@ -45,7 +46,8 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
             return 0;
         }
         if (!player.matches("[1-9]\\d*")) {
-            throw new IllegalArgumentException(PlayerUnresolvedToken.class + "#resolve expects integer higher than 1 or 'c' argument");
+            throw new IllegalArgumentException(
+                    PlayerUnresolvedToken.class + "#resolve expects integer higher than 1 or 'c' argument");
         }
 
         return Integer.valueOf(player);

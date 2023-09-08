@@ -14,22 +14,23 @@ import java.util.Map;
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class TaskTypeResolvedToken extends AbstractResolvedToken {
 
-	private static final String tag = "task_type";
-	Task.Type type;
+    private static final String tag = "task_type";
+    Task.Type type;
 
-	public TaskTypeResolvedToken() {}
+    public TaskTypeResolvedToken() {
+    }
 
-	public TaskTypeResolvedToken(Task unresolvedTask) {
-		type = unresolvedTask.type;
-	}
+    public TaskTypeResolvedToken(Task unresolvedTask) {
+        type = unresolvedTask.type;
+    }
 
-	@Override
-	public UnresolvedResult resolve(ResolutionContext context) {
-		return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(type.toString())));
-	}
+    @Override
+    public UnresolvedResult resolve(ResolutionContext context) {
+        return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(type.toString())));
+    }
 
-	@Override
-	public boolean isResolvable(ResolutionContext context) {
-		return true;
-	}
+    @Override
+    public boolean isResolvable(ResolutionContext context) {
+        return true;
+    }
 }

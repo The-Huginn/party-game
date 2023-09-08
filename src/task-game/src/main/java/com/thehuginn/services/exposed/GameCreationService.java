@@ -68,7 +68,7 @@ public class GameCreationService {
     }
 
     private Uni<GameSession> findGameSession(String gameId) {
-        return GameSession.<GameSession>findById(gameId)
+        return GameSession.<GameSession> findById(gameId)
                 .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"));
     }
 }

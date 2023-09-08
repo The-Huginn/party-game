@@ -46,28 +46,25 @@ public class TestCategoryService extends AbstractTest {
         super.setup(asserter);
     }
 
-
     @Test
     @Order(1)
     @RunOnVertxContext
     public void testCreateEmptyCategory(UniAsserter asserter) {
 
-        asserter.execute(() ->
-                given()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body("""
-                                {
-                                    "name": "test",
-                                    "description": "first test"
-                                }
-                                """)
-                        .when().post("category")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.OK)
-                        .body("name", is("test"),
-                                "description", is("first test"),
-                                "tasks.size()", is(0))
-        );
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "name": "test",
+                            "description": "first test"
+                        }
+                        """)
+                .when().post("category")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("name", is("test"),
+                        "description", is("first test"),
+                        "tasks.size()", is(0)));
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
@@ -75,17 +72,16 @@ public class TestCategoryService extends AbstractTest {
     @Order(2)
     @RunOnVertxContext
     public void testCreateCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<player_1").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> {
             String tasks = String.format("{ \"id\": %s }, { \"id\": %s }",
                     asserter.getData("task1"),
                     asserter.getData("task2"));
-
 
             given()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -105,14 +101,14 @@ public class TestCategoryService extends AbstractTest {
     @Order(3)
     @RunOnVertxContext
     public void testUpdatingCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"))
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -126,8 +122,7 @@ public class TestCategoryService extends AbstractTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(String.format(categoryBody,
                             "new name", "new description",
-                            String.format("{ \"id\": %s }", asserter.getData("task2"))
-                    ))
+                            String.format("{ \"id\": %s }", asserter.getData("task2"))))
                     .pathParam("id", id)
                     .when().put("category/{id}")
                     .then()
@@ -136,7 +131,7 @@ public class TestCategoryService extends AbstractTest {
                             "name", is("new name"),
                             "description", is("new description"),
                             "tasks.size()", is(1),
-                            "tasks[0].id", is((int)((long) asserter.getData("task2"))));
+                            "tasks[0].id", is((int) ((long) asserter.getData("task2"))));
         });
 
         asserter.execute(() -> {
@@ -152,8 +147,8 @@ public class TestCategoryService extends AbstractTest {
 
             //noinspection unchecked
             Assertions.assertTrue(categories.stream()
-                    .anyMatch(o -> ((LinkedHashMap<String, String>)o).get("name").equals("new name") &&
-                            ((LinkedHashMap<String, String>)o).get("description").equals("new description")));
+                    .anyMatch(o -> ((LinkedHashMap<String, String>) o).get("name").equals("new name") &&
+                            ((LinkedHashMap<String, String>) o).get("description").equals("new description")));
 
             given()
                     .pathParam("id", asserter.getData("id"))
@@ -171,14 +166,14 @@ public class TestCategoryService extends AbstractTest {
     @Order(4)
     @RunOnVertxContext
     public void testDeletingCategory(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
         asserter.execute(() -> EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2"))
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -199,11 +194,10 @@ public class TestCategoryService extends AbstractTest {
             Assertions.assertTrue(response);
         });
 
-        asserter.assertThat(() -> Task.<Task>listAll(), tasks -> {
+        asserter.assertThat(() -> Task.<Task> listAll(), tasks -> {
             Assertions.assertEquals(tasks.size(), 2);
-            Assertions.assertTrue(tasks.stream().allMatch(task ->
-                    task.id == (long) asserter.getData("task1") ||
-                            task.id == (long) asserter.getData("task2")));
+            Assertions.assertTrue(tasks.stream().allMatch(task -> task.id == (long) asserter.getData("task1") ||
+                    task.id == (long) asserter.getData("task2")));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -214,11 +208,11 @@ public class TestCategoryService extends AbstractTest {
     @RunOnVertxContext
     public void testGetCategories(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("category1", category.id)));
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("category2", category.id)));
 
@@ -228,9 +222,9 @@ public class TestCategoryService extends AbstractTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("$.size()", is(3),
-                        "[0].id",is(0),
-                        "[1].id",is((int) ((long) asserter.getData("category1"))),
-                        "[2].id",is((int) ((long) asserter.getData("category2")))));
+                        "[0].id", is(0),
+                        "[1].id", is((int) ((long) asserter.getData("category1"))),
+                        "[2].id", is((int) ((long) asserter.getData("category2")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -239,13 +233,15 @@ public class TestCategoryService extends AbstractTest {
     @Order(6)
     @RunOnVertxContext
     public void testGetCategoryTasks(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
-        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
-        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
+        asserter.execute(() -> new CategoryService()
+                .createCategory(
+                        EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -265,8 +261,9 @@ public class TestCategoryService extends AbstractTest {
             Assertions.assertEquals(tasks.size(), 2);
             //noinspection unchecked
             Assertions.assertTrue(tasks.stream()
-                    .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task1")) ||
-                            ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task2"))));
+                    .allMatch(o -> ((LinkedHashMap<String, Integer>) o).get("id").equals((int) (long) asserter.getData("task1"))
+                            ||
+                            ((LinkedHashMap<String, Integer>) o).get("id").equals((int) (long) asserter.getData("task2"))));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -277,7 +274,7 @@ public class TestCategoryService extends AbstractTest {
     @RunOnVertxContext
     public void testCreateCategoryTranslation(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -300,10 +297,10 @@ public class TestCategoryService extends AbstractTest {
                     .post("/category/translation/")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("category", is((int) (long)asserter.getData("id")),
+                    .body("category", is((int) (long) asserter.getData("id")),
                             "locale", is("en"),
                             "name_content", startsWith("Default Category"),
-                            "description_content",startsWith("Default English Category Description"));
+                            "description_content", startsWith("Default English Category Description"));
 
             given()
                     .body(String.format("""
@@ -320,10 +317,10 @@ public class TestCategoryService extends AbstractTest {
                     .post("/category/translation/")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("category", is((int) (long)asserter.getData("id")),
+                    .body("category", is((int) (long) asserter.getData("id")),
                             "locale", is("sk"),
                             "name_content", startsWith("Východzia Kategória"),
-                            "description_content",startsWith("Popis Východzej Kategórie"));
+                            "description_content", startsWith("Popis Východzej Kategórie"));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -334,22 +331,22 @@ public class TestCategoryService extends AbstractTest {
     @RunOnVertxContext
     public void testGetCategoryTranslation(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("id1", category.id)));
 
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("id2", category.id)));
 
         asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id1"), "en")
-                .<LocaleCategory>persistAndFlush()
+                .<LocaleCategory> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
         asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id2"), "sk")
-                .<LocaleCategory>persistAndFlush()
+                .<LocaleCategory> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("sk_locale", localeCategory)));
 
@@ -363,7 +360,7 @@ public class TestCategoryService extends AbstractTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                        "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
+                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
@@ -375,7 +372,7 @@ public class TestCategoryService extends AbstractTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
-                        "description",is(((LocaleCategory) asserter.getData("sk_locale")).description_content)));
+                        "description", is(((LocaleCategory) asserter.getData("sk_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -385,12 +382,12 @@ public class TestCategoryService extends AbstractTest {
     @RunOnVertxContext
     public void testUpdateCategoryTranslation(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("id", category.id)));
 
         asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
-                .<LocaleCategory>persistAndFlush()
+                .<LocaleCategory> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
@@ -412,7 +409,7 @@ public class TestCategoryService extends AbstractTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name_content", is("Východzia Kategória"),
-                        "description_content",is("Popis Východzej Kategórie")));
+                        "description_content", is("Popis Východzej Kategórie")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
@@ -433,19 +430,21 @@ public class TestCategoryService extends AbstractTest {
     @Order(10)
     @RunOnVertxContext
     public void testDefaultCategoryTasks(UniAsserter asserter) {
-        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task.id)));
 
-        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<player_1>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task.id)));
 
-        asserter.execute(() -> EntityCreator.createTask("<task>").<Task>persistAndFlush()
+        asserter.execute(() -> EntityCreator.createTask("<task>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task3", task.id)));
 
-        asserter.execute(() -> new CategoryService().createCategory(EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
+        asserter.execute(() -> new CategoryService()
+                .createCategory(
+                        EntityCreator.createCategory((long) asserter.getData("task1"), (long) asserter.getData("task2")))
                 .onItem()
                 .invoke(category -> {
                     asserter.putData("id", category.id);
@@ -467,7 +466,8 @@ public class TestCategoryService extends AbstractTest {
             Assertions.assertEquals(tasks.size(), 1);
             //noinspection unchecked
             Assertions.assertTrue(tasks.stream()
-                    .allMatch(o ->  ((LinkedHashMap<String, Integer>)o).get("id").equals((int) (long)asserter.getData("task3"))));
+                    .allMatch(o -> ((LinkedHashMap<String, Integer>) o).get("id")
+                            .equals((int) (long) asserter.getData("task3"))));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -478,12 +478,12 @@ public class TestCategoryService extends AbstractTest {
     @RunOnVertxContext
     public void testDefaultCategoryTranslation(UniAsserter asserter) {
         asserter.execute(() -> EntityCreator.createCategory()
-                .<Category>persistAndFlush()
+                .<Category> persistAndFlush()
                 .onItem()
                 .invoke(category -> asserter.putData("id", category.id)));
 
         asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
-                .<LocaleCategory>persistAndFlush()
+                .<LocaleCategory> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
@@ -495,7 +495,7 @@ public class TestCategoryService extends AbstractTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                        "description",is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
+                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

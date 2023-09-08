@@ -34,7 +34,7 @@ public class CategoryService {
     @WithTransaction
     public Uni<Category> createCategory(Category category) {
         return Task.findByIds(category.tasks)
-                .<Category>chain(tasks -> {
+                .<Category> chain(tasks -> {
                     if (category.tasks.size() != tasks.size()) {
                         throw new WebApplicationException("Unable to retrieve all tasks");
                     }
@@ -81,7 +81,7 @@ public class CategoryService {
     @Path("/translation/")
     public Uni<LocaleCategory> createTranslation(LocaleCategory localeCategory) {
         Helper.checkLocale(localeCategory.locale);
-        return Category.<Category>findById(localeCategory.category.id)
+        return Category.<Category> findById(localeCategory.category.id)
                 .chain(category -> {
                     localeCategory.category = category;
                     return localeCategory.persistAndFlush();
@@ -91,7 +91,7 @@ public class CategoryService {
     @PUT
     @Path("/translation/{id}/{locale}")
     public Uni<LocaleCategory> updateTranslation(@RestPath long id, @RestPath String locale, LocaleCategory localeCategory) {
-        return LocaleCategory.<LocaleCategory>find("category.id = :id and locale = :locale", Parameters.with("id", id)
+        return LocaleCategory.<LocaleCategory> find("category.id = :id and locale = :locale", Parameters.with("id", id)
                 .and("locale", locale))
                 .firstResult()
                 .chain(localeCategory1 -> {

@@ -39,7 +39,8 @@ public class ResolutionContextProvider implements ParamConverterProvider {
                     throw new IllegalArgumentException("Resolution Context can not be created due to missing fields");
                 }
                 List<String> players = new ArrayList<>();
-                root.get("players").elements().forEachRemaining(jsonNode -> players.add(jsonNode.has("name") ? jsonNode.get("name").asText() : jsonNode.asText()));
+                root.get("players").elements().forEachRemaining(
+                        jsonNode -> players.add(jsonNode.has("name") ? jsonNode.get("name").asText() : jsonNode.asText()));
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
                         .players(players);

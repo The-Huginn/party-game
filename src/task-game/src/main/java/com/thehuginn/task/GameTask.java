@@ -16,7 +16,9 @@ public class GameTask extends PanacheEntity implements Resolvable<ResolvedTask>,
     public Task unresolvedTask;
 
     public String assignedPlayer;
-    public GameTask() {}
+
+    public GameTask() {
+    }
 
     @Override
     public ResolvedTask resolve(ResolutionContext context) {

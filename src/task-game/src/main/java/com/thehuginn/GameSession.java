@@ -39,30 +39,24 @@ public class GameSession extends PanacheEntityBase {
     public String gameId;
 
     @JsonIgnore
-    @OneToOne(
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     public ResolvedTask currentTask;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "GameSession_Category",
-            joinColumns = @JoinColumn(name = "gameSession_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+    @JoinTable(name = "GameSession_Category", joinColumns = @JoinColumn(name = "gameSession_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     public Set<Category> categories = new HashSet<>();
 
     public String currentPlayer = null;
 
-    public GameSession() {}
+    public GameSession() {
+    }
 
     public Uni<Boolean> addCategory(Long categoryId) {
-        return Category.<Category>findById(categoryId)
+        return Category.<Category> findById(categoryId)
                 .chain(category -> {
                     if (category != null) {
                         this.categories.add(category);
@@ -74,7 +68,7 @@ public class GameSession extends PanacheEntityBase {
     }
 
     public Uni<Boolean> removeCategory(Long categoryId) {
-        return Category.<Category>findById(categoryId)
+        return Category.<Category> findById(categoryId)
                 .chain(category -> {
                     if (category != null) {
                         Boolean removed = this.categories.remove(category);
@@ -99,19 +93,19 @@ public class GameSession extends PanacheEntityBase {
                 .map(category -> Category.getTasks(category.id))
                 .toList();
         Uni<Set<Task>> tasksUni = Uni.combine().all()
-                .<Set<Task>>unis(tasks)
+                .<Set<Task>> unis(tasks)
                 .usingConcurrencyOf(1)
                 .combinedWith(objects -> objects.stream()
-                        .flatMap(collectedTasks -> ((Set<Task>)collectedTasks).stream())
+                        .flatMap(collectedTasks -> ((Set<Task>) collectedTasks).stream())
                         .collect(Collectors.toSet()));
 
         return tasksUni.call(allTasks -> {
-                    try {
-                        return GameTaskService.gameTasks(allTasks, context);
-                    } catch (CloneNotSupportedException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+            try {
+                return GameTaskService.gameTasks(allTasks, context);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        })
                 .chain(() -> {
                     this.currentTask = null;
                     return this.persist();
@@ -165,7 +159,7 @@ public class GameSession extends PanacheEntityBase {
     }
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
-        return GameTask.<GameTask>find("game = :game", Parameters.with("game", gameId))
+        return GameTask.<GameTask> find("game = :game", Parameters.with("game", gameId))
                 .page((int) ((new Random()).nextLong(count)), 1)
                 .firstResult()
                 .chain(gameTask -> {

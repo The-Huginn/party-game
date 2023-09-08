@@ -11,7 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class TimerUnresolvedToken extends AbstractUnresolvedToken {
 
-    public TimerUnresolvedToken() {}
+    public TimerUnresolvedToken() {
+    }
 
     public TimerUnresolvedToken(String key) {
         super(key);

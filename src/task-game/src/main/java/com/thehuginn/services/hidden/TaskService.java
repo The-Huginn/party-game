@@ -46,12 +46,12 @@ public class TaskService {
         Helper.checkLocale(task.task.locale);
         Function<List<UnresolvedToken>, UniAndGroupIterable<UnresolvedToken>> findOrCreateTokens = resolvables -> {
             List<Uni<AbstractUnresolvedToken>> unis = resolvables.stream()
-                    .map(resolvedTokenResolvable ->
-                            AbstractUnresolvedToken.<AbstractUnresolvedToken>findById(((AbstractUnresolvedToken) resolvedTokenResolvable).getKey())
-                                    .onItem().ifNull().switchTo(((AbstractUnresolvedToken) resolvedTokenResolvable).persist()))
+                    .map(resolvedTokenResolvable -> AbstractUnresolvedToken
+                            .<AbstractUnresolvedToken> findById(((AbstractUnresolvedToken) resolvedTokenResolvable).getKey())
+                            .onItem().ifNull().switchTo(((AbstractUnresolvedToken) resolvedTokenResolvable).persist()))
                     .toList();
             return Uni.combine()
-                    .all().<UnresolvedToken>unis(unis)
+                    .all().<UnresolvedToken> unis(unis)
                     .usingConcurrencyOf(1);
         };
         return Uni.createFrom()
@@ -84,8 +84,8 @@ public class TaskService {
     @Path("/{id}")
     @WithTransaction
     public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
-        return Task.<Task>findById(id)
-                .<Task>chain(task -> {
+        return Task.<Task> findById(id)
+                .<Task> chain(task -> {
                     if (updatedTask.task != null) {
                         if (updatedTask.task.content != null && !updatedTask.task.content.equals("<missing_value>")) {
                             task.task.content = updatedTask.task.content;
@@ -107,7 +107,7 @@ public class TaskService {
     @Path("/{id}/{locale}")
     public Uni<Task> getLocale(@RestPath Long id, @RestPath String locale) {
         ResolutionContext resolutionContext = ResolutionContext.locale(locale);
-        return Task.<Task>findById(id)
+        return Task.<Task> findById(id)
                 .call(task -> {
                     UnresolvedResult unresolvedResult = task.task.resolve(resolutionContext);
                     return unresolvedResult.resolve()
@@ -124,7 +124,7 @@ public class TaskService {
     @WithTransaction
     public Uni<? extends Translatable> createLocale(@RestPath Long id, @RestPath String locale, String content) {
         Helper.checkLocale(locale);
-        return Task.<Task>findById(id)
+        return Task.<Task> findById(id)
                 .invoke(task -> preservesTokens(task.task, content))
                 .chain(task -> {
                     LocaleText newLocale = new LocaleText(task.task, locale, content);
@@ -137,12 +137,12 @@ public class TaskService {
     @WithTransaction
     public Uni<? extends Translatable> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
         Function<TaskText, Uni<LocaleText>> translation = taskText -> LocaleText
-                .<LocaleText>findById(new LocaleText.LocaleTextPK(taskText, locale))
+                .<LocaleText> findById(new LocaleText.LocaleTextPK(taskText, locale))
                 .onItem().ifNotNull().transformToUni(localeText -> {
                     localeText.content = newContent;
                     return localeText.persist();
                 });
-        return Task.<Task>findById(id)
+        return Task.<Task> findById(id)
                 .map(task -> task.task)
                 .invoke(task -> preservesTokens(task, newContent))
                 .onItem().ifNotNull().transformToUni(taskText -> {
@@ -160,7 +160,9 @@ public class TaskService {
     private void preservesTokens(TaskText task, String content) {
         if (!TokenResolver.translateTask(task.content).equals(TokenResolver.translateTask(content))) {
             Log.warnf("Trying to create or update locale without preserving tokens in their respective order");
-            throw new WebApplicationException("Trying to create or update locale without preserving tokens in their respective order", RestResponse.StatusCode.BAD_REQUEST);
+            throw new WebApplicationException(
+                    "Trying to create or update locale without preserving tokens in their respective order",
+                    RestResponse.StatusCode.BAD_REQUEST);
         }
     }
 }

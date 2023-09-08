@@ -21,7 +21,8 @@ public class TimerResolvedToken extends AbstractResolvedToken {
 
     String timerTag;
 
-    public TimerResolvedToken() {}
+    public TimerResolvedToken() {
+    }
 
     public TimerResolvedToken(String key) {
         this.timerTag = key;

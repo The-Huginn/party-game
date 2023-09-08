@@ -28,7 +28,8 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
         public Long task;
         public String locale;
 
-        public TaskTextPK() {}
+        public TaskTextPK() {
+        }
 
         public TaskTextPK(Long task, String locale) {
             this.task = task;
@@ -37,7 +38,7 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
 
         @Override
         public boolean equals(Object obj) {
-            if (! (obj instanceof TaskTextPK pk)) {
+            if (!(obj instanceof TaskTextPK pk)) {
                 return false;
             } else {
                 return Objects.equals(task, pk.task) && locale.equals(pk.locale);
@@ -64,7 +65,8 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     @JsonProperty
     public String content = "<missing_value>";
 
-    public TaskText() {}
+    public TaskText() {
+    }
 
     public TaskText(String locale, String content) {
         this.locale = locale;
@@ -95,8 +97,8 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
                 // we will receive either LocaleText or a fallback of TaskText, both are Translatable
                 .map(panacheEntityBase -> (Translatable) panacheEntityBase);
         return new UnresolvedResult().task(Map.entry(task.getKey(),
-                        localeTextUni
-                                .map(Translatable::getContent)))
+                localeTextUni
+                        .map(Translatable::getContent)))
                 .appendData(Map.entry("locale",
                         localeTextUni
                                 .map(Translatable::getLocale)));

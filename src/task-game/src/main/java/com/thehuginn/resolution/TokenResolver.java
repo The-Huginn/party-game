@@ -18,13 +18,14 @@ public class TokenResolver {
 
     private static final Pattern tokenPattern = Pattern.compile("\\{.*?\\}");
 
-    private TokenResolver() {}
+    private TokenResolver() {
+    }
 
     public static boolean isToken(@Nonnull String key) {
         return tokenPattern.matcher(key).find();
     }
 
-    public static Tuple2<Class<? extends UnresolvedToken>, List<String >> resolveToken(@Nonnull String key) {
+    public static Tuple2<Class<? extends UnresolvedToken>, List<String>> resolveToken(@Nonnull String key) {
         String[] splitKey = key.substring(1, key.length() - 1).split("_");
         Class<? extends UnresolvedToken> tokenClass = switch (splitKey[0]) {
             case "player" -> PlayerUnresolvedToken.class;

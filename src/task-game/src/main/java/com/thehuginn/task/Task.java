@@ -31,14 +31,15 @@ import java.util.Set;
 @Entity
 public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
 
-    public enum Repeat {ALWAYS, PER_PLAYER, NEVER}
-
+    public enum Repeat {
+        ALWAYS,
+        PER_PLAYER,
+        NEVER
+    }
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
-            targetEntity = AbstractUnresolvedToken.class
-    )
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH,
+            CascadeType.DETACH }, targetEntity = AbstractUnresolvedToken.class)
     public List<UnresolvedToken> tokens = new ArrayList<>();
 
     @JsonProperty
@@ -67,7 +68,8 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         public boolean enabled = true;
         public int price = 1;
 
-        public Price() {}
+        public Price() {
+        }
 
         public Price(boolean enabled, int price) {
             this.enabled = enabled;
@@ -116,7 +118,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
             return this;
         }
 
-        public  Builder price(Price price) {
+        public Builder price(Price price) {
             this.price = price;
             return this;
         }
@@ -142,14 +144,19 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         }
     }
 
-    public Task() {}
+    public Task() {
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Task task1 = (Task) o;
-        return Objects.equals(tokens, task1.tokens) && type == task1.type && repeat == task1.repeat && Objects.equals(frequency, task1.frequency) && Objects.equals(price, task1.price) && Objects.equals(task, task1.task);
+        return Objects.equals(tokens, task1.tokens) && type == task1.type && repeat == task1.repeat
+                && Objects.equals(frequency, task1.frequency) && Objects.equals(price, task1.price)
+                && Objects.equals(task, task1.task);
     }
 
     @Override
@@ -157,7 +164,12 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         return Objects.hash(tokens, type, repeat, frequency, price, task);
     }
 
-    public enum Type {SINGLE, DUO, ALL}
+    public enum Type {
+        SINGLE,
+        DUO,
+        ALL
+    }
+
     @JsonIgnore
     public String getKey() {
         return "task_" + id;
@@ -171,7 +183,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
             gameTask.game = context.getGameId();
             gameTask.unresolvedTask = this;
             if (repeat.equals(Task.Repeat.PER_PLAYER)) {
-                for (String player: context.getPlayers()) {
+                for (String player : context.getPlayers()) {
                     GameTask shallowCopy = gameTask.clone();
                     shallowCopy.assignedPlayer = player;
                     tasks.add(shallowCopy);
@@ -194,12 +206,11 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         return repeat != Repeat.ALWAYS;
     }
 
-
     public static Uni<Set<Task>> findByIds(Set<Task> tasks) {
         List<Long> ids = tasks.stream()
                 .map(task -> task.id)
                 .toList();
-        return Task.<Task>find("From Task t where t.id IN :ids", Parameters.with("ids", ids))
+        return Task.<Task> find("From Task t where t.id IN :ids", Parameters.with("ids", ids))
                 .list()
                 .map(HashSet::new);
     }

@@ -19,7 +19,8 @@ public class UnresolvedResult {
                 .all()
                 .unis(fetchTask(), fetchData())
                 .usingConcurrencyOf(1)
-                .combinedWith(tuple2 -> new ResolvedResult((Map.Entry<String, String>) tuple2.get(0), (Map<String, Object>) tuple2.get(1)));
+                .combinedWith(tuple2 -> new ResolvedResult((Map.Entry<String, String>) tuple2.get(0),
+                        (Map<String, Object>) tuple2.get(1)));
     }
 
     private Uni<Map.Entry<String, String>> fetchTask() {
@@ -51,8 +52,7 @@ public class UnresolvedResult {
                             }
 
                             return result;
-                        })
-                );
+                        }));
     }
 
     public void addResolvedResult(UnresolvedResult other) {
@@ -79,7 +79,7 @@ public class UnresolvedResult {
         private ResolvedResult(Map.Entry<String, String> task, Map<String, Object> data) {
             this.data = data;
             String resolvedTask = task.getValue();
-            for (Map.Entry<String, Object> entry: data.entrySet()) {
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
                 if (TokenResolver.isToken(entry.getKey())) {
                     resolvedTask = (resolvedTask.replace(entry.getKey(), entry.getValue().toString()));
                 }

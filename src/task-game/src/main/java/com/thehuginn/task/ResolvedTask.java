@@ -25,60 +25,54 @@ import java.util.stream.Collectors;
 @Entity
 public class ResolvedTask extends PanacheEntity implements Resolvable<UnresolvedResult> {
 
-	@OneToOne(fetch = FetchType.EAGER)
-	@OnDelete(action = OnDeleteAction.SET_NULL)
-	public GameTask gameTask;
+    @OneToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    public GameTask gameTask;
 
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.EAGER,
-			cascade = CascadeType.ALL,
-			targetEntity = AbstractResolvedToken.class,
-			orphanRemoval = true,
-			mappedBy = "resolvedTask"
-	)
-	public List<ResolvedToken> tokens = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = AbstractResolvedToken.class, orphanRemoval = true, mappedBy = "resolvedTask")
+    public List<ResolvedToken> tokens = new ArrayList<>();
 
+    public ResolvedTask() {
+    }
 
-	public ResolvedTask() {
-	}
+    public static ResolvedTask resolve(GameTask gameTask, ResolutionContext resolutionContext) {
+        ResolvedTask resolvedTask = new ResolvedTask();
+        resolvedTask.gameTask = gameTask;
+        List<ResolvedToken> tokens = gameTask.unresolvedTask.tokens.stream()
+                .map(unresolvedToken -> unresolvedToken.resolve(resolutionContext))
+                .collect(Collectors.toList());
+        tokens.add(new TaskTypeResolvedToken(gameTask.unresolvedTask));
+        tokens.add(PlayerResolvedToken.getPlayer(resolutionContext));
 
-	public static ResolvedTask resolve(GameTask gameTask, ResolutionContext resolutionContext) {
-		ResolvedTask resolvedTask = new ResolvedTask();
-		resolvedTask.gameTask = gameTask;
-		List<ResolvedToken> tokens = gameTask.unresolvedTask.tokens.stream()
-				.map(unresolvedToken -> unresolvedToken.resolve(resolutionContext))
-				.collect(Collectors.toList());
-		tokens.add(new TaskTypeResolvedToken(gameTask.unresolvedTask));
-		tokens.add(PlayerResolvedToken.getPlayer(resolutionContext));
+        if (gameTask.unresolvedTask.type == Task.Type.DUO) {
+            tokens.add(new PairsResolvedToken(resolutionContext.getPlayers()));
+        }
 
-		if (gameTask.unresolvedTask.type == Task.Type.DUO) {
-			tokens.add(new PairsResolvedToken(resolutionContext.getPlayers()));
-		}
+        resolvedTask.tokens.addAll(tokens.stream()
+                .peek(resolvedToken -> ((AbstractResolvedToken) resolvedToken).resolvedTask = resolvedTask)
+                .toList());
+        return resolvedTask;
+    }
 
-		resolvedTask.tokens.addAll(tokens.stream()
-				.peek(resolvedToken -> ((AbstractResolvedToken) resolvedToken).resolvedTask = resolvedTask)
-				.toList());
-		return resolvedTask;
-	}
+    @Override
+    public UnresolvedResult resolve(ResolutionContext context) {
+        UnresolvedResult unresolvedResult = gameTask.unresolvedTask.task.resolve(context);
+        for (ResolvedToken token : tokens) {
+            unresolvedResult.addResolvedResult(token.resolve(context));
+        }
+        return unresolvedResult;
+    }
 
-	@Override
-	public UnresolvedResult resolve(ResolutionContext context) {
-		UnresolvedResult unresolvedResult = gameTask.unresolvedTask.task.resolve(context);
-		for (ResolvedToken token : tokens) {
-			unresolvedResult.addResolvedResult(token.resolve(context));
-		}
-		return unresolvedResult;
-	}
+    @Override
+    public boolean isResolvable(ResolutionContext context) {
+        return tokens.stream().allMatch(resolvedToken -> resolvedToken.isResolvable(context));
+    }
 
-	@Override
-	public boolean isResolvable(ResolutionContext context) {
-		return tokens.stream().allMatch(resolvedToken -> resolvedToken.isResolvable(context));
-	}
-
-	public Uni<Void> remove() {
-		if (gameTask.unresolvedTask.isRemovable()) {
-			return gameTask.delete();
-		}
-		return Uni.createFrom().voidItem();
-	}
+    public Uni<Void> remove() {
+        if (gameTask.unresolvedTask.isRemovable()) {
+            return gameTask.delete();
+        }
+        return Uni.createFrom().voidItem();
+    }
 }

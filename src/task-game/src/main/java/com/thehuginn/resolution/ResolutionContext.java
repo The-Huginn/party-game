@@ -37,8 +37,7 @@ public class ResolutionContext {
             String locale,
             String gameId,
             String player,
-            List<String> players
-    ) {
+            List<String> players) {
         if (!players.contains(player)) {
             throw new IllegalArgumentException("Player can not be found between all players.");
         }

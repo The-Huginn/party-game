@@ -76,7 +76,7 @@ public class TestTaskService extends AbstractTest {
     @Order(2)
     @RunOnVertxContext
     public void testGetTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask("drink responsibly with <player_1>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("drink responsibly with <player_1>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -102,7 +102,7 @@ public class TestTaskService extends AbstractTest {
     @Order(3)
     @RunOnVertxContext
     public void updateTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -146,7 +146,7 @@ public class TestTaskService extends AbstractTest {
     @Order(4)
     @RunOnVertxContext
     public void testDeleteTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
         asserter.execute(() -> {
@@ -169,11 +169,11 @@ public class TestTaskService extends AbstractTest {
     @Order(5)
     @RunOnVertxContext
     public void testEntityCreatorCreateTask(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
-        asserter.assertThat(() -> Task.<Task>findById(asserter.getData("id")), task -> Assertions.assertTrue(
-//                task.tokens.stream().allMatch(token -> token.key.equals("drink_responsibly") || token.key.equals("<player_1>")) &&
+        asserter.assertThat(() -> Task.<Task> findById(asserter.getData("id")), task -> Assertions.assertTrue(
+                //                task.tokens.stream().allMatch(token -> token.key.equals("drink_responsibly") || token.key.equals("<player_1>")) &&
                 task.type == Task.Type.ALL &&
                         task.repeat == Task.Repeat.PER_PLAYER &&
                         Objects.equals(task.frequency, (short) 3) &&
@@ -187,7 +187,7 @@ public class TestTaskService extends AbstractTest {
     @Order(6)
     @RunOnVertxContext
     public void testCreateLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -211,7 +211,7 @@ public class TestTaskService extends AbstractTest {
     @Order(7)
     @RunOnVertxContext
     public void updateTaskWithLocaleFail(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -255,7 +255,7 @@ public class TestTaskService extends AbstractTest {
     @Order(8)
     @RunOnVertxContext
     public void testGettingDefaultLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -282,7 +282,7 @@ public class TestTaskService extends AbstractTest {
     @Order(9)
     @RunOnVertxContext
     public void testGettingNewLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -322,28 +322,26 @@ public class TestTaskService extends AbstractTest {
     @Order(9)
     @RunOnVertxContext
     public void testCreateTaskWithUnknownLocale(UniAsserter asserter) {
-        asserter.execute(() ->
-                given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("""
-                            {
-                                "task": {
-                                    "content": "test",
-                                    "locale": "foo"
-                                },
-                                "type": "DUO",
-                                "repeat": "PER_PLAYER",
-                                "frequency": 3,
-                                "price": {
-                                    "enabled": false,
-                                    "price": 2
-                                }
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "foo"
+                            },
+                            "type": "DUO",
+                            "repeat": "PER_PLAYER",
+                            "frequency": 3,
+                            "price": {
+                                "enabled": false,
+                                "price": 2
                             }
-                            """)
-                    .when().post()
-                    .then()
-                    .statusCode(RestResponse.StatusCode.BAD_REQUEST)
-        );
+                        }
+                        """)
+                .when().post()
+                .then()
+                .statusCode(RestResponse.StatusCode.BAD_REQUEST));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -352,7 +350,7 @@ public class TestTaskService extends AbstractTest {
     @Order(10)
     @RunOnVertxContext
     public void testCreateUnknownLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("<drink_responsibly>").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("<drink_responsibly>").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -374,7 +372,7 @@ public class TestTaskService extends AbstractTest {
     @Order(11)
     @RunOnVertxContext
     public void testCreateWrongLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("{player_c} plays").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("{player_c} plays").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -396,7 +394,7 @@ public class TestTaskService extends AbstractTest {
     @Order(12)
     @RunOnVertxContext
     public void testUpdateToWrongLocale(UniAsserter asserter) {
-        asserter.execute(() -> createTask("{player_c} plays").<Task>persistAndFlush()
+        asserter.execute(() -> createTask("{player_c} plays").<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("id", task.id)));
 
@@ -430,7 +428,7 @@ public class TestTaskService extends AbstractTest {
     @RunOnVertxContext
     public void testUpdateToCorrectLocale(UniAsserter asserter) {
         asserter.execute(() -> createTask("{player_c} plays for {timer_42} with {player_1}")
-                .<Task>persistAndFlush()
+                .<Task> persistAndFlush()
                 .invoke(task -> asserter.putData("id", task.id)));
 
         asserter.execute(() -> {

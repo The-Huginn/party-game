@@ -66,19 +66,19 @@ public class LocaleCategory extends PanacheEntityBase {
     public String description_content;
 
     public static Uni<Map<String, String>> translation(Long categoryId, String locale) {
-        Uni<LocaleCategory> localeCategoryUniEnglish = LocaleCategory.
-                <LocaleCategory>find("#LocaleCategory.byCategory", Parameters.with("id", categoryId)
-                .and("locale", "en"))
+        Uni<LocaleCategory> localeCategoryUniEnglish = LocaleCategory
+                .<LocaleCategory> find("#LocaleCategory.byCategory", Parameters.with("id", categoryId)
+                        .and("locale", "en"))
                 .firstResult();
-        Uni<LocaleCategory> localeCategoryUni = LocaleCategory.
-                <LocaleCategory>find("#LocaleCategory.byCategory", Parameters.with("id", categoryId)
-                .and("locale", locale))
+        Uni<LocaleCategory> localeCategoryUni = LocaleCategory
+                .<LocaleCategory> find("#LocaleCategory.byCategory", Parameters.with("id", categoryId)
+                        .and("locale", locale))
                 .firstResult()
                 .onItem().ifNull().switchTo(() -> {
                     Log.warnf("Category %s has no locale %s", categoryId, locale);
                     return localeCategoryUniEnglish;
                 });
-        return Category.<Category>findById(categoryId)
+        return Category.<Category> findById(categoryId)
                 .invoke(category1 -> {
                     if (category1 == null) {
                         throw new IllegalStateException("Category with id: " + categoryId + " does not exist");

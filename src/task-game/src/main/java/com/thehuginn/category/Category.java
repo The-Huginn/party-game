@@ -21,11 +21,10 @@ import java.util.Set;
 
 /**
  * We have a special Category with id 0. All Tasks without being
- *  assigned to any Category fall under this `special` Category.
+ * assigned to any Category fall under this `special` Category.
  */
 @Entity
 public class Category extends PanacheEntity {
-
 
     @JsonProperty
     public String name;
@@ -41,7 +40,8 @@ public class Category extends PanacheEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     Set<GameSession> gameSessions;
 
-    public Category() {}
+    public Category() {
+    }
 
     public static Category getDefaultInstance() {
         Category category = new Category();
@@ -51,7 +51,7 @@ public class Category extends PanacheEntity {
 
     @JsonIgnore
     public static Uni<Set<Task>> getTasks(Long id) {
-        return Category.<Category>list("from Category i left join fetch i.tasks where i.id = :id", Parameters.with("id", id))
+        return Category.<Category> list("from Category i left join fetch i.tasks where i.id = :id", Parameters.with("id", id))
                 .map(categories -> categories.stream()
                         .map(category -> category.tasks)
                         .findFirst()
@@ -59,7 +59,8 @@ public class Category extends PanacheEntity {
     }
 
     public static Uni<Category> findByIdFetch(Object id) {
-        return Category.<Category>find("from Category i left join fetch i.tasks where i.id = :id", Parameters.with("id",id)).firstResult();
+        return Category.<Category> find("from Category i left join fetch i.tasks where i.id = :id", Parameters.with("id", id))
+                .firstResult();
     }
 
     /**
@@ -76,6 +77,7 @@ public class Category extends PanacheEntity {
             this.name = name;
             this.description = description;
         }
+
         public CategoryDto(Category category) {
             this.id = category.id;
             this.name = category.name;

@@ -8,7 +8,8 @@ import java.util.Locale;
 
 public class Helper {
 
-    private Helper() {}
+    private Helper() {
+    }
 
     public static void checkLocale(String locale) {
         if (locale == null || !Arrays.asList(Locale.getISOLanguages()).contains(locale)) {

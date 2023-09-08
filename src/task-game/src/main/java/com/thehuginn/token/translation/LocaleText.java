@@ -21,7 +21,8 @@ public class LocaleText extends PanacheEntityBase implements Translatable {
         public TaskText taskText;
         public String locale;
 
-        public LocaleTextPK() {}
+        public LocaleTextPK() {
+        }
 
         public LocaleTextPK(TaskText taskText, String locale) {
             this.taskText = taskText;
@@ -30,8 +31,10 @@ public class LocaleText extends PanacheEntityBase implements Translatable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
             LocaleTextPK that = (LocaleTextPK) o;
             return Objects.equals(taskText, that.taskText) && Objects.equals(locale, that.locale);
         }
@@ -55,7 +58,8 @@ public class LocaleText extends PanacheEntityBase implements Translatable {
     @JsonProperty
     public String content = "<missing_value>";
 
-    public LocaleText() {}
+    public LocaleText() {
+    }
 
     public LocaleText(String locale, String content) {
         this.locale = locale;

@@ -20,23 +20,25 @@ import java.util.stream.Collectors;
 public class GameTaskService {
 
     // TODO update this in correspondence with GameSession#start
-    public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
+    public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
+            throws CloneNotSupportedException {
         return new GameTaskService().generateGameTasks(allTasks, resolutionContext);
     }
 
     /**
      * Change with caution from Uni, such as internally we use shallow-copy,
-     *  and we persist all objects right away
+     * and we persist all objects right away
      */
     @WithTransaction
-    public Uni<Void> generateGameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext) throws CloneNotSupportedException {
+    public Uni<Void> generateGameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
+            throws CloneNotSupportedException {
         List<GameTask> createdTasks = new ArrayList<>();
         Set<Task> tasks = new HashSet<>(allTasks);
         for (var task : tasks) {
             createdTasks.addAll(task.resolve(resolutionContext));
         }
 
-        Uni<Long> deletePrevious = GameTask.delete("game", resolutionContext.getGameId() )
+        Uni<Long> deletePrevious = GameTask.delete("game", resolutionContext.getGameId())
                 .invoke(aLong -> {
                     if (aLong.compareTo(0L) > 0) {
                         Log.infof("Previous game [%s] was deleted with %d tasks remaining",
