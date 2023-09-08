@@ -40,7 +40,7 @@ public class TimerResolvedToken extends AbstractResolvedToken {
             throw new IllegalArgumentException(TimerResolvedToken.class + "#resolve expects integer");
         }
         int duration = Integer.parseInt(durationString);
-        int delay = 0;
+        int delay = -1;
         if (args.size() == 2) {
             String delayString = args.get(1);
 
