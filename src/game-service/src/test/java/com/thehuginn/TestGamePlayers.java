@@ -39,9 +39,9 @@ public class TestGamePlayers extends AbstractTest {
             given()
                     .cookie(new Cookie.Builder("gameId", ID).build())
                     .accept(ContentType.JSON)
-            .when()
+                    .when()
                     .get("/team")
-            .then()
+                    .then()
                     .statusCode(200)
                     .body("size()", is(0));
         });

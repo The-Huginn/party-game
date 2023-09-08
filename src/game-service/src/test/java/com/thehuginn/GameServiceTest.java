@@ -60,16 +60,14 @@ public class GameServiceTest extends AbstractTest {
     void testUpdateStatus(UniAsserter asserter) {
         asserter.assertThat(() -> Game.count("state = READY"), game -> Assertions.assertEquals(0L, (long) game));
 
-        asserter.execute(() ->
-                given()
-                        .cookie(new Cookie.Builder("gameId", ID).build())
-                        .contentType(ContentType.JSON)
-                        .body("\"READY\"")
-                        .when()
-                        .put("/game/status")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.NO_CONTENT)
-        );
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", ID).build())
+                .contentType(ContentType.JSON)
+                .body("\"READY\"")
+                .when()
+                .put("/game/status")
+                .then()
+                .statusCode(RestResponse.StatusCode.NO_CONTENT));
 
         asserter.assertThat(() -> Game.count("state = READY"), game -> Assertions.assertNotEquals(0L, (long) game));
 
@@ -81,16 +79,14 @@ public class GameServiceTest extends AbstractTest {
     void testMissingCookie(UniAsserter asserter) {
         asserter.assertThat(() -> Game.count("type = TASK"), game -> Assertions.assertEquals(1L, (long) game));
 
-        asserter.execute(() ->
-                given()
-                        .cookie(new Cookie.Builder("gameId", ID).build())
-                        .contentType(ContentType.JSON)
-                            .body("\"NONE\"")
-                        .when()
-                        .put("/game/type")
-                        .then()
-                        .statusCode(RestResponse.StatusCode.NO_CONTENT)
-        );
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", ID).build())
+                .contentType(ContentType.JSON)
+                .body("\"NONE\"")
+                .when()
+                .put("/game/type")
+                .then()
+                .statusCode(RestResponse.StatusCode.NO_CONTENT));
 
         asserter.assertThat(() -> Game.count("type = NONE"), game -> Assertions.assertEquals(1L, (long) game));
 

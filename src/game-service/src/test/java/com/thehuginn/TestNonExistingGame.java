@@ -34,9 +34,9 @@ public class TestNonExistingGame extends AbstractTest {
             given()
                     .contentType(ContentType.JSON)
                     .body(ID)
-            .when()
+                    .when()
                     .post()
-            .then()
+                    .then()
                     .cookie("gameId", is(ID))
                     .statusCode(RestResponse.StatusCode.CREATED);
 
@@ -49,9 +49,9 @@ public class TestNonExistingGame extends AbstractTest {
         asserter.execute(() -> {
             given()
                     .queryParam("gameId", ID)
-            .when()
+                    .when()
                     .get()
-            .then()
+                    .then()
                     .statusCode(RestResponse.StatusCode.NO_CONTENT);
         });
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -60,18 +60,15 @@ public class TestNonExistingGame extends AbstractTest {
     @Test
     public void testMissingCookie(UniAsserter asserter) {
 
-        asserter.execute(() ->
-            given()
-                    .body(Game.State.READY)
-                    .contentType(ContentType.JSON)
-                    .cookie(new Cookie.Builder("gameId", ID).build())
-            .when()
-                    .put("/status")
-            .then()
-                    .statusCode(RestResponse.StatusCode.BAD_REQUEST)
-        );
+        asserter.execute(() -> given()
+                .body(Game.State.READY)
+                .contentType(ContentType.JSON)
+                .cookie(new Cookie.Builder("gameId", ID).build())
+                .when()
+                .put("/status")
+                .then()
+                .statusCode(RestResponse.StatusCode.BAD_REQUEST));
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
-
 
 }

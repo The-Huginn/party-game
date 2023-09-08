@@ -22,7 +22,7 @@ public class PlayerService {
             throw new IllegalStateException("Missing Cookie");
         }
 
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem()
                 .transform(game -> game.team);
     }
@@ -31,7 +31,7 @@ public class PlayerService {
     @Path("/player")
     @WithTransaction
     public Uni<Player> addPlayer(@RestCookie String gameId, Player newPlayer) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem()
                 .ifNotNull()
                 .transform(game -> game.addPlayer(newPlayer));
@@ -41,7 +41,7 @@ public class PlayerService {
     @Path("/player")
     @WithTransaction
     public Uni<Boolean> removePlayer(@RestCookie String gameId, Long playerId) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem()
                 .transform(game -> game.removePlayer(playerId));
 

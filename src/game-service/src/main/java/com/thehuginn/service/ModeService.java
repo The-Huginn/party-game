@@ -27,7 +27,7 @@ public class ModeService {
     @GET
     @Path("/exists")
     public Uni<JsonNode> getGame(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game -> switch (game.type) {
                     case TASK -> taskRestClient.getGame(gameId);
                     case NONE -> Uni.createFrom().nullItem();
@@ -37,18 +37,17 @@ public class ModeService {
     @POST
     @Path("/create")
     public Uni<JsonNode> createGameMode(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.createGame(gameId);
                     case NONE -> Uni.createFrom().nullItem();
                 });
     }
 
-
     @PUT
     @Path("/start")
     public Uni<Boolean> startGame(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
                     case NONE -> Uni.createFrom().item(Boolean.FALSE);
@@ -59,7 +58,7 @@ public class ModeService {
     @GET
     @Path("/current")
     public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie String locale) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
                     case NONE -> Uni.createFrom().nullItem();
@@ -69,7 +68,7 @@ public class ModeService {
     @PUT
     @Path("/next")
     public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
                     case NONE -> Uni.createFrom().nullItem();

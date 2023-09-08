@@ -29,16 +29,17 @@ public class GameService {
     @WithTransaction
     public Uni<RestResponse<Game>> createGame(String gameId) {
         AtomicBoolean created = new AtomicBoolean(false);
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNull().switchTo(() -> {
                     created.set(true);
                     Game game = new Game(gameId);
                     return game.persist();
-                    })
+                })
                 .onItem()
                 .transform(game -> RestResponse.ResponseBuilder.ok(game)
                         .status(created.get() ? RestResponse.Status.CREATED : RestResponse.Status.CONFLICT)
-                        .cookie(new NewCookie.Builder("gameId").value(gameId).sameSite(NewCookie.SameSite.NONE).path("/").secure(true).build())
+                        .cookie(new NewCookie.Builder("gameId").value(gameId).sameSite(NewCookie.SameSite.NONE).path("/")
+                                .secure(true).build())
                         .build());
     }
 
@@ -52,7 +53,7 @@ public class GameService {
     public String randomGameId() {
         long time = Instant.now().getEpochSecond();
         StringBuilder gameId = new StringBuilder();
-        for (int i = 0; i < 6; i++){
+        for (int i = 0; i < 6; i++) {
             gameId.append((char) ('A' + (time % 26)));
             time /= 26;
             if (i == 2) {
@@ -66,7 +67,7 @@ public class GameService {
     @WithTransaction
     @Path("/status")
     public Uni<Void> updateStatus(@RestCookie String gameId, Game.State newState) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().call(game -> {
                     game.state = newState;
                     return game.persist();
@@ -77,7 +78,7 @@ public class GameService {
     @WithTransaction
     @Path("/type")
     public Uni<Void> updateType(@RestCookie String gameId, Game.Type newType) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().call(game -> {
                     game.type = newType;
                     return game.persist();

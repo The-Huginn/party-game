@@ -14,22 +14,33 @@ import java.util.Objects;
 @Entity
 public class Game extends PanacheEntityBase {
 
-    public enum State {CREATED, LOBBY, READY, STARTED, ONGOING, FINISHING, COMPLETED}
-    public enum Type {NONE, TASK}
+    public enum State {
+        CREATED,
+        LOBBY,
+        READY,
+        STARTED,
+        ONGOING,
+        FINISHING,
+        COMPLETED
+    }
+
+    public enum Type {
+        NONE,
+        TASK
+    }
 
     @Id
     public String gameId;
 
-    @OneToMany(fetch = FetchType.EAGER,
-    cascade = CascadeType.ALL,
-    orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Player> team;
 
     public State state;
 
     public Type type;
 
-    public Game() {}
+    public Game() {
+    }
 
     public Game(String id) {
         gameId = id;
