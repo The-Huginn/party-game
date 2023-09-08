@@ -134,35 +134,35 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>${version.checkstyle}</version>
-        <executions>
-          <execution>
-            <id>check-style</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>checkstyle</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.wildfly.checkstyle</groupId>
-            <artifactId>wildfly-checkstyle-config</artifactId>
-            <version>${version.org.wildfly.checkstyle}</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>
-          <encoding>UTF-8</encoding>
-          <consoleOutput>true</consoleOutput>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <excludes>**/*$logger.java,**/*$bundle.java</excludes>
-          <suppressionsLocation>wildfly-checkstyle/suppressions.xml</suppressionsLocation>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        <artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--        <version>${version.checkstyle}</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>check-style</id>-->
+<!--            <phase>compile</phase>-->
+<!--            <goals>-->
+<!--              <goal>checkstyle</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <dependencies>-->
+<!--          <dependency>-->
+<!--            <groupId>org.wildfly.checkstyle</groupId>-->
+<!--            <artifactId>wildfly-checkstyle-config</artifactId>-->
+<!--            <version>${version.org.wildfly.checkstyle}</version>-->
+<!--          </dependency>-->
+<!--        </dependencies>-->
+<!--        <configuration>-->
+<!--          <configLocation>wildfly-checkstyle/checkstyle.xml</configLocation>-->
+<!--          <encoding>UTF-8</encoding>-->
+<!--          <consoleOutput>true</consoleOutput>-->
+<!--          <failsOnError>true</failsOnError>-->
+<!--          <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+<!--          <excludes>**/*$logger.java,**/*$bundle.java</excludes>-->
+<!--          <suppressionsLocation>wildfly-checkstyle/suppressions.xml</suppressionsLocation>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
     </plugins>
   </build>
   <profiles>

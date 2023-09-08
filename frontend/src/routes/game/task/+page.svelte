@@ -18,7 +18,7 @@
 	$: timer = data.data.timer as Timer;
 	$: initialLoad = data.initialLoad;
 
-	async function submitHandler(event) {
+	async function submitHandler(event: SubmitEvent) {
 		const response = await fetch(`${game_url}/mode/next`, {
 			method: 'PUT',
 			credentials: 'include'

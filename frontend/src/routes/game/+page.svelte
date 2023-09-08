@@ -43,6 +43,7 @@
 		if (response.status == 201) {
 			goto('/game/lobby');
 		} else if (response.status == 409) {
+			cookie = gameId;
 			formSuccess = 'page.game.create.conflict';
 		}
 	}
