@@ -134,7 +134,7 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
     @Order(2)
     void testCurrentPlayerResolvedTask(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task.")
-                        .build())
+                .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
         asserter.execute(() -> {
