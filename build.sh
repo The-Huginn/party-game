@@ -1,7 +1,7 @@
 . ~/.configs/registry.config
 
 git pull origin
-cd app && \
+cd src/app && \
 podman build -t registry.localhost/game:latest .
 
 podman login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} registry.localhost

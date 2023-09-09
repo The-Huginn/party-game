@@ -1,0 +1,1 @@
+INSERT INTO Category(id,name,description) VALUES(0, 'Miscellaneous', 'Tasks that have not been assigned to any concrete category.');

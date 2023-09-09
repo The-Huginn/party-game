@@ -1,7 +1,0 @@
-{% extends 'task-simple.html' %}
-
-{% block header %}
-    {% if currentPlayer is defined %}
-    <p data-i18n="player-turn">{{ gettext('player-turn') }}</p> {{currentPlayer}}
-    {% endif %}
-{% endblock %}

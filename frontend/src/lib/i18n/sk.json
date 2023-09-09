@@ -1,0 +1,61 @@
+{
+    "page": {
+        "disclaimer": {
+            "title": "Vitaj!",
+            "text": "<b>Ahoj 👋<br><br>Vitaj na druhej verzií 🥃 hry. Dúfam, že si ju užiješ ešte viac ako predtým 😍 Avšak buď 😎 a nie že budeš 🔍 hry ostatných 😈<br>Táto stránka má rada 🍪, tak sa s tým zmier 😏 Nezabudni, 🍺 zodpovedne a hlavne mysli na svoju maminu 👩<br>Nazdravie 🍻!</b>",
+            "accept_btn": "Prijímam"
+        },
+        "game": {
+            "create": {
+                "choose_name": "Vyber si názov hry prosím",
+                "game_name": "Názov hry",
+                "confirm": "Potvrdzujem",
+                "title": "Vytvorenie hry",
+                "conflict": "Hra s týmto menom už existuje",
+                "missing_value": "Meno hry nemôže byť prázdne",
+                "game_exists": "Rozohratá hra nájdená, chceš pokračovať?",
+                "game_conflicts": "Hra s týmto menom už existuje, chceš pokračovať v nej?"
+            },
+            "lobby": {
+                "title": "Vyplňte si lobby",
+                "table_name": "Lobby",
+                "add_player": "Pridať",
+                "delete_player": "Odstrániť",
+                "submit_error": "Hráč už existuje",
+                "confirm": "Potvrdzujem Lobby"
+            },
+            "mode-selection": {
+                "title": "Vyber si môd hry",
+                "task": "Mód úloh",
+                "game_continue": "Chcel by si pokračovať v predošlej hre?"
+            },
+            "task": {
+                "title": "Úloha",
+                "next": "Ďalej",
+                "start_timer": "Spustiť Časovač",
+                "single": "Je tvoj čas",
+                "duo": "Úloha pre dvojice!",
+                "all": "Pripravte sa všetci!"
+            }
+        },
+        "task": {
+            "category": {
+                "title": "Vyber si kategórie",
+                "table_name": "Kategórie",
+                "confirm": "Potvrdzujem Kategórie",
+                "missing_category": "Vyber aspoň jednu kategóriu prosím"
+            },
+            "game": {
+                "missing_tasks": "V hre neboli nájdené žiadne úlohy"
+            }
+        }
+    },
+    "button": {
+        "yes": "Samozrejme!",
+        "no": "Nie tak rýchlo"
+    },
+    "settings": {
+        "language": "Jazyk",
+        "theme": "Téma"
+    }
+}

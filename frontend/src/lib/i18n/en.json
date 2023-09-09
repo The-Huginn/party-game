@@ -1,0 +1,61 @@
+{
+    "page": {
+        "disclaimer": {
+            "title": "Welcome!",
+            "text": "<b>Hello 👋<br><br>Welcome to the second version of 🥃 game. I hope you will enjoy it even more then before 😍 However, be 😎 and do not 🔍 other's games 😈<br>This website likes 🍪, deal with it 😏 Don't forget to 🍺 responsibly and think about your moms 👩<br>Cheers 🍻!</b>",
+            "accept_btn": "I accept"
+        },
+        "game": {
+            "create": {
+                "choose_name": "Please pick a unique name",
+                "game_name": "Game Name",
+                "confirm": "Confirm",
+                "title": "Game Creation",
+                "conflict": "Game Already exists",
+                "missing_value": "Game Name can not be empty",
+                "game_exists": "Game in progress found, would you like to continue?",
+                "game_conflicts": "Game with this name exists, would you like to continue it?"
+            },
+            "lobby": {
+                "title": "Fill in your Lobby",
+                "table_name": "Lobby",
+                "add_player": "Add",
+                "delete_player": "Delete",
+                "submit_error": "Player already exists",
+                "confirm": "Confirm lobby"
+            },
+            "mode-selection": {
+                "title": "Choose game mode",
+                "task": "Task Mode",
+                "game_continue": "Would you like to continue previous game?"
+            },
+            "task": {
+                "title": "Task",
+                "next": "Next",
+                "start_timer": "Start Timer",
+                "single": "It's your task",
+                "duo": "Task for pairs!",
+                "all": "Everybody be ready!"
+            }
+        },
+        "task": {
+            "category": {
+                "title": "Choose Categories",
+                "table_name": "Categories",
+                "confirm": "Confirm categories",
+                "missing_category": "Please select at least one category"
+            },
+            "game": {
+                "missing_tasks": "Game does not have any tasks associated"
+            }
+        }
+    },
+    "button": {
+        "yes": "Hell Yeah!",
+        "no": "Not so quick"
+    },
+    "settings": {
+        "language": "Language",
+        "theme": "Theme"
+    }
+}
