@@ -454,7 +454,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
         });
 
         asserter.execute(() -> {
-            given()
+            JsonAsserter.assertEquals(asserter.getData("task"), given()
                     .cookie(new Cookie.Builder("gameId", GAME).build())
                     .cookie(new Cookie.Builder("locale", "en").build())
                     .queryParam("resolutionContext", resolutionContext)
@@ -463,7 +463,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                     .get("/task/current")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body(is(asserter.getData("task")));
+                    .extract()
+                    .asPrettyString());
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

@@ -42,7 +42,6 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
         List<ResolvedToken> tokens = gameTask.unresolvedTask.tokens.stream()
                 .map(unresolvedToken -> unresolvedToken.resolve(resolutionContext))
                 .collect(Collectors.toList());
-        tokens.add(new TaskTypeResolvedToken(gameTask.unresolvedTask));
         tokens.add(PlayerResolvedToken.getPlayer(resolutionContext));
 
         if (gameTask.unresolvedTask.type == Task.Type.DUO) {
@@ -61,6 +60,7 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
         for (ResolvedToken token : tokens) {
             unresolvedResult.addResolvedResult(token.resolve(context));
         }
+        unresolvedResult.addResolvedResult(new TaskTypeResolvedToken(gameTask.unresolvedTask).resolve(context));
         return unresolvedResult;
     }
 

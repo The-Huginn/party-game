@@ -69,13 +69,32 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
             players.remove(pair.first);
             Assertions.assertEquals(2, players.size());
             Assertions.assertTrue(players.contains(pair.second));
+            asserter.putData("pair", pair);
+        });
+
+        // We test that it was even persisted properly and we are able to retrieve it
+        asserter.execute(() -> {
+            PairsResolvedToken.Pair pair = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("data.pairs.size()", is(1))
+                    .extract()
+                    .jsonPath()
+                    .getObject("data.pairs[0]", PairsResolvedToken.Pair.class);
+            Assertions.assertEquals(pair, asserter.getData("pair"));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     void testPairsResolvedTaskWith6Players(UniAsserter asserter) {
         PLAYERS.addAll(List.of("player4", "player5", "player6"));
         asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for pairs.")
@@ -94,16 +113,53 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
         });
         asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
-        asserter.execute(() -> given()
-                .cookie(new Cookie.Builder("gameId", GAME).build())
-                .cookie(new Cookie.Builder("locale", "en").build())
-                .queryParam("resolutionContext", resolutionContext)
-                .contentType(MediaType.APPLICATION_JSON)
-                .when()
-                .get("/task/current")
-                .then()
-                .statusCode(RestResponse.StatusCode.OK)
-                .body("data.pairs.size()", is(3)));
+        // We test it gets also persisted
+        for (int i = 0; i < 2; i++) {
+            asserter.execute(() -> given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("data.pairs.size()", is(3)));
+        }
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(2)
+    void testCurrentPlayerResolvedTask(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task.")
+                        .build())
+                .onItem()
+                .invoke(task -> asserter.putData("task", task)));
+        asserter.execute(() -> {
+            List<Task> tasks = List.of((Task) asserter.getData("task"));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+
+        // We test it gets also persisted
+        for (int i = 0; i < 2; i++) {
+            asserter.execute(() -> given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("data.player", is(PLAYER)));
+        }
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

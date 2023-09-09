@@ -2,23 +2,16 @@ package com.thehuginn.token.resolved;
 
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
+import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.task.Task;
 import io.smallrye.mutiny.Uni;
-import jakarta.persistence.Entity;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Map;
 
-@Entity
-@OnDelete(action = OnDeleteAction.CASCADE)
-public class TaskTypeResolvedToken extends AbstractResolvedToken {
+public class TaskTypeResolvedToken implements ResolvedToken {
 
     private static final String tag = "task_type";
     Task.Type type;
-
-    public TaskTypeResolvedToken() {
-    }
 
     public TaskTypeResolvedToken(Task unresolvedTask) {
         type = unresolvedTask.type;
