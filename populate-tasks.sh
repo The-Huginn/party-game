@@ -1,5 +1,8 @@
+url='https://game.thehuginn.com/api/task'
+# url='http://localhost:8082'
+
 curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -17,7 +20,7 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -35,7 +38,7 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -53,7 +56,7 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -71,7 +74,7 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -89,19 +92,7 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task/3/sk' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{player_c} pozri sa von'
-
-curl -X 'POST' \
-  'http://localhost:8082/task/5/sk' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{player_c} spievaj {timer_10_-1}'
-
-curl -X 'POST' \
-  'http://localhost:8082/task' \
+  "${url}/task" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -119,7 +110,19 @@ curl -X 'POST' \
 }'
 
 curl -X 'POST' \
-  'http://localhost:8082/task/6/sk' \
+  "${url}/task/3/sk" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{player_c} pozri sa von'
+
+curl -X 'POST' \
+  "${url}/task/5/sk" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{player_c} spievaj {timer_10_-1}'
+
+curl -X 'POST' \
+  "${url}/task/6/sk" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d 'Usmievajte sa jeden na druheho na {timer_10_-1}'
