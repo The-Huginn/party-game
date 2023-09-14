@@ -1,0 +1,56 @@
+[
+    {
+        "payload": {
+            "repeat": "ALWAYS",
+            "type": "ALL",
+            "task": {
+                "locale": "en",
+                "content": "Everybody has to get off one piece of cloathing."
+            }
+        },
+        "translations": [
+            {
+                "locale": "sk",
+                "translation": "Každý si musí vyzlieť jeden kus oblečenia"
+            }
+        ],
+        "category": 1
+    },
+    {
+        "payload": {
+            "repeat": "ALWAYS",
+            "task": {
+                "locale": "en",
+                "content": "You can not wink for {timer_30}"
+            }
+        },
+        "translations": [
+            {
+                "locale": "sk",
+                "translation": "Nesmieš žmurknúť {timer_30}"
+            }
+        ]
+    },
+    {
+        "payload": {
+            "type": "SINGLE",
+            "repeat": "ALWAYS",
+            "frequency": 1,
+            "price": {
+                "enaled": true,
+                "price": 1
+            },
+            "task": {
+                "locale": "en",
+                "content": "Brush teeth of player {player_1} with your finger."
+            },
+            "message": "Who does not agree, has to drink"
+        },
+        "translations": [
+            {
+                "locale": "sk",
+                "translation": "Umy zuby hráčovi {player_1} tvojím prstom"
+            }
+        ]
+    }
+]
