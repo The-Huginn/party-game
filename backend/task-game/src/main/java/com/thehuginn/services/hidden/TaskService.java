@@ -1,5 +1,6 @@
 package com.thehuginn.services.hidden;
 
+import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
@@ -65,6 +66,18 @@ public class TaskService {
                             .combinedWith(objects -> task1.tokens = (List<UnresolvedToken>) objects);
                 })
                 .chain(task1 -> task1.persist());
+    }
+
+    @POST
+    @WithTransaction
+    @Path("/category/{id}")
+    public Uni<Task> createCategorizedTask(@Valid Task task, @RestPath Long id) {
+        return Category.<Category> findById(id)
+                .replaceIfNullWith(Category.getDefaultInstance())
+                .flatMap(category -> {
+                    task.category = category;
+                    return createTask(task);
+                });
     }
 
     @GET

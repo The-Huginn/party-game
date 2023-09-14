@@ -512,4 +512,46 @@ public class TestCategoryService extends AbstractTest {
 
         return localeCategory;
     }
+
+    @Test
+    @Order(14)
+    @RunOnVertxContext
+    public void testCreateTaskInCategory(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category> persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category", category)));
+
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                            {
+                                "task": {
+                                    "content": "test",
+                                    "locale": "en"
+                                },
+                                "type": "DUO",
+                                "repeat": "PER_PLAYER",
+                                "frequency": 3,
+                                "price": {
+                                    "enabled": false,
+                                    "price": 2
+                                }
+                            }
+                            """)
+                .pathParam("id", ((Category) asserter.getData("category")).id)
+                .when().post("task/category/{id}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK));
+
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .pathParam("id", ((Category) asserter.getData("category")).id)
+                .when().get("category/{id}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("$.size()", is(1)));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 }
