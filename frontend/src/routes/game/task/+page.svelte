@@ -69,7 +69,7 @@
 	>
 	{#if task.price.enabled}
 	<div class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">
-		<div class="flex flex-row float-right items-center justify-center bg-warning rounded-2xl p-2">
+		<div class="flex flex-row float-right items-center justify-center bg-warning rounded-2xl p-2 shadow-lg">
 			<p class="text-xl font-bold">{$_('page.game.task.price')}</p>
 			{#each Array(task.price.price) as _}
 				<img class="object-contain w-8 h-8" src={shot} alt="price" />
