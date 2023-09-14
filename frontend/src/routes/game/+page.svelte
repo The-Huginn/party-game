@@ -84,7 +84,7 @@
 	<meta name="description" content="Creation of a game session" />
 </svelte:head>
 
-<section class="flex flex-col justify-center items-center w-3/5 text-xl">
+<section class="flex flex-col justify-center items-center w-4/5 lg:w-3/5 text-xl">
 	{#if $isLoading}
 		<span class="loading loading-spinner text-info" />
 	{:else}

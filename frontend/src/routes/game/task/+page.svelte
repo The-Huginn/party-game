@@ -65,7 +65,7 @@
 		<PairTable pairs={task.pairs} />
 	{/if}
 	<div
-		class="grid relative w-3/5 gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
+		class="grid relative w-4/5 lg:w-2/5 gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
 	{#if task.price.enabled}
 	<div class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">

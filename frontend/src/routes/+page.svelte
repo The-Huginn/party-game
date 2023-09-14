@@ -1,9 +1,8 @@
 <script lang="ts">
+	import { _ } from '$lib/i18n/i18n-init';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import { isLoading } from 'svelte-i18n';
-	import { _ } from '$lib/i18n/i18n-init';
-	import { location } from 'svelte-spa-router';
 	import { header } from '../store';
 
 	$header = {text: 'page.disclaimer.title', append: ''};

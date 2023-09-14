@@ -4,7 +4,7 @@
 	export let pairs: TeamPair[];
 </script>
 
-<div class="grid relative w-2/5 gap-4 p-4 mb-4 bg-secondary shadow-lg rounded-2xl">
+<div class="grid relative w-4/5 lg:w-2/5 gap-4 p-4 mb-4 bg-secondary shadow-lg rounded-2xl">
 	<table class="min-w-full text-center text-sm font-light">
 		<tbody class="table-auto">
 			{#each pairs as pair}

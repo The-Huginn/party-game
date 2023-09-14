@@ -35,33 +35,29 @@
 				<tr class="items-center" transition:slide|local>
 					<th class="nowrap">
 						<form class="w-full flex">
-							<div class="form-control">
-								<label class="cursor-pointer label">
-									<input type="hidden" name="id" hidden value={category.id} />
-									{#if selected.filter((e) => e.id === category.id).length > 0}
-										<input
-											type="checkbox"
-											id={category.id.toString()}
-											on:click={handleSubmit}
-											checked
-											class="checkbox checkbox-info"
-										/>
-									{:else}
-										<input
-											type="checkbox"
-											id={category.id.toString()}
-											on:click={handleSubmit}
-											class="checkbox checkbox-info"
-										/>
-									{/if}
-								</label>
+							<div class="form-control space-x-10 flex flex-row items-center">
+								<input type="hidden" name="id" hidden value={category.id} />
+								{#if selected.filter((e) => e.id === category.id).length > 0}
+									<input
+										type="checkbox"
+										id={category.id.toString()}
+										on:click={handleSubmit}
+										checked
+										class="checkbox checkbox-warning"
+									/>
+								{:else}
+									<input
+										type="checkbox"
+										id={category.id.toString()}
+										on:click={handleSubmit}
+										class="checkbox checkbox-warning"
+									/>
+								{/if}
+								<label class="cursor-pointer label font-bold text-3xl" for={category.id.toString()}
+									>{category.name}</label
+								>
 							</div>
 						</form>
-					</th>
-					<th class="w-full">
-						<div class="w-full flex align-left space-x-3 text-3xl">
-							<div class="font-bold">{category.name}</div>
-						</div>
 					</th>
 					<th class="nowrap">
 						<div
