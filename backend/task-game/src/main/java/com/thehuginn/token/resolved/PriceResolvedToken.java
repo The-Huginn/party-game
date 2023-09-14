@@ -19,7 +19,7 @@ public class PriceResolvedToken implements ResolvedToken {
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(price)));
+        return new UnresolvedResult().appendData(Map.entry(tag, price));
     }
 
     @Override

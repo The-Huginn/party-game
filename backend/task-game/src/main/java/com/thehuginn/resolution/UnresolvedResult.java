@@ -9,18 +9,12 @@ import java.util.Map;
 
 public class UnresolvedResult {
 
-    // This needs to be ordered map see #resolveUnis()
     private Map.Entry<String, Uni<String>> task;
-    private final Map<String, Uni<?>> data = new LinkedHashMap<>();
+    private final Map<String, ? super Object> data = new LinkedHashMap<>();
 
     public Uni<ResolvedResult> resolve() {
-        //noinspection unchecked
-        return Uni.combine()
-                .all()
-                .unis(fetchTask(), fetchData())
-                .usingConcurrencyOf(1)
-                .combinedWith(tuple2 -> new ResolvedResult((Map.Entry<String, String>) tuple2.get(0),
-                        (Map<String, Object>) tuple2.get(1)));
+        return fetchTask()
+                .map(taskEntry -> new ResolvedResult(taskEntry, data));
     }
 
     private Uni<Map.Entry<String, String>> fetchTask() {
@@ -29,30 +23,6 @@ public class UnresolvedResult {
         }
         return task.getValue()
                 .map(s -> Map.entry(task.getKey(), s));
-    }
-
-    private Uni<Map<String, Object>> fetchData() {
-        // we rely on the order of the unis retrieved and then returned back
-        //  as resolved objects
-        List<? extends Uni<?>> dataUnis = data.values().stream()
-                .map(o -> (Uni<?>) o)
-                .toList();
-        return Uni.createFrom()
-                .item(this)
-                .chain(unresolvedResult -> Uni.combine()
-                        .all()
-                        .unis(dataUnis)
-                        .usingConcurrencyOf(1)
-                        .combinedWith(objects -> {
-                            assert objects.size() == data.size();
-                            Map<String, Object> result = new LinkedHashMap<>(data);
-                            Iterator<?> iterator = objects.iterator();
-                            for (Map.Entry<String, Object> entry : result.entrySet()) {
-                                entry.setValue(iterator.next());
-                            }
-
-                            return result;
-                        }));
     }
 
     public void addResolvedResult(UnresolvedResult other) {
@@ -67,7 +37,7 @@ public class UnresolvedResult {
         return this;
     }
 
-    public UnresolvedResult appendData(Map.Entry<String, Uni<?>> entry) {
+    public UnresolvedResult appendData(Map.Entry<String, ?> entry) {
         data.put(entry.getKey(), entry.getValue());
         return this;
     }

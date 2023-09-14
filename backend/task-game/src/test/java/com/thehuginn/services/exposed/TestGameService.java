@@ -95,8 +95,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .get("/task/current")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task"),
-                        "data.locale", is("en")));
+                .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -130,8 +129,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is("simple task for " + PLAYERS.get(1)), is("simple task for " + PLAYERS.get(2))),
-                        "data.locale", is("en")));
+                        anyOf(is("simple task for " + PLAYERS.get(1)), is("simple task for " + PLAYERS.get(2)))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -164,8 +162,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .get("/task/current")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task for 30s"),
-                        "data.locale", is("en")));
+                .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task for 30s")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -201,8 +198,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
                         anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")),
-                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s"))),
-                        "data.locale", is("en")));
+                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -236,8 +232,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is(PLAYER + PLAYERS.get(1) + PLAYERS.get(2)), is(PLAYER + PLAYERS.get(2) + PLAYERS.get(1))),
-                        "data.locale", is("en")));
+                        anyOf(is(PLAYER + PLAYERS.get(1) + PLAYERS.get(2)), is(PLAYER + PLAYERS.get(2) + PLAYERS.get(1)))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -275,8 +270,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
                         anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")),
-                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s"))),
-                        "data.locale", is("sk")));
+                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

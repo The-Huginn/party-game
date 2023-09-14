@@ -55,8 +55,8 @@ public class TimerResolvedToken extends AbstractResolvedToken {
             Log.error("Timer with unexpected argument [%s].".formatted(timerTag));
             throw new IllegalArgumentException("Timer with unexpected argument [%s].".formatted(timerTag));
         }
-        return new UnresolvedResult().appendData(Map.entry(timerTag, Uni.createFrom().item(duration + "s")))
-                .appendData(Map.entry(TIMER_KEY, Uni.createFrom().item(new Timer(duration, delay))));
+        return new UnresolvedResult().appendData(Map.entry(timerTag, duration + "s"))
+                .appendData(Map.entry(TIMER_KEY, new Timer(duration, delay)));
     }
 
     @Override

@@ -267,7 +267,6 @@ public class TestTaskService extends AbstractTest {
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("task.content", is("<drink_responsibly>"),
-                            "task.locale", is("en"),
                             "type", is("ALL"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),
@@ -307,7 +306,6 @@ public class TestTaskService extends AbstractTest {
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("task.content", is("Pi zodpovedne"),
-                            "task.locale", is("sk"),
                             "type", is("ALL"),
                             "repeat", is("PER_PLAYER"),
                             "frequency", is(3),

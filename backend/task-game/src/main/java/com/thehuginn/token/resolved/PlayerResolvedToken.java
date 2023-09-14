@@ -30,7 +30,7 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        return new UnresolvedResult().appendData(Map.entry(playerTag, Uni.createFrom().item(player)));
+        return new UnresolvedResult().appendData(Map.entry(playerTag, player));
     }
 
     @Override

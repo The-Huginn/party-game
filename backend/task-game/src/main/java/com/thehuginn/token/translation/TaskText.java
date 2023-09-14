@@ -98,10 +98,7 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
                 .map(panacheEntityBase -> (Translatable) panacheEntityBase);
         return new UnresolvedResult().task(Map.entry(task.getKey(),
                 localeTextUni
-                        .map(Translatable::getContent)))
-                .appendData(Map.entry("locale",
-                        localeTextUni
-                                .map(Translatable::getLocale)));
+                        .map(Translatable::getContent)));
     }
 
     @Override

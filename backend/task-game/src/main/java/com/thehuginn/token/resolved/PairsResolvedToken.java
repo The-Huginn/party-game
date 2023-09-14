@@ -43,7 +43,7 @@ public class PairsResolvedToken extends AbstractResolvedToken {
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(pairs)));
+        return new UnresolvedResult().appendData(Map.entry(tag, pairs));
     }
 
     @Override
