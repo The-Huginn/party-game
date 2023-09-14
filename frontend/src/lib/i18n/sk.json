@@ -35,7 +35,8 @@
                 "start_timer": "Spustiť Časovač",
                 "single": "Je tvoj čas",
                 "duo": "Úloha pre dvojice!",
-                "all": "Pripravte sa všetci!"
+                "all": "Pripravte sa všetci!",
+                "price": "Odmena za nesplnenie"
             }
         },
         "task": {

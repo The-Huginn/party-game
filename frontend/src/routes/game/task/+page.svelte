@@ -10,6 +10,7 @@
 	import type { Task, Timer } from './Task';
 	import TimerComponent from './TimerComponent.svelte';
 	import PairTable from './PairTable.svelte';
+	import shot from '$lib/images/shot.svg';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -61,12 +62,22 @@
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
 	{#if task.pairs}
-		<PairTable pairs={task.pairs}/>
+		<PairTable pairs={task.pairs} />
 	{/if}
 	<div
-		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
+		class="grid relative w-3/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
-		<h1>
+	{#if task.price.enabled}
+	<div class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">
+		<div class="flex flex-row float-right items-center justify-center bg-warning rounded-2xl p-2">
+			<p class="text-xl font-bold">{$_('page.game.task.price')}</p>
+			{#each Array(task.price.price) as _}
+				<img class="object-contain w-8 h-8" src={shot} alt="price" />
+			{/each}
+		</div>
+	</div>
+	{/if}
+		<h1 class="pt-4">
 			<span class="font-bold text-4xl">
 				{rawTask[task.task]}
 			</span>
