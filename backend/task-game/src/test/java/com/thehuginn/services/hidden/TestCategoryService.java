@@ -525,20 +525,20 @@ public class TestCategoryService extends AbstractTest {
         asserter.execute(() -> given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
-                            {
-                                "task": {
-                                    "content": "test",
-                                    "locale": "en"
-                                },
-                                "type": "DUO",
-                                "repeat": "PER_PLAYER",
-                                "frequency": 3,
-                                "price": {
-                                    "enabled": false,
-                                    "price": 2
-                                }
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "en"
+                            },
+                            "type": "DUO",
+                            "repeat": "PER_PLAYER",
+                            "frequency": 3,
+                            "price": {
+                                "enabled": false,
+                                "price": 2
                             }
-                            """)
+                        }
+                        """)
                 .pathParam("id", ((Category) asserter.getData("category")).id)
                 .when().post("task/category/{id}")
                 .then()

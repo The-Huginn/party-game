@@ -8,18 +8,18 @@ import io.smallrye.mutiny.Uni;
 
 import java.util.Map;
 
-public class TaskTypeResolvedToken implements ResolvedToken {
+public class PriceResolvedToken implements ResolvedToken {
 
-    private static final String tag = "task_type";
-    private final Task.Type type;
+    private static final String tag = "price";
+    private final Task.Price price;
 
-    public TaskTypeResolvedToken(Task unresolvedTask) {
-        type = unresolvedTask.type;
+    public PriceResolvedToken(Task unresolvedTask) {
+        this.price = unresolvedTask.price;
     }
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(type.toString())));
+        return new UnresolvedResult().appendData(Map.entry(tag, Uni.createFrom().item(price)));
     }
 
     @Override

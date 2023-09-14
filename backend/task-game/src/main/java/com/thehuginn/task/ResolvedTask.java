@@ -7,6 +7,7 @@ import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.token.resolved.AbstractResolvedToken;
 import com.thehuginn.token.resolved.PairsResolvedToken;
 import com.thehuginn.token.resolved.PlayerResolvedToken;
+import com.thehuginn.token.resolved.PriceResolvedToken;
 import com.thehuginn.token.resolved.TaskTypeResolvedToken;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.smallrye.mutiny.Uni;
@@ -60,7 +61,10 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
         for (ResolvedToken token : tokens) {
             unresolvedResult.addResolvedResult(token.resolve(context));
         }
+
         unresolvedResult.addResolvedResult(new TaskTypeResolvedToken(gameTask.unresolvedTask).resolve(context));
+        unresolvedResult.addResolvedResult(new PriceResolvedToken(gameTask.unresolvedTask).resolve(context));
+
         return unresolvedResult;
     }
 
