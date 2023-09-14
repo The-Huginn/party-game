@@ -94,7 +94,7 @@
 		<Modal {onMountCallback} {yesCallback} {noCallback} question="page.game.create.game_exists" />
 	{/if}
 	<div
-		class="flex flex-col w-full gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl justify-center items-center"
+		class="flex flex-col w-full gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl justify-center items-center"
 	>
 		<form class="w-4/5 flex flex-col space-y-5" on:submit|preventDefault={handleSubmit}>
 			<div class="w-full form-control">

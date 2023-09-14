@@ -39,7 +39,7 @@
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
 	<div
-		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-gray-700 shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
+		class="grid relative w-2/5 gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
 		<span class="font-bold text-3xl">{$_(`page.task.category.table_name`)}</span>
 		<CategoryTable bind:categories {selected} />
