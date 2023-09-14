@@ -288,8 +288,8 @@ public class TestCategoryService extends AbstractTest {
                             "category": {
                             "id": "%s"
                             },
-                            "name_content": "Default Category",
-                            "description_content": "Default English Category Description",
+                            "name": "Default Category",
+                            "description": "Default English Category Description",
                             "locale": "en"
                             }""", asserter.getData("id")))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -299,8 +299,8 @@ public class TestCategoryService extends AbstractTest {
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("category", is((int) (long) asserter.getData("id")),
                             "locale", is("en"),
-                            "name_content", startsWith("Default Category"),
-                            "description_content", startsWith("Default English Category Description"));
+                            "name", startsWith("Default Category"),
+                            "description", startsWith("Default English Category Description"));
 
             given()
                     .body(String.format("""
@@ -308,8 +308,8 @@ public class TestCategoryService extends AbstractTest {
                             "category": {
                             "id": "%s"
                             },
-                            "name_content": "Východzia Kategória",
-                            "description_content": "Popis Východzej Kategórie",
+                            "name": "Východzia Kategória",
+                            "description": "Popis Východzej Kategórie",
                             "locale": "sk"
                             }""", asserter.getData("id")))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -319,8 +319,8 @@ public class TestCategoryService extends AbstractTest {
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("category", is((int) (long) asserter.getData("id")),
                             "locale", is("sk"),
-                            "name_content", startsWith("Východzia Kategória"),
-                            "description_content", startsWith("Popis Východzej Kategórie"));
+                            "name", startsWith("Východzia Kategória"),
+                            "description", startsWith("Popis Východzej Kategórie"));
         });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -359,8 +359,8 @@ public class TestCategoryService extends AbstractTest {
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
+                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name),
+                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
@@ -371,8 +371,8 @@ public class TestCategoryService extends AbstractTest {
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name_content),
-                        "description", is(((LocaleCategory) asserter.getData("sk_locale")).description_content)));
+                .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name),
+                        "description", is(((LocaleCategory) asserter.getData("sk_locale")).description)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -397,8 +397,8 @@ public class TestCategoryService extends AbstractTest {
                         "category": {
                         "id": 20
                         },
-                        "name_content": "Východzia Kategória",
-                        "description_content": "Popis Východzej Kategórie",
+                        "name": "Východzia Kategória",
+                        "description": "Popis Východzej Kategórie",
                         "locale": "sk"
                         }""")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -408,8 +408,8 @@ public class TestCategoryService extends AbstractTest {
                 .put("/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name_content", is("Východzia Kategória"),
-                        "description_content", is("Popis Východzej Kategórie")));
+                .body("name", is("Východzia Kategória"),
+                        "description", is("Popis Východzej Kategórie")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
@@ -494,8 +494,8 @@ public class TestCategoryService extends AbstractTest {
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name_content),
-                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description_content)));
+                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name),
+                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -507,8 +507,8 @@ public class TestCategoryService extends AbstractTest {
 
         localeCategory.locale = locale;
         localeCategory.category = category;
-        localeCategory.name_content = "Default Category" + Math.random();
-        localeCategory.description_content = "Default English Category Description" + Math.random();
+        localeCategory.name = "Default Category" + Math.random();
+        localeCategory.description = "Default English Category Description" + Math.random();
 
         return localeCategory;
     }

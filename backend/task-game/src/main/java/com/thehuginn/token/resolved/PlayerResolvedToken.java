@@ -2,7 +2,6 @@ package com.thehuginn.token.resolved;
 
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
-import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

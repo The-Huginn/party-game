@@ -95,8 +95,8 @@ public class CategoryService {
                 .and("locale", locale))
                 .firstResult()
                 .chain(localeCategory1 -> {
-                    localeCategory1.name_content = localeCategory.name_content;
-                    localeCategory1.description_content = localeCategory.description_content;
+                    localeCategory1.name = localeCategory.name;
+                    localeCategory1.description = localeCategory.description;
                     return localeCategory1.persistAndFlush();
                 });
     }

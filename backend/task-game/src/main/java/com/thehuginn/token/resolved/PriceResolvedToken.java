@@ -4,7 +4,6 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.task.Task;
-import io.smallrye.mutiny.Uni;
 
 import java.util.Map;
 

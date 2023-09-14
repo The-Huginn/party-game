@@ -2,7 +2,6 @@ package com.thehuginn.token.resolved;
 
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
-import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;

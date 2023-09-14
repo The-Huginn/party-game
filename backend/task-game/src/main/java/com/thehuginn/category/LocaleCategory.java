@@ -61,9 +61,9 @@ public class LocaleCategory extends PanacheEntityBase {
     @Id
     public String locale = "en";
 
-    public String name_content;
+    public String name;
 
-    public String description_content;
+    public String description;
 
     public static Uni<Map<String, String>> translation(Long categoryId, String locale) {
         Uni<LocaleCategory> localeCategoryUniEnglish = LocaleCategory
@@ -86,7 +86,7 @@ public class LocaleCategory extends PanacheEntityBase {
                 })
                 .chain(category1 -> localeCategoryUni
                         .onItem()
-                        .transform(localeCategory -> Map.of(category1.name, localeCategory.name_content,
-                                category1.description, localeCategory.description_content)));
+                        .transform(localeCategory -> Map.of(category1.name, localeCategory.name,
+                                category1.description, localeCategory.description)));
     }
 }

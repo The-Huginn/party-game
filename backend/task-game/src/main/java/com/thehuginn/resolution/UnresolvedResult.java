@@ -2,9 +2,7 @@ package com.thehuginn.resolution;
 
 import io.smallrye.mutiny.Uni;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UnresolvedResult {
