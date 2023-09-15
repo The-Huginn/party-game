@@ -24,6 +24,8 @@ import java.util.Objects;
 @IdClass(TaskText.TaskTextPK.class)
 public class TaskText extends PanacheEntityBase implements ResolvedToken, Translatable {
 
+    public static final String CONTENT_TAG = "content";
+
     public static class TaskTextPK {
         public Long task;
         public String locale;
@@ -80,8 +82,8 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     }
 
     @Override
-    public String getContent() {
-        return this.content;
+    public Map<String, String> getContent() {
+        return Map.of(CONTENT_TAG, content);
     }
 
     @Override
@@ -91,14 +93,14 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        Uni<? extends Translatable> localeTextUni = LocaleText
-                .findById(new LocaleText.LocaleTextPK(this, context.getLocale()))
+        Uni<? extends Translatable> localeTextUni = LocaleTaskText
+                .findById(new LocaleTaskText.LocaleTaskTextPK(this, context.getLocale()))
                 .replaceIfNullWith(this)
-                // we will receive either LocaleText or a fallback of TaskText, both are Translatable
+                // we will receive either LocaleTaskText or a fallback of TaskText, both are Translatable
                 .map(panacheEntityBase -> (Translatable) panacheEntityBase);
         return new UnresolvedResult().task(Map.entry(task.getKey(),
                 localeTextUni
-                        .map(Translatable::getContent)));
+                        .map(translatable -> translatable.getContent().get(CONTENT_TAG))));
     }
 
     @Override

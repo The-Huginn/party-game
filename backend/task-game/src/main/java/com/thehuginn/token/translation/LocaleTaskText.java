@@ -11,20 +11,23 @@ import jakarta.persistence.ManyToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Map;
 import java.util.Objects;
 
-@Entity
-@IdClass(LocaleText.LocaleTextPK.class)
-public class LocaleText extends PanacheEntityBase implements Translatable {
+import static com.thehuginn.token.translation.TaskText.CONTENT_TAG;
 
-    public static class LocaleTextPK {
+@Entity
+@IdClass(LocaleTaskText.LocaleTaskTextPK.class)
+public class LocaleTaskText extends PanacheEntityBase implements Translatable {
+
+    public static class LocaleTaskTextPK {
         public TaskText taskText;
         public String locale;
 
-        public LocaleTextPK() {
+        public LocaleTaskTextPK() {
         }
 
-        public LocaleTextPK(TaskText taskText, String locale) {
+        public LocaleTaskTextPK(TaskText taskText, String locale) {
             this.taskText = taskText;
             this.locale = locale;
         }
@@ -35,7 +38,7 @@ public class LocaleText extends PanacheEntityBase implements Translatable {
                 return true;
             if (o == null || getClass() != o.getClass())
                 return false;
-            LocaleTextPK that = (LocaleTextPK) o;
+            LocaleTaskTextPK that = (LocaleTaskTextPK) o;
             return Objects.equals(taskText, that.taskText) && Objects.equals(locale, that.locale);
         }
 
@@ -58,23 +61,23 @@ public class LocaleText extends PanacheEntityBase implements Translatable {
     @JsonProperty
     public String content = "<missing_value>";
 
-    public LocaleText() {
+    public LocaleTaskText() {
     }
 
-    public LocaleText(String locale, String content) {
+    public LocaleTaskText(String locale, String content) {
         this.locale = locale;
         this.content = content;
     }
 
-    public LocaleText(TaskText taskText, String locale, String content) {
+    public LocaleTaskText(TaskText taskText, String locale, String content) {
         this.taskText = taskText;
         this.locale = locale;
         this.content = content;
     }
 
     @Override
-    public String getContent() {
-        return this.content;
+    public Map<String, String> getContent() {
+        return Map.of(CONTENT_TAG, content);
     }
 
     @Override
