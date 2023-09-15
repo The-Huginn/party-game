@@ -39,35 +39,34 @@ public class TestTaskService extends AbstractTest {
     @RunOnVertxContext
     @Order(1)
     public void testCreateTask(UniAsserter asserter) {
-        asserter.execute(() -> {
-            given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body("""
-                            {
-                                "task": {
-                                    "content": "test",
-                                    "locale": "en"
-                                },
-                                "type": "DUO",
-                                "repeat": "PER_PLAYER",
-                                "frequency": 3,
-                                "price": {
-                                    "enabled": false,
-                                    "price": 2
-                                }
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "en"
+                            },
+                            "type": "DUO",
+                            "repeat": "PER_PLAYER",
+                            "frequency": 3,
+                            "price": {
+                                "enabled": false,
+                                "price": 2
                             }
-                            """)
-                    .when().post()
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("task.content", is("test"),
-                            "task.locale", is("en"),
-                            "type", is("DUO"),
-                            "repeat", is("PER_PLAYER"),
-                            "frequency", is(3),
-                            "price.enabled", is(false),
-                            "price.price", is(2));
-        });
+                        }
+                        """)
+                .when().post()
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("task.content", is("test"),
+                        "task.locale", is("en"),
+                        "type", is("DUO"),
+                        "repeat", is("PER_PLAYER"),
+                        "frequency", is(3),
+                        "price.enabled", is(false),
+                        "price.price", is(2))
+                .extract().asString());
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }

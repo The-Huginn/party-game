@@ -5,7 +5,7 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.LocaleText;
+import com.thehuginn.token.translation.LocaleTaskText;
 import com.thehuginn.token.translation.TaskText;
 import com.thehuginn.token.translation.Translatable;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
@@ -62,6 +62,7 @@ public class TaskService {
                     if (TokenResolver.translateTask(task1.task.content).isEmpty()) {
                         return Uni.createFrom().voidItem();
                     }
+                    //noinspection unchecked
                     return findOrCreateTokens.apply(TokenResolver.translateTask(task1.task.content))
                             .combinedWith(objects -> task1.tokens = (List<UnresolvedToken>) objects);
                 })
@@ -140,7 +141,7 @@ public class TaskService {
         return Task.<Task> findById(id)
                 .invoke(task -> preservesTokens(task.task, content))
                 .chain(task -> {
-                    LocaleText newLocale = new LocaleText(task.task, locale, content);
+                    LocaleTaskText newLocale = new LocaleTaskText(task.task, locale, content);
                     return newLocale.persist();
                 });
     }
@@ -149,11 +150,11 @@ public class TaskService {
     @Path("/{id}/{locale}")
     @WithTransaction
     public Uni<? extends Translatable> updateKey(@RestPath Long id, @RestPath String locale, String newContent) {
-        Function<TaskText, Uni<LocaleText>> translation = taskText -> LocaleText
-                .<LocaleText> findById(new LocaleText.LocaleTextPK(taskText, locale))
-                .onItem().ifNotNull().transformToUni(localeText -> {
-                    localeText.content = newContent;
-                    return localeText.persist();
+        Function<TaskText, Uni<LocaleTaskText>> translation = taskText -> LocaleTaskText
+                .<LocaleTaskText> findById(new LocaleTaskText.LocaleTaskTextPK(taskText, locale))
+                .onItem().ifNotNull().transformToUni(localeTaskText -> {
+                    localeTaskText.content = newContent;
+                    return localeTaskText.persist();
                 });
         return Task.<Task> findById(id)
                 .map(task -> task.task)

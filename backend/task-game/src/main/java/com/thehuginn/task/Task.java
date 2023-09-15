@@ -54,6 +54,7 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
     @JsonProperty
     public Price price = new Price();
 
+    @JsonProperty
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "task")
     public TaskText task;
 

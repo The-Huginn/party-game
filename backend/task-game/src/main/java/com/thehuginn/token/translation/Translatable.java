@@ -1,12 +1,14 @@
 package com.thehuginn.token.translation;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Map;
 
-@JsonSerialize(as = Translatable.class)
 public interface Translatable {
+
+    @JsonIgnore
     Map<String, String> getContent();
 
+    @JsonIgnore
     String getLocale();
 }
