@@ -139,18 +139,18 @@ public class TestTaskService extends AbstractTest {
         });
 
         asserter.execute(() -> given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .pathParam("id", asserter.getData("id"))
-                    .when().get("/{id}")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("task.content", is("<drink_responsibly>"),
-                            "task.locale", is("en"),
-                            "type", is("DUO"),
-                            "repeat", is("PER_PLAYER"),
-                            "frequency", is(3),
-                            "price.enabled", is(false),
-                            "price.price", is(2)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .pathParam("id", asserter.getData("id"))
+                .when().get("/{id}")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("task.content", is("<drink_responsibly>"),
+                        "task.locale", is("en"),
+                        "type", is("DUO"),
+                        "repeat", is("PER_PLAYER"),
+                        "frequency", is(3),
+                        "price.enabled", is(false),
+                        "price.price", is(2)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
