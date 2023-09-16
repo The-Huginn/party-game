@@ -3,7 +3,11 @@ package com.thehuginn.services.exposed;
 import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
 import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.task.GameTask;
+import com.thehuginn.task.Task;
+import com.thehuginn.token.resolved.AbstractResolvedToken;
 import com.thehuginn.token.translation.CategoryText;
+import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -73,6 +77,19 @@ public class GameCreationService {
     public Uni<Boolean> removeCategory(@RestCookie String gameId, @RestPath Long categoryId) {
         return findGameSession(gameId)
                 .chain(gameSession -> gameSession.removeCategory(categoryId));
+    }
+
+    @DELETE
+    @WithTransaction
+    @Path("/clearAll")
+    public Uni<Void> removeAll() {
+        return GameTask.deleteAll()
+                .chain(() -> Task.deleteAll())
+                .chain(() -> Category.delete("id > 0"))
+                .chain(() -> AbstractUnresolvedToken.deleteAll())
+                .chain(() -> AbstractResolvedToken.deleteAll())
+                .chain(() -> GameSession.deleteAll())
+                .replaceWithVoid();
     }
 
     private Uni<GameSession> findGameSession(String gameId) {
