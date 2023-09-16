@@ -1,7 +1,6 @@
 package com.thehuginn;
 
 import com.thehuginn.category.Category;
-import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.resolved.AbstractResolvedToken;
@@ -26,7 +25,6 @@ public abstract class AbstractTest {
         asserter.execute(() -> GameTask.deleteAll());
         asserter.execute(() -> Task.deleteAll());
         asserter.execute(() -> Category.delete("id > 0"));
-        asserter.execute(() -> LocaleCategory.deleteAll());
         asserter.execute(() -> AbstractUnresolvedToken.deleteAll());
         asserter.execute(() -> AbstractResolvedToken.deleteAll());
         asserter.execute(() -> GameSession.deleteAll());

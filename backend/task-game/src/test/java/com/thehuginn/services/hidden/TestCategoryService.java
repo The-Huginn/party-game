@@ -2,8 +2,8 @@ package com.thehuginn.services.hidden;
 
 import com.thehuginn.AbstractTest;
 import com.thehuginn.category.Category;
-import com.thehuginn.category.LocaleCategory;
 import com.thehuginn.task.Task;
+import com.thehuginn.token.translation.LocaleCategoryText;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -128,8 +128,6 @@ public class TestCategoryService extends AbstractTest {
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("id", is((int) id),
-                            "name", is("new name"),
-                            "description", is("new description"),
                             "tasks.size()", is(1),
                             "tasks[0].id", is((int) ((long) asserter.getData("task2"))));
         });
@@ -283,43 +281,35 @@ public class TestCategoryService extends AbstractTest {
 
         asserter.execute(() -> {
             given()
-                    .body(String.format("""
+                    .body("""
                             {
-                            "category": {
-                            "id": "%s"
-                            },
                             "name": "Default Category",
-                            "description": "Default English Category Description",
-                            "locale": "en"
-                            }""", asserter.getData("id")))
+                            "description": "Default English Category Description"
+                            }""")
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .post("/category/translation/")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "en")
+                    .post("/category/translation/{id}/{locale}")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("category", is((int) (long) asserter.getData("id")),
-                            "locale", is("en"),
-                            "name", startsWith("Default Category"),
+                    .body("name", startsWith("Default Category"),
                             "description", startsWith("Default English Category Description"));
 
             given()
                     .body(String.format("""
                             {
-                            "category": {
-                            "id": "%s"
-                            },
                             "name": "Východzia Kategória",
-                            "description": "Popis Východzej Kategórie",
-                            "locale": "sk"
-                            }""", asserter.getData("id")))
+                            "description": "Popis Východzej Kategórie"
+                            }"""))
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .post("/category/translation/")
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .post("/category/translation/{id}/{locale}")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("category", is((int) (long) asserter.getData("id")),
-                            "locale", is("sk"),
-                            "name", startsWith("Východzia Kategória"),
+                    .body("name", startsWith("Východzia Kategória"),
                             "description", startsWith("Popis Východzej Kategórie"));
         });
 
@@ -333,46 +323,46 @@ public class TestCategoryService extends AbstractTest {
         asserter.execute(() -> EntityCreator.createCategory()
                 .<Category> persistAndFlush()
                 .onItem()
-                .invoke(category -> asserter.putData("id1", category.id)));
+                .invoke(category -> asserter.putData("category1", category)));
 
         asserter.execute(() -> EntityCreator.createCategory()
                 .<Category> persistAndFlush()
                 .onItem()
-                .invoke(category -> asserter.putData("id2", category.id)));
+                .invoke(category -> asserter.putData("category2", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id1"), "en")
-                .<LocaleCategory> persistAndFlush()
+        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category1"), "en")
+                .<LocaleCategoryText> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
-        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id2"), "sk")
-                .<LocaleCategory> persistAndFlush()
+        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category2"), "sk")
+                .<LocaleCategoryText> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("sk_locale", localeCategory)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
         asserter.execute(() -> given()
-                .pathParam("id", asserter.getData("id1"))
+                .pathParam("id", ((Category) asserter.getData("category1")).id)
                 .pathParam("locale", "en")
                 .when()
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name),
-                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description)));
+                .body("name", is(((LocaleCategoryText) asserter.getData("en_locale")).name),
+                        "description", is(((LocaleCategoryText) asserter.getData("en_locale")).description)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
         asserter.execute(() -> given()
-                .pathParam("id", asserter.getData("id2"))
+                .pathParam("id", ((Category) asserter.getData("category2")).id)
                 .pathParam("locale", "sk")
                 .when()
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("sk_locale")).name),
-                        "description", is(((LocaleCategory) asserter.getData("sk_locale")).description)));
+                .body("name", is(((LocaleCategoryText) asserter.getData("sk_locale")).name),
+                        "description", is(((LocaleCategoryText) asserter.getData("sk_locale")).description)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -384,26 +374,20 @@ public class TestCategoryService extends AbstractTest {
         asserter.execute(() -> EntityCreator.createCategory()
                 .<Category> persistAndFlush()
                 .onItem()
-                .invoke(category -> asserter.putData("id", category.id)));
+                .invoke(category -> asserter.putData("category", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
-                .<LocaleCategory> persistAndFlush()
-                .onItem()
-                .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
+        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category"), "sk")
+                .<LocaleCategoryText> persistAndFlush());
 
         asserter.execute(() -> given()
                 .body("""
                         {
-                        "category": {
-                        "id": 20
-                        },
                         "name": "Východzia Kategória",
-                        "description": "Popis Východzej Kategórie",
-                        "locale": "sk"
+                        "description": "Popis Východzej Kategórie"
                         }""")
                 .contentType(MediaType.APPLICATION_JSON)
-                .pathParam("id", asserter.getData("id"))
-                .pathParam("locale", "en")
+                .pathParam("id", ((Category) asserter.getData("category")).id)
+                .pathParam("locale", "sk")
                 .when()
                 .put("/category/translation/{id}/{locale}")
                 .then()
@@ -414,8 +398,8 @@ public class TestCategoryService extends AbstractTest {
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
 
         asserter.execute(() -> given()
-                .pathParam("id", asserter.getData("id"))
-                .pathParam("locale", "en")
+                .pathParam("id", ((Category) asserter.getData("category")).id)
+                .pathParam("locale", "sk")
                 .when()
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
@@ -480,33 +464,31 @@ public class TestCategoryService extends AbstractTest {
         asserter.execute(() -> EntityCreator.createCategory()
                 .<Category> persistAndFlush()
                 .onItem()
-                .invoke(category -> asserter.putData("id", category.id)));
+                .invoke(category -> asserter.putData("category", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((long) asserter.getData("id"), "en")
-                .<LocaleCategory> persistAndFlush()
+        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category"), "cs")
+                .<LocaleCategoryText> persistAndFlush()
                 .onItem()
-                .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
+                .invoke(localeCategory -> asserter.putData("cs_locale", localeCategory)));
 
         asserter.execute(() -> given()
-                .pathParam("id", asserter.getData("id"))
+                .pathParam("id", ((Category) asserter.getData("category")).id)
                 .pathParam("locale", "sk")
                 .when()
                 .get("/task-mode/category/translation/{id}/{locale}")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("name", is(((LocaleCategory) asserter.getData("en_locale")).name),
-                        "description", is(((LocaleCategory) asserter.getData("en_locale")).description)));
+                .body("name", is("name"),
+                        "description", is("description")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
-    private LocaleCategory createRandomLocaleCategory(long id, String locale) {
-        LocaleCategory localeCategory = new LocaleCategory();
-        Category category = new Category();
-        category.id = id;
+    private LocaleCategoryText createRandomLocaleCategory(Category category, String locale) {
+        LocaleCategoryText localeCategory = new LocaleCategoryText();
 
+        localeCategory.categoryText = category.categoryText;
         localeCategory.locale = locale;
-        localeCategory.category = category;
         localeCategory.name = "Default Category" + Math.random();
         localeCategory.description = "Default English Category Description" + Math.random();
 

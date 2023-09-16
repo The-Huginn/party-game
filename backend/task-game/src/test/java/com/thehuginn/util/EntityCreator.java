@@ -3,6 +3,7 @@ package com.thehuginn.util;
 import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
 import com.thehuginn.task.Task;
+import com.thehuginn.token.translation.CategoryText;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -21,8 +22,11 @@ public class EntityCreator {
 
     public static Category createCategory(long... taskIds) {
         Category category = new Category();
-        category.name = "name";
-        category.description = "description";
+        category.categoryText = new CategoryText();
+        category.categoryText.category = category;
+        category.categoryText.locale = "en";
+        category.categoryText.name = "name";
+        category.categoryText.description = "description";
         category.tasks = Arrays.stream(taskIds)
                 .mapToObj(value -> {
                     Task task = createTask("this is a task");

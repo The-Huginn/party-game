@@ -2,7 +2,8 @@ package com.thehuginn.services.exposed;
 
 import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
-import com.thehuginn.category.LocaleCategory;
+import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.token.translation.CategoryText;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -19,7 +20,6 @@ import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestPath;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,23 +32,31 @@ public class GameCreationService {
     @GET
     @Path("/category")
     @WithTransaction
-    public Uni<List<Category.CategoryDto>> getCategories() {
-        return Category.findAll().project(Category.CategoryDto.class).list();
+    public Uni<List<CategoryText.CategoryDto>> getCategories(@RestCookie @DefaultValue("en") String locale) {
+        Uni<List<Uni<CategoryText.CategoryDto>>> localeCategories = Category.<Category> listAll().map(
+                categories -> categories.stream()
+                        .map(category -> category.categoryText.resolve(ResolutionContext.locale(locale)))
+                        .toList());
+        //noinspection unchecked
+        return localeCategories.chain(unis -> Uni.combine().all().<List<CategoryText.CategoryDto>> unis(unis)
+                .usingConcurrencyOf(1)
+                .combinedWith(objects -> (List<CategoryText.CategoryDto>) objects));
     }
 
     @GET
     @Path("/category/selected")
     @WithTransaction
-    public Uni<Set<Category.CategoryDto>> getSelectedCategories(@RestCookie String gameId) {
+    public Uni<Set<CategoryText.CategoryDto>> getSelectedCategories(@RestCookie String gameId) {
         return findGameSession(gameId).map(gameSession -> gameSession.categories.stream()
-                .map(Category.CategoryDto::new)
+                .map(CategoryText.CategoryDto::new)
                 .collect(Collectors.toSet()));
     }
 
     @GET
     @Path("/category/translation/{id}/{locale}")
-    public Uni<Map<String, String>> getTranslation(@RestPath long id, @RestPath @DefaultValue("en") String locale) {
-        return LocaleCategory.translation(id, locale);
+    public Uni<CategoryText.CategoryDto> getTranslation(@RestPath long id, @RestPath @DefaultValue("en") String locale) {
+        return Category.<Category> findById(id)
+                .flatMap(category -> category.categoryText.resolve(ResolutionContext.locale(locale)));
     }
 
     @PUT
