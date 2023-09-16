@@ -79,7 +79,7 @@ public class CategoryText extends PanacheEntityBase implements Resolvable<Uni<Ca
     public Uni<CategoryDto> resolve(ResolutionContext context) {
         return LocaleCategoryText
                 .findById(new LocaleCategoryText.LocaleCategoryTextPK(this, context.getLocale()))
-                .replaceIfNullWith(() -> this)
+                .replaceIfNullWith(this)
                 .map(translatable -> (TranslatableCategory) translatable)
                 .map(translatableCategory -> new CategoryDto(category.id, translatableCategory.getName(),
                         translatableCategory.getDescription()));

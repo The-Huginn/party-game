@@ -4,6 +4,7 @@ import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.translation.CategoryText;
+import com.thehuginn.token.translation.LocaleCategoryText;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -42,5 +43,11 @@ public class EntityCreator {
         GameSession gameSession = new GameSession();
         gameSession.gameId = gameId;
         return gameSession;
+    }
+
+    public static LocaleCategoryText createRandomLocaleCategory(Category category, String locale) {
+        return new LocaleCategoryText(category.categoryText, locale,
+                "Default Category" + Math.random(),
+                "Default English Category Description" + Math.random());
     }
 }

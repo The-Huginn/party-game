@@ -297,16 +297,27 @@ public class TestCategoryService extends AbstractTest {
                             "description", startsWith("Default English Category Description"));
 
             given()
-                    .body(String.format("""
+                    .body("""
                             {
                             "name": "Východzia Kategória",
                             "description": "Popis Východzej Kategórie"
-                            }"""))
+                            }""")
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
                     .pathParam("id", asserter.getData("id"))
                     .pathParam("locale", "sk")
                     .post("/category/translation/{id}/{locale}")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("name", startsWith("Východzia Kategória"),
+                            "description", startsWith("Popis Východzej Kategórie"));
+
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .pathParam("id", asserter.getData("id"))
+                    .pathParam("locale", "sk")
+                    .get("task-mode/category/translation/{id}/{locale}")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
                     .body("name", startsWith("Východzia Kategória"),
@@ -330,12 +341,12 @@ public class TestCategoryService extends AbstractTest {
                 .onItem()
                 .invoke(category -> asserter.putData("category2", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category1"), "en")
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category1"), "en")
                 .<LocaleCategoryText> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("en_locale", localeCategory)));
 
-        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category2"), "sk")
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category2"), "sk")
                 .<LocaleCategoryText> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("sk_locale", localeCategory)));
@@ -376,7 +387,7 @@ public class TestCategoryService extends AbstractTest {
                 .onItem()
                 .invoke(category -> asserter.putData("category", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category"), "sk")
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category"), "sk")
                 .<LocaleCategoryText> persistAndFlush());
 
         asserter.execute(() -> given()
@@ -466,7 +477,7 @@ public class TestCategoryService extends AbstractTest {
                 .onItem()
                 .invoke(category -> asserter.putData("category", category)));
 
-        asserter.execute(() -> createRandomLocaleCategory((Category) asserter.getData("category"), "cs")
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category"), "cs")
                 .<LocaleCategoryText> persistAndFlush()
                 .onItem()
                 .invoke(localeCategory -> asserter.putData("cs_locale", localeCategory)));
@@ -482,17 +493,6 @@ public class TestCategoryService extends AbstractTest {
                         "description", is("description")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    private LocaleCategoryText createRandomLocaleCategory(Category category, String locale) {
-        LocaleCategoryText localeCategory = new LocaleCategoryText();
-
-        localeCategory.categoryText = category.categoryText;
-        localeCategory.locale = locale;
-        localeCategory.name = "Default Category" + Math.random();
-        localeCategory.description = "Default English Category Description" + Math.random();
-
-        return localeCategory;
     }
 
     @Test

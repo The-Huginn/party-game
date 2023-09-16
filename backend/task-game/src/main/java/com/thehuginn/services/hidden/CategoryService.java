@@ -92,7 +92,7 @@ public class CategoryService {
                 .<LocaleCategoryText> chain(category -> {
                     LocaleCategoryText newLocale = new LocaleCategoryText(category.categoryText, locale, categoryDto.name,
                             categoryDto.description);
-                    return newLocale.persist();
+                    return newLocale.persistAndFlush();
                 })
                 .map(localeCategoryText -> new CategoryText.CategoryDto(id, localeCategoryText.getName(),
                         localeCategoryText.getDescription()));

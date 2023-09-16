@@ -6,6 +6,7 @@ import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.services.hidden.CategoryService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
+import com.thehuginn.token.translation.LocaleCategoryText;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.panache.common.Parameters;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
@@ -39,13 +41,6 @@ public class TestGameCreationService extends AbstractTest {
             .player(PLAYER)
             .players(PLAYERS)
             .locale(LOCALE).build();
-
-    //    @BeforeEach
-    //    @AfterEach
-    //    @RunOnVertxContext
-    //    public void setup(UniAsserter asserter) {
-    //        super.setup(asserter);
-    //    }
 
     @Test
     @Order(1)
@@ -205,6 +200,85 @@ public class TestGameCreationService extends AbstractTest {
 
         asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> Assertions.assertEquals(gameTasks.size(), 18));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(4)
+    void testGetDefaultLocalizedCategories(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category> persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category1", category)));
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category1"), "sk")
+                .<LocaleCategoryText> persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("sk_category1", localeCategory)));
+
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category> persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category2", category)));
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category2"), "sk")
+                .<LocaleCategoryText> persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("sk_category2", localeCategory)));
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .when()
+                    .get("/task-mode/category")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("$.size()", is(3),
+                            "[1].name", is("name"),
+                            "[1].description", is("description"));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(5)
+    void testGetLocalizedCategories(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category> persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category1", category)));
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category1"), "sk")
+                .<LocaleCategoryText> persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("sk_category1", localeCategory)));
+
+        asserter.execute(() -> EntityCreator.createCategory()
+                .<Category> persistAndFlush()
+                .onItem()
+                .invoke(category -> asserter.putData("category2", category)));
+        asserter.execute(() -> EntityCreator.createRandomLocaleCategory((Category) asserter.getData("category2"), "sk")
+                .<LocaleCategoryText> persistAndFlush()
+                .onItem()
+                .invoke(localeCategory -> asserter.putData("sk_category2", localeCategory)));
+
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "sk").build())
+                    .when()
+                    .get("/task-mode/category")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("$.size()", is(3),
+                            "[1].name", anyOf(
+                                    is(((LocaleCategoryText) asserter.getData("sk_category1")).getName()),
+                                    is(((LocaleCategoryText) asserter.getData("sk_category2")).getName())),
+                            "[1].description", anyOf(
+                                    is(((LocaleCategoryText) asserter.getData("sk_category1")).getDescription()),
+                                    is(((LocaleCategoryText) asserter.getData("sk_category2")).getDescription())));
+        });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
