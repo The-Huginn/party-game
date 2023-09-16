@@ -454,4 +454,33 @@ public class TestTaskService extends AbstractTest {
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
+
+    @Test
+    @RunOnVertxContext
+    @Order(14)
+    public void testCreateTaskWithDefaultValues(UniAsserter asserter) {
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "en"
+                            }
+                        }
+                        """)
+                .when().post()
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("task.content", is("test"),
+                        "task.locale", is("en"),
+                        "type", is("SINGLE"),
+                        "repeat", is("NEVER"),
+                        "frequency", is(1),
+                        "price.enabled", is(true),
+                        "price.price", is(1))
+                .extract().asString());
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 }
