@@ -100,13 +100,6 @@ public class TaskService {
     public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
         return Task.<Task> findById(id)
                 .<Task> chain(task -> {
-                    if (updatedTask.task != null) {
-                        if (updatedTask.task.content != null && !updatedTask.task.content.equals("<missing_value>")) {
-                            task.task.content = updatedTask.task.content;
-                            task.tokens.clear();
-                            task.tokens.addAll(TokenResolver.translateTask(updatedTask.task.content));
-                        }
-                    }
                     task.type = updatedTask.type != null ? updatedTask.type : task.type;
                     task.repeat = updatedTask.repeat != null ? updatedTask.repeat : task.repeat;
                     task.frequency = updatedTask.frequency != null ? updatedTask.frequency : task.frequency;
