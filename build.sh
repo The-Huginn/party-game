@@ -10,8 +10,7 @@ do
 	kubectl apply -f target/kubernetes/kubernetes.yml
 done
 
-kubectl apply -f ~/party-game/frontend/frontend.yaml
-
+kubectl rollout restart deployment svelte-frontend
 #podman login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} registry.localhost
 #podman push registry.localhost/game:latest
 
