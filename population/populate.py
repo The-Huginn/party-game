@@ -14,8 +14,7 @@ for category in categories:
     id = response.json()['id']
 
     for translation in category['translations']:
-        translation['category'] = id
-        requests.post(api_url + '/category/translation', json=translation)
+        requests.post(api_url + '/category/translation/' + str(id) + '/' + translation['locale'], json=translation)
 
 for task in tasks:
     final_url = api_url + '/task'
