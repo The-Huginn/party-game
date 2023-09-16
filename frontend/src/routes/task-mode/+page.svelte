@@ -2,18 +2,21 @@
 	import { goto } from '$app/navigation';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
-	import { isLoading } from 'svelte-i18n';
-	import { game_url, header } from '../../store';
+	import { isLoading, locale } from 'svelte-i18n';
+	import { game_url, header, task_url } from '../../store';
 	import type { PageData } from './$types';
 	import CategoryTable from './CategoryTable.svelte';
+	import { setCookie } from '$lib/common/cookies';
+	import { onDestroy } from 'svelte';
+	import type { Category } from './Category';
 
 	export let data: PageData;
 	export let formSuccess: string = '';
 
-	let { categories } = data;
-	let { selected } = data;
+	$: categories = data.categories;
+	$: selected = data.selected;
 
-	async function handleSubmit(event) {
+	async function handleSubmit(event: SubmitEvent) {
 		const formDatam = new FormData(this);
 
 		const response = await fetch(`${game_url}/mode/start`, {
@@ -33,6 +36,30 @@
 			}
 		}
 	}
+
+	$: subscription = locale.subscribe(async (newLocale) => {
+		if (newLocale == null) {
+			return;
+		}
+
+		if (typeof window !== 'undefined') {
+			setCookie('locale', newLocale.substring(0, 2));
+			console.log(newLocale);
+			const allCategories = await fetch(`${task_url}/task-mode/category`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			const selectedCategories = await fetch(`${task_url}/task-mode/category/selected`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			categories = (await allCategories.json()) as Category[];
+			selected = (await selectedCategories.json());
+		}
+	});
+	$: onDestroy(subscription);
 
 	$header = { text: 'page.task.category.title', append: '' };
 </script>
