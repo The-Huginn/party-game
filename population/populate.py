@@ -1,28 +1,31 @@
-import requests, json
+import requests, json, glob
+from pathlib import Path
 
-# api_url = "https://game.thehuginn.com/api/task/"
-api_url = "http://localhost:8082/"
+api_url = "https://game.thehuginn.com/api/task/"
+# api_url = "http://localhost:8082/"
 
-categories_file = open('categories.json', 'r')
-categories = json.loads(categories_file.read())
+def make_request(url, json=None, data=None):
+    response = requests.post(url, json=json, data=data)
+    if response.status_code != 200:
+        print(f'[ERROR] - status [{response.status_code}] url[{url}] json[{json}] data[{data}]')
+    return response.json()
 
-tasks_file = open('tasks.json', 'r')
-tasks = json.loads(tasks_file.read())
-
-for category in categories:
-    response = requests.post(api_url + '/category', json=category['payload'])
-    id = response.json()['id']
-
-    for translation in category['translations']:
-        requests.post(api_url + '/category/translation/' + str(id) + '/' + translation['locale'], json=translation)
-
+tasks = [Path(x).stem for x in glob.glob('tasks/*.json')]
 for task in tasks:
-    final_url = api_url + '/task'
-    if 'category' in task:
-        final_url = final_url + '/category/' + str(task['category'])
+    f = open(f'tasks/{task}.json', 'r')
+    data = json.loads(f.read())
 
-    response = requests.post(final_url, json=task['payload'])
-    id = response.json()['id']
+    if 'category' in data:
+        id = make_request(api_url + '/category', json=data['category']['payload'])['id']
+        for translation in data['category']['translations']:
+            make_request(api_url + '/category/translation/' + str(id) + '/' + translation['locale'], json=translation)
+    else:
+        id = 0
 
-    for translation in task['translations']:
-        requests.post(api_url + '/task/' + str(id) + '/' + translation['locale'], data=translation['translation'].encode())
+    for task in data['tasks']:
+        final_url = api_url + '/task/category/' + str(id)
+
+        task_id = make_request(final_url, json=task['payload'])['id']
+
+        for translation in task['translations']:
+            make_request(api_url + '/task/' + str(task_id) + '/' + translation['locale'], data=translation['translation'].encode())

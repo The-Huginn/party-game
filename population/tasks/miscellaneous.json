@@ -1,0 +1,188 @@
+{
+    "tasks": [
+        {
+            "payload": {
+                "repeat": "PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "Where would you hide dead body?"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Kde by si schoval mŕtvolu?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "What do you hate on the opposite sex?"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Čo neznášaš na opačnom pohlaví?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "When was the last time you peed yourself"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Kedy si sa naposledy pošťaľ?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "Give a compliment to the beauty of the table"
+                },
+                "price": {
+                    "enabled": "true",
+                    "price": 2
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Daj kompliment najväčšej kráske (krásavcovi) za stolom"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "Insult the worst looking person of the table"
+                },
+                "price": {
+                    "enabled": "true",
+                    "price": 2
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Povedz urážku najhoršie vyzerajúcej osobe za stolom"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat":"ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "Choose the ugliest person of the table. This person has to drink a shot"
+                },
+                "price": {
+                    "enabled": "true",
+                    "price": 2
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Vyber najškaredšiu osobu za stolom. Táto osoba si musí vypiť jeden panák"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "task": {
+                    "locale": "en",
+                    "content": "Who smells the best of all of you?"
+                },
+                "price": {
+                    "enabled":"true",
+                    "price":2
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Kto vonia najlepšie za stolom?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat":"PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "How often in a day do you pick your nose?"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Ako často do dňa si špáraš v nose?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat":"ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "What is the worst thing you recall the player {player_0} has done?"
+                },
+                "price": {
+                    "enabled":"true",
+                    "price":2
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Čo je najhoršia vec, o ktorej vieš, že spravil hráč {player_0}?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat":"PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "What is the worst thing you recall you have done?"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Čo je najhoršia vec, ktorú si spravil?"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat":"PER_PLAYER",
+                "task": {
+                    "locale": "en",
+                    "content": "What is the most embarassing thing that has happened to you?"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Čo je najtrápnejšia vec, čo sa ti v živote stala?"
+                }
+            ]
+        }
+    ]
+}

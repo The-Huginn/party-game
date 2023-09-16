@@ -1,0 +1,127 @@
+{
+    "category": {
+        "payload": {
+            "name": "Human contact",
+            "description": "Get ready for human-touching interactions (Best suited with combination with other categories)"
+        },
+        "translations": [
+            {
+                "locale": "sk",
+                "name": "Ľudské interakcie",
+                "description": "Buďte pripravený na priame ľudské kontakty (Najlepšie s kombináciou s inými kategóriami)"
+            }
+        ]
+    },
+    "tasks": [
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "type": "ALL",
+                "task": {
+                    "locale": "en",
+                    "content": "Everybody has to get off one piece of cloathing"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Každý si musí vyzlieť jeden kus oblečenia"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "type": "DUO",
+                "task": {
+                    "locale": "en",
+                    "content": "Get off one piece of cloathing of by one another"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Dajde si navzájom dole po jednom kuse oblečenia"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "type": "DUO",
+                "task": {
+                    "locale": "en",
+                    "content": "Give each other some nice massage"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Vzájomne sa trochu pomasírujte"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "type": "DUO",
+                "frequency": 3,
+                "task": {
+                    "locale": "en",
+                    "content": "Change your shoes with each other for the duration of the game"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Vzájomne si vymente obuv do konca hry"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "type": "DUO",
+                "frequency": 3,
+                "task": {
+                    "locale": "en",
+                    "content": "Switch T-shirts with each other for the duration of the game"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Vzájomne si vymente tričká do konca hry"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "Get off one piece of cloathing"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Dajde si dole jeden kus oblečenia"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "ALWAYS",
+                "task": {
+                    "locale": "en",
+                    "content": "Get off two piece of cloathing"
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Dajde si dole dva kusy oblečenia"
+                }
+            ]
+        }
+    ]
+}
