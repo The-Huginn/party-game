@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.thehuginn.util.Helper.ITALIC;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -158,7 +159,7 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                     .get("/task/current")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    .body("data.player", is(PLAYER)));
+                    .body("data.player", is(ITALIC.formatted(PLAYER))));
         }
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

@@ -79,7 +79,7 @@
 	{/if}
 		<h1 class="pt-4">
 			<span class="font-bold text-4xl">
-				{rawTask[task.task]}
+				{@html rawTask[task.task]}
 			</span>
 		</h1>
 		{#if !initialLoad && timer}

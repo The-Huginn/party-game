@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.thehuginn.util.Helper.UNDERLINED;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -129,7 +130,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is("simple task for " + PLAYERS.get(1)), is("simple task for " + PLAYERS.get(2)))));
+                        anyOf(is("simple task for " + UNDERLINED.formatted(PLAYERS.get(1))),
+                                is("simple task for " + UNDERLINED.formatted(PLAYERS.get(2))))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -197,8 +199,9 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")),
-                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s")))));
+                        anyOf(is(task.formatted(UNDERLINED.formatted(PLAYER), UNDERLINED.formatted(PLAYERS.get(1)), "42s")),
+                                is(task.formatted(UNDERLINED.formatted(PLAYER), UNDERLINED.formatted(PLAYERS.get(2)),
+                                        "42s")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -232,7 +235,10 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is(PLAYER + PLAYERS.get(1) + PLAYERS.get(2)), is(PLAYER + PLAYERS.get(2) + PLAYERS.get(1)))));
+                        anyOf(is(UNDERLINED.formatted(PLAYER) + UNDERLINED.formatted(PLAYERS.get(1))
+                                + UNDERLINED.formatted(PLAYERS.get(2))),
+                                is(UNDERLINED.formatted(PLAYER) + UNDERLINED.formatted(PLAYERS.get(2))
+                                        + UNDERLINED.formatted(PLAYERS.get(1))))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -269,8 +275,9 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("data." + ((Task) asserter.getData("task")).getKey(),
-                        anyOf(is(task.formatted(PLAYER, PLAYERS.get(1), "42s")),
-                                is(task.formatted(PLAYER, PLAYERS.get(2), "42s")))));
+                        anyOf(is(task.formatted(UNDERLINED.formatted(PLAYER), UNDERLINED.formatted(PLAYERS.get(1)), "42s")),
+                                is(task.formatted(UNDERLINED.formatted(PLAYER), UNDERLINED.formatted(PLAYERS.get(2)),
+                                        "42s")))));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
@@ -564,7 +571,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
                         .asString();
-                Assertions.assertTrue(result.contains(task.formatted(PLAYERS.get(i % PLAYERS.size()))));
+                Assertions.assertTrue(result.contains(task.formatted(UNDERLINED.formatted(PLAYERS.get(i % PLAYERS.size())))));
             }
         });
 

@@ -8,10 +8,14 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Map;
 
+import static com.thehuginn.util.Helper.ITALIC;
+import static com.thehuginn.util.Helper.UNDERLINED;
+
 @Entity
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class PlayerResolvedToken extends AbstractResolvedToken {
 
+    private static final String PLAYER_TAG = "player";
     String playerTag;
     String player;
 
@@ -20,11 +24,14 @@ public class PlayerResolvedToken extends AbstractResolvedToken {
 
     public PlayerResolvedToken(String playerTag, String player) {
         this.playerTag = playerTag;
-        this.player = player;
+        this.player = UNDERLINED.formatted(player);
     }
 
     public static PlayerResolvedToken getPlayer(ResolutionContext resolutionContext) {
-        return new PlayerResolvedToken("player", resolutionContext.getPlayer());
+        PlayerResolvedToken playerResolvedToken = new PlayerResolvedToken();
+        playerResolvedToken.playerTag = PLAYER_TAG;
+        playerResolvedToken.player = ITALIC.formatted(resolutionContext.getPlayer());
+        return playerResolvedToken;
     }
 
     @Override

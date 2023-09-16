@@ -28,7 +28,9 @@
 				{#if $isLoading}
 					<span class="loading loading-spinner text-info" />
 				{:else}
-					{$_(`${$header.text}`)} {$header.append != '' ? ' ' + $header.append : ''}
+				<span>
+					{$_(`${$header.text}`).trim()} {@html $header.append != '' ? ' ' + $header.append.trim() : ''}
+				</span>
 				{/if}
 			</h1>
 		{/key}

@@ -8,6 +8,9 @@ import java.util.Locale;
 
 public class Helper {
 
+    public static final String ITALIC = "<em>%s</em>";
+    public static final String UNDERLINED = "<u>%s</u>";
+
     private Helper() {
     }
 
