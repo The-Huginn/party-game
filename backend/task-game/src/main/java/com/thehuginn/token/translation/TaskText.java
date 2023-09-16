@@ -8,6 +8,7 @@ import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -65,6 +66,7 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     public String locale = "en";
 
     @JsonProperty
+    @Column(updatable = false)
     public String content = "<missing_value>";
 
     public TaskText() {
