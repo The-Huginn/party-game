@@ -21,7 +21,7 @@
 	<div class="w-16 h-16 flex-1 px-10">
 		{#key $header.text}
 			<h1
-				class="flex relative justify-center items-center w-full h-full inset-0 text-5xl lg:text-6xl mt-2"
+				class="flex relative justify-center items-center w-full h-full inset-0 text-4xl lg:text-6xl mt-2"
 				in:slide={{ duration, delay: duration, easing }}
 				out:slide={{ duration, easing, axis: 'x' }}
 			>
@@ -41,9 +41,9 @@
 			<img class="object-contain w-12 h-12" src={github} alt="GitHub" />
 		</a>
 	</div>
-	<div class="h-16 flex items-center justify-center hover:shadow-lg">
+	<div class="h-16 flex items-center justify-center hover:shadow-lg z-20">
 		<div class="dropdown dropdown-hover dropdown-end">
-			<img class="object-contain w-12 h-12" src={settings} alt="Settings" />
+			<button><img class="object-contain w-12 h-12 button" src={settings} alt="Settings" /></button>
 			<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 space-y-3">
 				<li>
 					{$_(`settings.theme`)}
