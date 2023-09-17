@@ -137,7 +137,13 @@ public class GameSession extends PanacheEntityBase {
         ResolutionContext resolutionContext = resolutionContextBuilder.player(this.currentPlayer).build();
 
         Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
-                .invoke(gameSession -> gameSession.currentTask = resolvedTask)
+                .invoke(gameSession -> {
+                    if (gameSession.currentTask != null) {
+                        gameSession.currentTask.copy(resolvedTask);
+                    } else {
+                        gameSession.currentTask = resolvedTask;
+                    }
+                })
                 .call(gameSession -> gameSession.persist());
 
         Uni<Void> deleteCurrentTask = Uni.createFrom().item(this.currentTask)

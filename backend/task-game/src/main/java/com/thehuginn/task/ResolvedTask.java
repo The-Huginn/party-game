@@ -79,4 +79,12 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
         }
         return Uni.createFrom().voidItem();
     }
+
+    public void copy(ResolvedTask resolvedTask) {
+        this.gameTask = resolvedTask.gameTask;
+        this.tokens.clear();
+        this.tokens.addAll(resolvedTask.tokens.stream()
+                .peek(resolvedToken -> ((AbstractResolvedToken) resolvedToken).resolvedTask = this)
+                .toList());
+    }
 }
