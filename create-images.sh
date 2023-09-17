@@ -5,8 +5,5 @@ cd frontend && \
 podman build -t registry.thehuginn.com/party-game/svelte-frontend . && \
 podman push registry.thehuginn.com/party-game/svelte-frontend:latest
 
-cd ../backend/game-service && \
-mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true
-
-cd ../task-game && \
+cd ../backend/ && \
 mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true
