@@ -2,3 +2,6 @@
 .cache
 .idea
 __pycache__
+
+# valuable resources
+population/tasks/
