@@ -10,7 +10,7 @@ def make_request(url, json=None, data=None):
         print(f'[ERROR] - status [{response.status_code}] url[{url}] json[{json}] data[{data}]')
     return response.json()
 
-make_request(api_url + '/task-mode/clearAll')
+requests.delete(api_url + '/task-mode/clearAll')
 
 tasks = [Path(x).stem for x in glob.glob('tasks/*.json')]
 for task in tasks:
