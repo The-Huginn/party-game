@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
+	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { game_url, header, task_url } from '../../store';
 	import type { PageData } from './$types';
-	import CategoryTable from './CategoryTable.svelte';
-	import { setCookie } from '$lib/common/cookies';
-	import { onDestroy } from 'svelte';
 	import type { Category } from './Category';
+	import CategoryTable from './CategoryTable.svelte';
 
 	export let data: PageData;
 	export let formSuccess: string = '';
@@ -44,7 +44,6 @@
 
 		if (typeof window !== 'undefined') {
 			setCookie('locale', newLocale.substring(0, 2));
-			console.log(newLocale);
 			const allCategories = await fetch(`${task_url}/task-mode/category`, {
 				method: 'GET',
 				credentials: 'include'

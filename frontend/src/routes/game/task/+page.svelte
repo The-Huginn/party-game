@@ -3,14 +3,14 @@
 	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
+	import shot from '$lib/images/shot.svg';
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
+	import PairTable from './PairTable.svelte';
 	import type { Task, Timer } from './Task';
 	import TimerComponent from './TimerComponent.svelte';
-	import PairTable from './PairTable.svelte';
-	import shot from '$lib/images/shot.svg';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -38,15 +38,13 @@
 			return;
 		}
 
-		if (typeof window !== 'undefined') {
-			setCookie('locale', newLocale.substring(0, 2));
-			const response = await fetch(`${game_url}/mode/current`, {
-				method: 'GET',
-				credentials: 'include'
-			});
+		setCookie('locale', newLocale);
+		const response = await fetch(`${game_url}/mode/current`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 
-			rawTask = (await response.json()).data as Task;
-		}
+		rawTask = (await response.json()).data as Task;
 	});
 
 	$: onDestroy(subscription);

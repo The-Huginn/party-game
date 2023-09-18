@@ -1,4 +1,9 @@
 export function getCookie(cname: string) {
+    if (typeof window === 'undefined') {
+        console.log('unable to get cookie');
+        return;
+    }
+    
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
@@ -11,13 +16,20 @@ export function getCookie(cname: string) {
             return c.substring(name.length, c.length);
         }
     }
-    return "";
+    return null;
 }
 
 export function setCookie(name: string, value: any, options = {}) {
+    if (typeof window === 'undefined') {
+        console.log('unable to set cookie ' + name + ' with value ' + value);
+        return;
+    }
+    
     if (options.expires instanceof Date) {
         options.expires = options.expires.toUTCString();
     }
+
+    options.path = '/';
 
     let updatedCookie = {
         [encodeURIComponent(name)]: encodeURIComponent(value),

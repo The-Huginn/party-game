@@ -1,16 +1,17 @@
-import { _, addMessages, getLocaleFromNavigator, init, register } from 'svelte-i18n';
+import { getCookie } from '$lib/common/cookies';
 import en from '$lib/i18n/en.json';
 import sk from '$lib/i18n/sk.json';
+import { _, addMessages, getLocaleFromNavigator, init } from 'svelte-i18n';
 
-function setupI18n({ withLocale: _locale } = { withLocale: getLocaleFromNavigator() }) {
+function setupI18n({ withLocale: _locale } = { withLocale: getCookie('locale') ?? getLocaleFromNavigator() }) {
     // register('en', () => import('./en.json'));
     // register('en', () => import('./sk.json'));
-    
-    addMessages('en-US', en);
-    addMessages('sk-SK', sk);
-    
+
+    addMessages('en', en);
+    addMessages('sk', sk);
+
     init({
-        fallbackLocale: 'en-US',
+        fallbackLocale: 'en',
         initialLocale: _locale
     });
 }

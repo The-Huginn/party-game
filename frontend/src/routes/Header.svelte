@@ -28,9 +28,10 @@
 				{#if $isLoading}
 					<span class="loading loading-spinner text-info" />
 				{:else}
-				<span>
-					{$_(`${$header.text}`).trim()} {@html $header.append != '' ? ' ' + $header.append.trim() : ''}
-				</span>
+					<span>
+						{$_(`${$header.text}`).trim()}
+						{@html $header.append != '' ? ' ' + $header.append.trim() : ''}
+					</span>
 				{/if}
 			</h1>
 		{/key}
@@ -48,32 +49,40 @@
 			<button><img class="object-contain w-12 h-12 button" src={settings} alt="Settings" /></button>
 			<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 space-y-3">
 				<li>
-					{$_(`settings.theme`)}
-					<select class="items-center justify-center select bg-opacity-30" data-choose-theme>
-						<option disabled value=""> Pick a theme </option>
-						<option value="">Default</option>
-						<option value="light">Light</option>
-						<option value="dark">Dark</option>
-						<option value="cyberpunk">Cyberpunk</option>
-						<option value="valentine">Valentine</option>
-						<option value="lofi">Lofi</option>
-						<option value="retro">Retro</option>
-						<option value="dracula">Dracula</option>
-						<option value="night">Night</option>
-						<option value="halloween">Halloween</option>
-					</select>
+					{#if $isLoading}
+						<span class="loading loading-spinner text-info" />
+					{:else}
+						{$_(`settings.theme`)}
+						<select class="items-center justify-center select bg-opacity-30" data-choose-theme>
+							<option disabled value=""> Pick a theme </option>
+							<option value="">Default</option>
+							<option value="light">Light</option>
+							<option value="dark">Dark</option>
+							<option value="cyberpunk">Cyberpunk</option>
+							<option value="valentine">Valentine</option>
+							<option value="lofi">Lofi</option>
+							<option value="retro">Retro</option>
+							<option value="dracula">Dracula</option>
+							<option value="night">Night</option>
+							<option value="halloween">Halloween</option>
+						</select>
+					{/if}
 				</li>
 				<li>
-					{$_(`settings.language`)}
-					<select class="items-center justify-center select bg-opacity-30" bind:value={$locale}>
-						{#each $locales as value}
-							{#if $locale == value}
-								<option {value} selected>{value.substring(0, 2)}</option>
-							{:else}
-								<option {value}>{value.substring(0, 2)}</option>
-							{/if}
-						{/each}
-					</select>
+					{#if $isLoading}
+						<span class="loading loading-spinner text-info" />
+					{:else}
+						{$_(`settings.language`)}
+						<select class="items-center justify-center select bg-opacity-30" bind:value={$locale}>
+							{#each $locales as value}
+								{#if $locale == value}
+									<option {value} selected>{value.substring(0, 2)}</option>
+								{:else}
+									<option {value}>{value.substring(0, 2)}</option>
+								{/if}
+							{/each}
+						</select>
+					{/if}
 				</li>
 			</ul>
 		</div>
