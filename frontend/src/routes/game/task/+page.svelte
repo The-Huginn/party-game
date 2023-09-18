@@ -38,7 +38,6 @@
 			return;
 		}
 
-		setCookie('locale', newLocale);
 		const response = await fetch(`${game_url}/mode/current`, {
 			method: 'GET',
 			credentials: 'include'

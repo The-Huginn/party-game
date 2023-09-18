@@ -42,21 +42,18 @@
 			return;
 		}
 
-		if (typeof window !== 'undefined') {
-			setCookie('locale', newLocale.substring(0, 2));
-			const allCategories = await fetch(`${task_url}/task-mode/category`, {
-				method: 'GET',
-				credentials: 'include'
-			});
+		const allCategories = await fetch(`${task_url}/task-mode/category`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 
-			const selectedCategories = await fetch(`${task_url}/task-mode/category/selected`, {
-				method: 'GET',
-				credentials: 'include'
-			});
+		const selectedCategories = await fetch(`${task_url}/task-mode/category/selected`, {
+			method: 'GET',
+			credentials: 'include'
+		});
 
-			categories = (await allCategories.json()) as Category[];
-			selected = (await selectedCategories.json());
-		}
+		categories = (await allCategories.json()) as Category[];
+		selected = (await selectedCategories.json());
 	});
 	$: onDestroy(subscription);
 

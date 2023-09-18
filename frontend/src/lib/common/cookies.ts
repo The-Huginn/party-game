@@ -16,6 +16,8 @@ export function getCookie(cname: string) {
             return c.substring(name.length, c.length);
         }
     }
+
+    console.log('here');
     return null;
 }
 

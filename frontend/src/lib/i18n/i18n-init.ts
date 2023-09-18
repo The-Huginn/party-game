@@ -7,6 +7,7 @@ function setupI18n({ withLocale: _locale } = { withLocale: getCookie('locale') ?
     // register('en', () => import('./en.json'));
     // register('en', () => import('./sk.json'));
 
+    console.log(_locale);
     addMessages('en', en);
     addMessages('sk', sk);
 

@@ -1,11 +1,23 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { setCookie } from '$lib/common/cookies';
+	import { onDestroy, onMount } from 'svelte';
+	import { locale } from 'svelte-i18n';
 	import { themeChange } from 'theme-change';
 
 	onMount(() => {
 		themeChange(false);
 	});
 
+	$: subscription = locale.subscribe(async (newLocale) => {
+		if (newLocale == null) {
+			return;
+		}
+
+		setCookie('locale', newLocale);
+	});
+
+	$: onDestroy(subscription);
+	
 </script>
 
 <svelte:head>
