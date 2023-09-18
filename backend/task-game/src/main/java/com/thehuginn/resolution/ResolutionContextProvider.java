@@ -40,7 +40,7 @@ public class ResolutionContextProvider implements ParamConverterProvider {
                 }
                 List<String> players = new ArrayList<>();
                 root.get("players").elements().forEachRemaining(
-                        jsonNode -> players.add(jsonNode.has("name") ? jsonNode.get("name").asText() : jsonNode.asText()));
+                        jsonNode -> players.add(jsonNode.asText()));
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
                         .players(players);
