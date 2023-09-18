@@ -6,6 +6,7 @@ import com.thehuginn.external.GameRestClientTask;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -57,7 +58,7 @@ public class ModeService {
 
     @GET
     @Path("/current")
-    public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie String locale) {
+    public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie @DefaultValue("en") String locale) {
         return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
@@ -67,7 +68,7 @@ public class ModeService {
 
     @PUT
     @Path("/next")
-    public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale) {
+    public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie @DefaultValue("en") String locale) {
         return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
