@@ -1,16 +1,20 @@
 package com.thehuginn.task;
 
+import com.thehuginn.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
 public class GameTask extends PanacheEntity implements Resolvable<ResolvedTask>, Cloneable {
 
-    public String game;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game")
+    public GameSession game;
 
     @ManyToOne(fetch = FetchType.EAGER)
     public Task unresolvedTask;

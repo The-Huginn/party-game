@@ -51,6 +51,7 @@ public class TestGameTask extends AbstractTest {
     @Order(1)
     @RunOnVertxContext
     void testCreateFromEmptyList(UniAsserter asserter) {
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             try {
                 return new GameTaskService().generateGameTasks(Collections.emptyList(), resolutionContext);
@@ -70,6 +71,7 @@ public class TestGameTask extends AbstractTest {
                 .onItem()
                 .invoke(task -> asserter.putData("task1", task)));
 
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of(
                     (Task) asserter.getData("task1"));
@@ -80,7 +82,7 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.count("game = :game", Parameters.with("game", GAME)),
+        asserter.assertThat(() -> GameTask.count("game.gameId = :game", Parameters.with("game", GAME)),
                 aLong -> Assertions.assertEquals(aLong, 9L));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -120,6 +122,7 @@ public class TestGameTask extends AbstractTest {
                 .invoke(task -> asserter.putData("task4", task)));
 
         List<Task> tasks = new ArrayList<>();
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             tasks.add((Task) asserter.getData("task1"));
             tasks.add((Task) asserter.getData("task2"));
@@ -132,7 +135,7 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
+        asserter.assertThat(() -> GameTask.<GameTask> find("game.id = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> {
                     Assertions.assertEquals(gameTasks.size(), 11);
                     Assertions.assertEquals(gameTasks.stream()
@@ -198,6 +201,7 @@ public class TestGameTask extends AbstractTest {
                 .invoke(task -> asserter.putData("task4", task)));
 
         List<Task> tasks = new ArrayList<>();
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             tasks.add((Task) asserter.getData("task1"));
             tasks.add((Task) asserter.getData("task2"));
@@ -220,7 +224,7 @@ public class TestGameTask extends AbstractTest {
             }
         });
 
-        asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
+        asserter.assertThat(() -> GameTask.<GameTask> find("game.id = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> {
                     Assertions.assertEquals(gameTasks.size(), 5);
                     Assertions.assertEquals(gameTasks.stream()

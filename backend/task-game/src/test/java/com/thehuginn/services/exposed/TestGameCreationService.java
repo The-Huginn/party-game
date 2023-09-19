@@ -198,7 +198,7 @@ public class TestGameCreationService extends AbstractTest {
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(is("true")));
 
-        asserter.assertThat(() -> GameTask.<GameTask> find("game = :game", Parameters.with("game", GAME))
+        asserter.assertThat(() -> GameTask.<GameTask> find("game.id = :game", Parameters.with("game", GAME))
                 .list(), gameTasks -> Assertions.assertEquals(gameTasks.size(), 18));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));

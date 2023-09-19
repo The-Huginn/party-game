@@ -41,6 +41,8 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -49,7 +51,6 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             PairsResolvedToken.Pair pair = given()
@@ -104,6 +105,8 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -112,7 +115,6 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         // We test it gets also persisted
         for (int i = 0; i < 2; i++) {
@@ -138,6 +140,8 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -146,7 +150,6 @@ public class TestTaskResolution extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         // We test it gets also persisted
         for (int i = 0; i < 2; i++) {

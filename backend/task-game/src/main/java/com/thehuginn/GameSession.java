@@ -20,10 +20,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,10 @@ public class GameSession extends PanacheEntityBase {
     public Set<Category> categories = new HashSet<>();
 
     public String currentPlayer = null;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
+    @JsonIgnore
+    public List<GameTask> tasks = new ArrayList<>();
 
     public GameSession() {
     }
@@ -156,13 +162,15 @@ public class GameSession extends PanacheEntityBase {
         Uni<Void> deleteCurrentTask = Uni.createFrom().item(this.currentTask)
                 .onItem().ifNotNull().transformToUni(ResolvedTask::remove);
 
-        Uni<ResolvedTask> nextTask = GameTask.count("game = :game", Parameters.with("game", gameId))
-                .chain(count -> {
-                    if (count.equals(0L)) {
+        Uni<ResolvedTask> nextTask = GameSession
+                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                        Parameters.with("id", gameId))
+                .singleResult().chain(gameSession -> {
+                    if (gameSession.tasks.isEmpty()) {
                         return Uni.createFrom().failure(new IllegalStateException("No more tasks remain for current game"));
                     }
 
-                    return nextTaskUni(resolutionContext, count);
+                    return nextTaskUni(resolutionContext, gameSession.tasks.size());
                 })
                 .call(updateResolvedTask)
                 .onFailure().recoverWithNull();
@@ -172,7 +180,7 @@ public class GameSession extends PanacheEntityBase {
     }
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
-        return GameTask.<GameTask> find("game = :game", Parameters.with("game", gameId))
+        return GameTask.<GameTask> find("game.id = :game", Parameters.with("game", gameId))
                 .page((int) (ThreadLocalRandom.current().nextLong(count)), 1)
                 .firstResult()
                 .chain(gameTask -> {

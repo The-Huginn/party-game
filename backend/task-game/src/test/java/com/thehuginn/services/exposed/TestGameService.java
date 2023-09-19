@@ -77,6 +77,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -85,7 +87,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -110,6 +111,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -118,7 +121,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -145,6 +147,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -153,7 +157,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -179,6 +182,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task1 -> asserter.putData("task", task1)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -187,7 +192,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -215,6 +219,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task1 -> asserter.putData("task", task1)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -223,7 +229,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -255,6 +260,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .invoke(task1 -> asserter.putData("task", task1)));
         asserter.execute(() -> taskService.createLocale(((Task) asserter.getData("task")).id, "sk",
                 task.formatted("{player_c}", "{player_1}", "{timer_42}")));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -263,7 +270,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -291,6 +297,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = List.of((Task) asserter.getData("task"));
             try {
@@ -299,7 +307,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> asserter.putData("resolvedTask", given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -357,6 +364,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
                     (Task) asserter.getData("task2")));
@@ -367,7 +376,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             String task = given()
@@ -428,6 +436,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .build())
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
                     (Task) asserter.getData("task2")));
@@ -437,7 +447,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             String task = given()
@@ -484,6 +493,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .type(Task.Type.SINGLE)
                 .build())
                 .invoke(task -> asserter.putData("task2", task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
                     (Task) asserter.getData("task2")));
@@ -493,7 +504,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             String task = given()
@@ -547,6 +557,8 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .type(Task.Type.SINGLE)
                 .build())
                 .invoke(task1 -> asserter.putData("task2", task1)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
                     (Task) asserter.getData("task2")));
@@ -556,7 +568,6 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             for (int i = 0; i <= 2 * PLAYERS.size(); i++) {

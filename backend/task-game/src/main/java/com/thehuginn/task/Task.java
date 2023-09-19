@@ -181,7 +181,6 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
         List<GameTask> tasks = new ArrayList<>();
         for (short amount = 0; amount < frequency; amount++) {
             GameTask gameTask = new GameTask();
-            gameTask.game = context.getGameId();
             gameTask.unresolvedTask = this;
             if (repeat.equals(Task.Repeat.PER_PLAYER)) {
                 for (String player : context.getPlayers()) {

@@ -1,10 +1,11 @@
 package com.thehuginn.services.hidden;
 
+import com.thehuginn.GameSession;
 import com.thehuginn.resolution.ResolutionContext;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
-import io.quarkus.logging.Log;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 
@@ -38,29 +39,26 @@ public class GameTaskService {
             createdTasks.addAll(task.resolve(resolutionContext));
         }
 
-        Uni<Long> deletePrevious = GameTask.delete("game", resolutionContext.getGameId())
-                .invoke(aLong -> {
-                    if (aLong.compareTo(0L) > 0) {
-                        Log.infof("Previous game [%s] was deleted with %d tasks remaining",
-                                resolutionContext.getGameId(), aLong);
-                    }
-                });
-
-        if (createdTasks.isEmpty()) {
-            return deletePrevious
-                    .replaceWithVoid();
-        }
-
         Collections.shuffle(createdTasks);
-        Uni<Void> newGameTasks = Uni.combine()
-                .all()
-                .unis(createdTasks.stream()
-                        .map(gameTask -> gameTask.persist())
-                        .collect(Collectors.toList()))
-                .usingConcurrencyOf(1)
-                .discardItems();
-
-        return deletePrevious
-                .replaceWith(newGameTasks);
+        return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                Parameters.with("id", resolutionContext.getGameId())).firstResult()
+                .<GameSession> chain(gameSession -> {
+                    gameSession.tasks.clear();
+                    gameSession.tasks.addAll(createdTasks);
+                    return gameSession.persist();
+                })
+                .chain(gameSession -> {
+                    if (createdTasks.isEmpty()) {
+                        return Uni.createFrom().voidItem();
+                    }
+                    return Uni.combine()
+                            .all()
+                            .unis(createdTasks.stream()
+                                    .peek(gameTask -> gameTask.game = gameSession)
+                                    .map(gameTask -> gameTask.persist())
+                                    .collect(Collectors.toList()))
+                            .usingConcurrencyOf(1)
+                            .discardItems();
+                });
     }
 }

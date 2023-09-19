@@ -46,6 +46,7 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
                 .onItem()
                 .invoke(task -> asserter.putData(SECOND, task)));
 
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData(FIRST),
                     (Task) asserter.getData(SECOND)));
@@ -55,7 +56,6 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             String currentTask = given()
@@ -121,6 +121,7 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
                 .onItem()
                 .invoke(task -> asserter.putData(SECOND, task)));
 
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData(FIRST),
                     (Task) asserter.getData(SECOND)));
@@ -130,7 +131,6 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
                 throw new RuntimeException(e);
             }
         });
-        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
 
         asserter.execute(() -> {
             String currentTask = given()
