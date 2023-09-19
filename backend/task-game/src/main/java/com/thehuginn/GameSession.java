@@ -27,8 +27,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -115,9 +115,16 @@ public class GameSession extends PanacheEntityBase {
 
     public Uni<ResolvedTask> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
         resolutionContextBuilder = resolutionContextBuilder.player(this.currentPlayer);
+        ResolutionContext.Builder finalResolutionContextBuilder = resolutionContextBuilder;
         return Uni.createFrom()
                 .item(this.currentTask)
-                .onItem().ifNull().switchTo(nextTask(resolutionContextBuilder));
+                .chain(resolvedTask -> {
+                    if (resolvedTask == null || resolvedTask.gameTask == null) {
+                        return nextTask(finalResolutionContextBuilder);
+                    }
+
+                    return Uni.createFrom().item(resolvedTask);
+                });
     }
 
     public Uni<ResolvedTask> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
@@ -166,11 +173,11 @@ public class GameSession extends PanacheEntityBase {
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
         return GameTask.<GameTask> find("game = :game", Parameters.with("game", gameId))
-                .page((int) ((new Random()).nextLong(count)), 1)
+                .page((int) (ThreadLocalRandom.current().nextLong(count)), 1)
                 .firstResult()
                 .chain(gameTask -> {
                     if (!gameTask.isResolvable(resolutionContext) ||
-                            (currentTask != null && currentTask.gameTask.equals(gameTask))) {
+                            (currentTask != null && currentTask.gameTask != null && currentTask.gameTask.equals(gameTask))) {
                         return nextTaskUni(resolutionContext, count);
                     }
 

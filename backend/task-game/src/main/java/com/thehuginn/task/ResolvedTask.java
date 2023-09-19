@@ -74,7 +74,7 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
     }
 
     public Uni<Void> remove() {
-        if (gameTask.unresolvedTask.isRemovable()) {
+        if (gameTask != null && gameTask.unresolvedTask.isRemovable()) {
             return gameTask.delete();
         }
         return Uni.createFrom().voidItem();
