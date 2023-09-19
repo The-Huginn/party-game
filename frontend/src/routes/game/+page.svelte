@@ -16,9 +16,14 @@
 	let gameId: string;
 	let cookie: string;
 
-	onMount(() => {
+	onMount(async () => {
 		cookie = getCookie('gameId');
 		gameId = cookie ?? gameIdFallback;
+		const response = await fetch(`${game_url}/game?gameId=${cookie}`);
+
+		if (response.status == 200) {
+			gameState = (await response.json()).state;
+		}
 	});
 
 	async function handleSubmit(event: SubmitEvent) {
