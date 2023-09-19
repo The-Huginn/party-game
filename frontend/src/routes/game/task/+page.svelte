@@ -3,7 +3,6 @@
 	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
-	import shot from '$lib/images/shot.svg';
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { game_url, header } from '../../../store';
@@ -11,6 +10,7 @@
 	import PairTable from './PairTable.svelte';
 	import type { Task, Timer } from './Task';
 	import TimerComponent from './TimerComponent.svelte';
+	import Price from './Price.svelte';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -65,14 +65,7 @@
 		class="grid relative w-4/5 lg:w-2/5 gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
 	{#if task.price.enabled}
-	<div class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">
-		<div class="flex flex-row float-right items-center justify-center bg-warning rounded-2xl p-2 shadow-lg">
-			<p class="text-xl font-bold">{$_('page.game.task.price')}</p>
-			{#each Array(task.price.price) as _}
-				<img class="object-contain w-8 h-8" src={shot} alt="price" />
-			{/each}
-		</div>
-	</div>
+		<Price price={task.price.price}/>
 	{/if}
 		<h1 class="pt-4">
 			<span class="font-bold text-4xl">
