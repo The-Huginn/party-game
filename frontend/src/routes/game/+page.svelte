@@ -50,7 +50,7 @@
 
 	$header = { text: 'page.game.create.title', append: '' };
 
-	let gameState: string = 'CREATED';
+	let gameState: string = 'NONE';
 
 	async function onMountCallback() {
 		const response = await fetch(`${game_url}/game?gameId=${cookie}`);
@@ -90,7 +90,7 @@
 	{:else}
 		<h1 class="w-full m-10 text-4xl font-bold">{$_('page.game.create.choose_name')}</h1>
 	{/if}
-	{#if cookie != ''}
+	{#if cookie != '' && gameState != 'NONE'}
 		<Modal {onMountCallback} {yesCallback} {noCallback} question="page.game.create.game_exists" />
 	{/if}
 	<div
