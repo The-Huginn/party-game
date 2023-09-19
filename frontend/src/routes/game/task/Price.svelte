@@ -1,11 +1,12 @@
 <script lang="ts">
 	import shot from '$lib/images/shot.svg';
 	import { _ } from 'svelte-i18n';
+	import { slide } from 'svelte/transition';
 
     export let price: number;
 </script>
 
-<div class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">
+<div in:slide out:slide class="absolute flex flex-row w-full justify-end whitespace-nowrap -mt-6 mx-4">
     <div class="flex flex-row float-right items-center justify-center bg-warning rounded-2xl p-2 shadow-lg">
         <p class="text-xl font-bold">{$_('page.game.task.price')}</p>
         {#each Array(price) as _}
