@@ -27,15 +27,15 @@ import static io.restassured.RestAssured.given;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ResolvedTaskTest extends AbstractResolutionTaskTest {
 
-    @Test
-    @Order(1)
-    @RunOnVertxContext
     /**
      * This test verifies that the potential bug is not present and a work-around is in place.
-     * The bug is documented especially in https://github.com/The-Huginn/party-game/issues/39
+     * The bug is documented especially in this <a href="https://github.com/The-Huginn/party-game/issues/39">issue</a>
      * We delete the gameTask and set it to null for currentTask (ResolvedTask). When
      * calling `/current` or `/next` we expect the game to progress and not become stale
      */
+    @Test
+    @Order(1)
+    @RunOnVertxContext
     void testWithNullGameTaskCurrent(UniAsserter asserter) {
         String FIRST = "first";
         String SECOND = "second";
@@ -101,16 +101,16 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
-    @Test
-    @Order(2)
-    @RunOnVertxContext
     /**
      * This is spin-off of previous test testing route `/next`
      * This test verifies that the potential bug is not present and a work-around is in place.
-     * The bug is documented especially in https://github.com/The-Huginn/party-game/issues/39
+     * The bug is documented especially in this <a href="https://github.com/The-Huginn/party-game/issues/39">issue</a>
      * We delete the gameTask and set it to null for currentTask (ResolvedTask). When
      * calling `/current` or `/next` we expect the game to progress and not become stale
      */
+    @Test
+    @Order(2)
+    @RunOnVertxContext
     void testWithNullGameTaskNext(UniAsserter asserter) {
         String FIRST = "first";
         String SECOND = "second";
