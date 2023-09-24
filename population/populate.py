@@ -3,6 +3,7 @@ from pathlib import Path
 
 api_url = "https://game.thehuginn.com/api/task/"
 # api_url = "http://localhost:8082/"
+ignore = ['template']
 
 # Delete request made to /clearAll
 total_requests = 1
@@ -22,6 +23,9 @@ requests.delete(api_url + '/task-mode/clearAll')
 
 tasks = [Path(x).stem for x in glob.glob('tasks/*.json')]
 for task in tasks:
+    if task in ignore:
+        continue
+
     f = open(f'tasks/{task}.json', 'r')
     data = json.loads(f.read())
 

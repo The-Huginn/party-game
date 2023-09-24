@@ -1,0 +1,21 @@
+{
+    "payload": {
+        "repeat":"ALWAYS",
+        "type":"ALL",
+        "frequency":2,
+        "task": {
+            "locale": "en",
+            "content": ""
+        },
+        "price":{
+            "enabled":"true",
+            "price":2
+        }
+    },
+    "translations": [
+        {
+            "locale": "sk",
+            "translation": ""
+        }
+    ]
+}
