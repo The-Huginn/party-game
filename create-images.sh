@@ -1,5 +1,5 @@
 . .env
-podman login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD}
+podman login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} registry.thehuginn.com
 
 cd frontend && \
 podman build -t registry.thehuginn.com/party-game/svelte-frontend . && \

@@ -12,7 +12,13 @@ do
 done
 
 echo -e '\033[1mRolling out update for frontend...\033[0m'
-kubectl rollout restart deployment svelte-frontend
+cd ~/party-game/frontend && \
+kubectl delete -f frontend.yaml && \
+kubectl apply -f frontend.yaml
+
+cd ~/party-game/kubernetes && \
+kubectl delete -f nginx.yaml && \
+kubectl apply -f nginx.yaml
 
 cd ~/party-game/population/tasks && git pull origin
 
