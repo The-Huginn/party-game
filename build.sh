@@ -2,7 +2,7 @@
 
 git pull origin
 
-echo "Creating backend resources for kubernetes..."
+echo -e '\033[1mCreating backend resources for kubernetes...\033[0m'
 for microservice in game-service task-game
 do
 	cd ~/party-game/backend/$microservice && \
@@ -11,11 +11,12 @@ do
 	kubectl apply -f target/kubernetes/kubernetes.yml
 done
 
-echo "Rolling out update for frontend..."
+echo -e '\033[1mRolling out update for frontend...\033[0m'
 kubectl rollout restart deployment svelte-frontend
 
 cd ~/party-game/population/tasks && git pull origin
 
-sleep 3
-echo "Populating tasks..."
+echo -e '\033[1mWaiting for pods to activate for 10 seconds...\033[0m'
+sleep 10
+echo -e '\033[1mPopulating tasks...\033[0m'
 cd ~/party-game/population && python3.11 populate.py
