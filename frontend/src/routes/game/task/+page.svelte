@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { setCookie } from '$lib/common/cookies';
 	import Alert from '$lib/components/Alert.svelte';
+	import Loading from '$lib/components/Loading.svelte';
 	import { _ } from '$lib/i18n/i18n-init';
 	import { onDestroy } from 'svelte';
 	import { isLoading, locale } from 'svelte-i18n';
 	import { game_url, header } from '../../../store';
 	import type { PageData } from './$types';
 	import PairTable from './PairTable.svelte';
+	import Price from './Price.svelte';
 	import type { Task, Timer } from './Task';
 	import TimerComponent from './TimerComponent.svelte';
-	import Price from './Price.svelte';
 
 	export let data: PageData;
 	let formSuccess: string = '';
@@ -20,7 +20,12 @@
 	$: timer = data.data.timer as Timer;
 	$: initialLoad = data.initialLoad;
 
-	async function submitHandler(event: SubmitEvent) {
+	let nextCallback;
+	function submitHandler(event: SubmitEvent) {
+		nextCallback = nextTask(event);
+	}
+
+	async function nextTask(event: SubmitEvent) {
 		const response = await fetch(`${game_url}/mode/next`, {
 			method: 'PUT',
 			credentials: 'include'
@@ -64,12 +69,16 @@
 	<div
 		class="grid relative w-4/5 lg:w-2/5 gap-4 p-4 mb-4 bg-info shadow-lg border-1 border-solid border-gray-800 rounded-2xl"
 	>
-	{#if task.price.enabled}
-		<Price price={task.price.price}/>
-	{/if}
+		{#if task.price.enabled}
+			<Price price={task.price.price} />
+		{/if}
 		<h1 class="pt-4">
 			<span class="font-bold text-4xl">
-				{@html rawTask[task.task]}
+				{#await nextCallback}
+					<Loading />
+				{:then}
+					{@html rawTask[task.task]}
+				{/await}
 			</span>
 		</h1>
 		{#if !initialLoad && timer}

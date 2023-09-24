@@ -1,8 +1,8 @@
 import requests, json, glob, time
 from pathlib import Path
 
-api_url = "https://game.thehuginn.com/api/task/"
-# api_url = "http://localhost:8082/"
+# api_url = "https://game.thehuginn.com/api/task/"
+api_url = "http://localhost:8082/"
 ignore = ['template']
 
 # Delete request made to /clearAll
