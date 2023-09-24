@@ -31,7 +31,7 @@
 			credentials: 'include'
 		});
 
-		data = {
+		return data = {
 			url: $page.url.toString(),
 			data: (await response.json()).data,
 			initialLoad: true
