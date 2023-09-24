@@ -101,12 +101,12 @@ spec:
           value: /auth/htpasswd
         
         resources:
-          limits:
-            memory: 256Mi
-            cpu: 300m
           requests:
             memory: 128Mi
             cpu: 150m
+          limits:
+            memory: 512Mi
+            cpu: 500m
 
         ports:
         - containerPort: 5000
