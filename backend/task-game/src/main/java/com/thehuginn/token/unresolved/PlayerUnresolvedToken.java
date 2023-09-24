@@ -32,8 +32,12 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
 
     @Override
     public boolean isResolvable(ResolutionContext context) {
-        Integer index = getPlayerIndex();
-        return index.compareTo(0) > 0 && index.compareTo(context.getPlayers().size()) < 0;
+        try {
+            Integer index = getPlayerIndex();
+            return index.compareTo(0) > 0 && index.compareTo(context.getPlayers().size()) < 0;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     private Integer getPlayerIndex() throws IllegalStateException, IllegalArgumentException {

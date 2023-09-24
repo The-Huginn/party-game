@@ -11,6 +11,7 @@ import com.thehuginn.task.GameTask;
 import com.thehuginn.task.ResolvedTask;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
@@ -151,6 +152,7 @@ public class GameSession extends PanacheEntityBase {
 
         Function<ResolvedTask, Uni<?>> updateResolvedTask = resolvedTask -> Uni.createFrom().item(this)
                 .invoke(gameSession -> {
+                    Log.infof("New resolved task to be: %s", resolvedTask.gameTask.unresolvedTask.task.content);
                     if (gameSession.currentTask != null) {
                         gameSession.currentTask.copy(resolvedTask);
                     } else {
@@ -184,8 +186,10 @@ public class GameSession extends PanacheEntityBase {
                 .page((int) (ThreadLocalRandom.current().nextLong(count)), 1)
                 .firstResult()
                 .chain(gameTask -> {
+                    Log.infof("Randomly chosen task to potentially play: %s", gameTask.unresolvedTask.task.content);
                     if (!gameTask.isResolvable(resolutionContext) ||
                             (currentTask != null && currentTask.gameTask != null && currentTask.gameTask.equals(gameTask))) {
+                        Log.infof("New task is required");
                         return nextTaskUni(resolutionContext, count);
                     }
 

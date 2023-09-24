@@ -1,5 +1,6 @@
 package com.thehuginn.resolution;
 
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ public class UnresolvedResult {
         private final Map<String, Object> data;
 
         private ResolvedResult(Map.Entry<String, String> task, Map<String, Object> data) {
+            Log.infof("Creating new resolved result with task: [%s] data: [%s]", task, data);
             this.data = data;
             String resolvedTask = task.getValue();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
