@@ -67,6 +67,14 @@ spec:
           mountPath: /etc/nginx/templates
           readOnly: true
 
+        resources:
+        limits:
+          memory: 64Mi
+          cpu: 100m
+        requests:
+          memory: 192Mi
+          cpu: 200m
+
 ---
 
 apiVersion: v1
