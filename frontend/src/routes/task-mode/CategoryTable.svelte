@@ -32,8 +32,8 @@
 	<table class="table table-auto">
 		<tbody class="table-auto">
 			{#each categories as category}
-				<tr class="items-center" transition:slide|local>
-					<th class="nowrap">
+				<tr class="items-center flex flex-col sm:flex-row" transition:slide|local>
+					<th class="nowrap w-full">
 						<form class="w-full flex">
 							<div class="form-control space-x-10 flex flex-row items-center">
 								<input type="hidden" name="id" hidden value={category.id} />
@@ -59,7 +59,7 @@
 							</div>
 						</form>
 					</th>
-					<th class="nowrap">
+					<th class="nowrap w-1/5">
 						<div
 							class="corner w-8 h-8 tooltip"
 							role="tooltip"
