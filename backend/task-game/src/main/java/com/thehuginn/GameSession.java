@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -182,9 +181,12 @@ public class GameSession extends PanacheEntityBase {
     }
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
-        return GameTask.<GameTask> find("game.id = :game", Parameters.with("game", gameId))
-                .page((int) (ThreadLocalRandom.current().nextLong(count)), 1)
+        return GameTask
+                .<GameTask> find("game.id = :game AND id > game.currentTask.gameTask.id", Parameters.with("game", gameId))
+                .page(0, 1)
                 .firstResult()
+                .onItem().ifNull()
+                .switchTo(() -> GameTask.find("game.id = :game", Parameters.with("game", gameId)).firstResult())
                 .chain(gameTask -> {
                     Log.infof("Randomly chosen task to potentially play: %s", gameTask.unresolvedTask.task.content);
                     if (!gameTask.isResolvable(resolutionContext) ||
