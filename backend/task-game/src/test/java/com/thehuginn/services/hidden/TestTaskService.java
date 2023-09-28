@@ -497,4 +497,39 @@ public class TestTaskService extends AbstractTest {
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
+
+    @Test
+    @RunOnVertxContext
+    @Order(4)
+    public void testFailOnDuplicateTaskContent(UniAsserter asserter) {
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "en"
+                            }
+                        }
+                        """)
+                .when().post()
+                .then()
+                .statusCode(RestResponse.StatusCode.OK));
+
+        asserter.execute(() -> given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                            "task": {
+                                "content": "test",
+                                "locale": "en"
+                            }
+                        }
+                        """)
+                .when().post()
+                .then()
+                .statusCode(RestResponse.StatusCode.INTERNAL_SERVER_ERROR));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
 }

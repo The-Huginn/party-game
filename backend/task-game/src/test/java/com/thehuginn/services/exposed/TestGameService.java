@@ -488,7 +488,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .type(Task.Type.SINGLE)
                 .build())
                 .invoke(task -> asserter.putData("task1", task)));
-        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_1}")
+        asserter.execute(() -> taskService.createTask(new Task.Builder("simple task for {player_2}")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.SINGLE)
                 .build())
@@ -552,7 +552,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 .type(Task.Type.SINGLE)
                 .build())
                 .invoke(task1 -> asserter.putData("task1", task1)));
-        asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}"))
+        asserter.execute(() -> taskService.createTask(new Task.Builder(task.formatted("{player_c}."))
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.SINGLE)
                 .build())

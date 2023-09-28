@@ -105,7 +105,7 @@ public class TestGameTask extends AbstractTest {
                 .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
-        asserter.execute(() -> new Task.Builder("simple task")
+        asserter.execute(() -> new Task.Builder("simple task 2")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.DUO)
                 .build()
@@ -185,7 +185,7 @@ public class TestGameTask extends AbstractTest {
                 .<Task> persistAndFlush()
                 .onItem()
                 .invoke(task -> asserter.putData("task2", task)));
-        asserter.execute(() -> new Task.Builder("simple task")
+        asserter.execute(() -> new Task.Builder("simple task 2")
                 .repeat(Task.Repeat.ALWAYS)
                 .type(Task.Type.DUO)
                 .build()

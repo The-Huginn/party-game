@@ -66,7 +66,7 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     public String locale = "en";
 
     @JsonProperty
-    @Column(updatable = false)
+    @Column(updatable = false, unique = true)
     public String content = "<missing_value>";
 
     public TaskText() {
