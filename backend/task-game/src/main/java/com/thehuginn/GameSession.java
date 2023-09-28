@@ -160,8 +160,9 @@ public class GameSession extends PanacheEntityBase {
                 })
                 .call(gameSession -> gameSession.persist());
 
-        Uni<Void> deleteCurrentTask = Uni.createFrom().item(this.currentTask)
-                .onItem().ifNotNull().transformToUni(ResolvedTask::remove);
+        Uni<Void> deleteCurrentTask = this.currentTask != null
+                ? this.currentTask.remove()
+                : Uni.createFrom().voidItem();
 
         Uni<ResolvedTask> nextTask = GameSession
                 .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
@@ -171,7 +172,11 @@ public class GameSession extends PanacheEntityBase {
                         return Uni.createFrom().failure(new IllegalStateException("No more tasks remain for current game"));
                     }
 
-                    return nextTaskUni(resolutionContext, gameSession.tasks.size());
+                    long id = -1;
+                    if (gameSession.currentTask != null && gameSession.currentTask.gameTask != null) {
+                        id = gameSession.currentTask.gameTask.id;
+                    }
+                    return nextTaskUni(resolutionContext, id);
                 })
                 .call(updateResolvedTask)
                 .onFailure().recoverWithNull();
@@ -180,18 +185,21 @@ public class GameSession extends PanacheEntityBase {
                 .chain(() -> nextTask);
     }
 
-    private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long count) {
+    private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long id) {
         return GameTask
-                .<GameTask> find("game.id = :game AND id > game.currentTask.gameTask.id", Parameters.with("game", gameId))
+                .<GameTask> find("game.id = :game AND id > :id", Parameters.with("game", gameId).and("id", id))
                 .page(0, 1)
                 .firstResult()
                 .onItem().ifNull()
-                .switchTo(() -> GameTask.find("game.id = :game", Parameters.with("game", gameId)).firstResult())
+                .switchTo(() -> {
+                    Log.info("Unable to find next task, getting a \"random\" one");
+                    return GameTask.find("game.id = :game", Parameters.with("game", gameId)).firstResult();
+                })
                 .chain(gameTask -> {
-                    Log.infof("Chosen task to potentially play: %s", gameTask.unresolvedTask.task.content);
+                    Log.infof("Chosen task to potentially play: %d %s", gameTask.id, gameTask.unresolvedTask.task.content);
                     if (!gameTask.isResolvable(resolutionContext)) {
                         Log.infof("New task is required");
-                        return nextTaskUni(resolutionContext, count);
+                        return nextTaskUni(resolutionContext, -1);
                     }
 
                     return Uni.createFrom().item(gameTask.resolve(resolutionContext));
