@@ -188,9 +188,8 @@ public class GameSession extends PanacheEntityBase {
                 .onItem().ifNull()
                 .switchTo(() -> GameTask.find("game.id = :game", Parameters.with("game", gameId)).firstResult())
                 .chain(gameTask -> {
-                    Log.infof("Randomly chosen task to potentially play: %s", gameTask.unresolvedTask.task.content);
-                    if (!gameTask.isResolvable(resolutionContext) ||
-                            (currentTask != null && currentTask.gameTask != null && currentTask.gameTask.equals(gameTask))) {
+                    Log.infof("Chosen task to potentially play: %s", gameTask.unresolvedTask.task.content);
+                    if (!gameTask.isResolvable(resolutionContext)) {
                         Log.infof("New task is required");
                         return nextTaskUni(resolutionContext, count);
                     }

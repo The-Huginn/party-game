@@ -1,5 +1,7 @@
 package com.thehuginn.services.exposed;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thehuginn.AbstractResolutionTaskTest;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
@@ -583,6 +585,83 @@ public class TestGameService extends AbstractResolutionTaskTest {
                         .extract()
                         .asString();
                 Assertions.assertTrue(result.contains(task.formatted(UNDERLINED.formatted(PLAYERS.get(i % PLAYERS.size())))));
+            }
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(14)
+    void testCycleTasks(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("First task")
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task1 -> asserter.putData("task1", task1)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder("Second task")
+                        .repeat(Task.Repeat.ALWAYS)
+                        .type(Task.Type.SINGLE)
+                        .build())
+                .invoke(task1 -> asserter.putData("task2", task1)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        asserter.execute(() -> {
+            ObjectMapper mapper = new ObjectMapper();
+                String first = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asString();
+
+            // second task
+            String second = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asString();
+
+            for (int i = 0; i < 4; i++) {
+                String receivedTask = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asString();
+                String expectedTask = i % 2 == 0 ? first : second;
+                try {
+                    String taskTag = mapper.readTree(expectedTask).get("data").get("task").asText();
+                    Assertions.assertEquals(mapper.readTree(expectedTask).get("data").get(taskTag).asText(), mapper.readTree(receivedTask).get("data").get(taskTag).asText());
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
