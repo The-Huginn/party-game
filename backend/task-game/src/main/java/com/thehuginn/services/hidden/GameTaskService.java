@@ -12,8 +12,10 @@ import jakarta.enterprise.context.RequestScoped;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,12 +36,59 @@ public class GameTaskService {
     public Uni<Void> generateGameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
             throws CloneNotSupportedException {
         List<GameTask> createdTasks = new ArrayList<>();
+        Map<String, List<GameTask>> perPlayerTasks = new HashMap<>();
+        List<String> players = resolutionContext.getPlayers();
+        for (String player : players) {
+            perPlayerTasks.put(player, new ArrayList<>());
+        }
         Set<Task> tasks = new HashSet<>(allTasks);
-        for (var task : tasks) {
-            createdTasks.addAll(task.resolve(resolutionContext));
+        for (Task task : tasks) {
+            if (task.repeat.equals(Task.Repeat.PER_PLAYER)) {
+                List<GameTask> tasks1 = task.resolve(resolutionContext);
+                tasks1.forEach(gameTask -> perPlayerTasks.get(gameTask.assignedPlayer).add(gameTask));
+            } else {
+                createdTasks.addAll(task.resolve(resolutionContext));
+            }
         }
 
         Collections.shuffle(createdTasks);
+        int perPlayerTasksSize = 0;
+        for (Map.Entry<String, List<GameTask>> playerTasks : perPlayerTasks.entrySet()) {
+            perPlayerTasksSize = playerTasks.getValue().size();
+            Collections.shuffle(playerTasks.getValue());
+        }
+
+        // We want to cut the List into equal parts and in each part
+        //  every player will have one random task assigned to him
+        //  Example:
+        //      Non PER_PLAYER tasks: 103   -- createdTasks.size()
+        //      PER_PLAYER tasks: 5         -- perPlayerTasksSize
+        //      players: 4                  -- resolutionContext.getPlayers().size()
+        //      in each 20 tasks we should add 4 PER_PLAYER -- createdTasks.size() / perPlayerTasksSize
+        //      tasks for each player one
+        //  Similar mechanism is applied inside a single sublist but
+        //  additionally we need to guarantee a player will have his turn
+        if (perPlayerTasksSize != 0){
+            int sublistSize = createdTasks.size() / perPlayerTasksSize;
+            for (int sublistIndex = 0; sublistIndex < perPlayerTasksSize; sublistIndex++) {
+                // spread between 2 PER_PLAYER tasks in a single sublist
+                //  Note: we need to adjust this to match index for the current player
+                int perPlayerTaskInterval = sublistSize / players.size();
+                int currentIndex = sublistIndex * (sublistSize + players.size()) + perPlayerTaskInterval;
+                for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
+                    int realPlayerIndex = currentIndex % players.size();
+                    String realPlayer = players.get(realPlayerIndex);
+                    GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
+                    createdTasks.add(currentIndex, realPerPlayerGameTask);
+                    if (perPlayerTaskInterval < players.size()) {
+                        currentIndex++;
+                    } else {
+                        currentIndex += (perPlayerTaskInterval - 1);
+                    }
+                }
+            }
+        }
+
         return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
                 Parameters.with("id", resolutionContext.getGameId())).firstResult()
                 .<GameSession> chain(gameSession -> {
