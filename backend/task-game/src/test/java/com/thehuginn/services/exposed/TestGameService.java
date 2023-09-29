@@ -9,7 +9,6 @@ import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import com.thehuginn.util.JsonAsserter;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.logging.Log;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;

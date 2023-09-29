@@ -92,7 +92,8 @@ public class GameTaskService {
                         possiblePositions++;
                     }
                     // index within the sublist accounting for the offset and overflowing (modulo sublistWithSize + 1)
-                    int inSublistIndex = (currentIndexOffset + random.nextInt(possiblePositions) * players.size() + playerIndex) % (sublistWithSize + 1);
+                    int inSublistIndex = (currentIndexOffset + random.nextInt(possiblePositions) * players.size() + playerIndex)
+                            % (sublistWithSize + 1);
 
                     String realPlayer = players.get(playerIndex);
                     GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
