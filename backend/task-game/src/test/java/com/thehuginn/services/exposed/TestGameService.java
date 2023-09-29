@@ -1,6 +1,7 @@
 package com.thehuginn.services.exposed;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thehuginn.AbstractResolutionTaskTest;
 import com.thehuginn.task.GameTask;
@@ -665,6 +666,102 @@ public class TestGameService extends AbstractResolutionTaskTest {
                 }
             }
         });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(15)
+    void testCycleAllTasksWithRemovable(UniAsserter asserter) {
+        int taskCount = 3;
+        String neverTask = "Never task %d";
+        String alwaysTask = "Always task %d";
+        String playerTask = "Player task %s %d";
+        for (int i = 0; i < taskCount; i++) {
+            int finalI = i;
+            asserter.execute(() -> taskService.createTask(new Task.Builder(neverTask.formatted(finalI))
+                    .repeat(Task.Repeat.NEVER)
+                    .type(Task.Type.SINGLE)
+                    .build())
+                    .invoke(task1 -> asserter.putData(neverTask.formatted(finalI), task1)));
+            asserter.execute(() -> taskService.createTask(new Task.Builder(alwaysTask.formatted(finalI))
+                    .repeat(Task.Repeat.ALWAYS)
+                    .type(Task.Type.SINGLE)
+                    .build())
+                    .invoke(task1 -> asserter.putData(alwaysTask.formatted(finalI), task1)));
+            asserter.execute(() -> taskService.createTask(new Task.Builder(playerTask.formatted("{player_c}", finalI))
+                    .repeat(Task.Repeat.PER_PLAYER)
+                    .type(Task.Type.SINGLE)
+                    .build())
+                    .invoke(task1 -> asserter.putData(playerTask.formatted("{player_c}", finalI), task1)));
+        }
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>();
+            for (int i = 0; i < taskCount; i++) {
+                tasks.add((Task) asserter.getData(neverTask.formatted(i)));
+                tasks.add((Task) asserter.getData(alwaysTask.formatted(i)));
+                tasks.add((Task) asserter.getData(playerTask.formatted("{player_c}", i)));
+            }
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        //        asserter.assertThat(() -> GameTask.count("game = " + GAME),
+        //                aLong -> Assertions.assertEquals((long) taskCount * (2 + PLAYERS.size()), aLong));
+
+        asserter.execute(() -> {
+            List<String> expectedTasks = new ArrayList<>();
+            for (int i = 0; i < taskCount; i++) {
+                expectedTasks.add(neverTask.formatted(i));
+                expectedTasks.add(alwaysTask.formatted(i));
+                for (int j = 0; j < PLAYERS.size(); j++) {
+                    expectedTasks.add(playerTask.formatted(UNDERLINED.formatted(PLAYERS.get(j)), i));
+                }
+            }
+
+            List<String> collectedTasks = new ArrayList<>();
+            ObjectMapper mapper = new ObjectMapper();
+            for (int i = 0; i < taskCount * (2 + PLAYERS.size()); i++) {
+                String task = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .asString();
+                try {
+                    JsonNode serializedTask = mapper.readTree(task);
+                    String taskTag = serializedTask.get("data").get("task").asText();
+                    collectedTasks.add(serializedTask.get("data").get(taskTag).asText());
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            // In case removable task is as the last one we need to remove it by getting next ALWAYS task
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK);
+
+            Assertions.assertEquals(taskCount * (2 + PLAYERS.size()), collectedTasks.size());
+            Assertions.assertTrue(expectedTasks.containsAll(collectedTasks));
+        });
+
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(taskCount, aLong));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
