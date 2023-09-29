@@ -16,11 +16,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @RequestScoped
 public class GameTaskService {
+
+    private Random random = new Random();
 
     // TODO update this in correspondence with GameSession#start
     public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
@@ -73,19 +77,22 @@ public class GameTaskService {
             for (int sublistIndex = 0; sublistIndex < perPlayerTasksSize; sublistIndex++) {
                 // spread between 2 PER_PLAYER tasks in a single sublist
                 //  Note: we need to adjust this to match index for the current player
-                int perPlayerTaskInterval = sublistSize / players.size();
-                int currentIndex = sublistIndex * (sublistSize + players.size()) + perPlayerTaskInterval;
+                int perPlayerTasksInterval = sublistSize + players.size();
+                int currentIndex = sublistIndex * (sublistSize + players.size());
+
+                // Each GameTask has some positions it can position itself to be applied
+                //  for assigned player in coherence with current player
+                Map<Integer, GameTask> indexedPerPlayerTasks = new TreeMap<>();
                 for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
-                    int realPlayerIndex = currentIndex % players.size();
-                    String realPlayer = players.get(realPlayerIndex);
-                    GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
-                    createdTasks.add(currentIndex, realPerPlayerGameTask);
-                    if (perPlayerTaskInterval < players.size()) {
-                        currentIndex++;
-                    } else {
-                        currentIndex += (perPlayerTaskInterval - 1);
+                    int possiblePositions = perPlayerTasksInterval / players.size();
+                    if (perPlayerTasksInterval % players.size() > playerIndex) {
+                        possiblePositions++;
                     }
+                    String realPlayer = players.get(playerIndex);
+                    GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
+                    indexedPerPlayerTasks.put(random.nextInt(possiblePositions) * 6 + playerIndex, realPerPlayerGameTask);
                 }
+                indexedPerPlayerTasks.forEach(createdTasks::add);
             }
         }
 
