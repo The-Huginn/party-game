@@ -199,7 +199,7 @@ public class GameSession extends PanacheEntityBase {
                     Log.infof("Chosen task to potentially play: %d %s", gameTask.id, gameTask.unresolvedTask.task.content);
                     if (!gameTask.isResolvable(resolutionContext)) {
                         Log.infof("New task is required");
-                        return nextTaskUni(resolutionContext, -1);
+                        return nextTaskUni(resolutionContext, id + 1);
                     }
 
                     return Uni.createFrom().item(gameTask.resolve(resolutionContext));
