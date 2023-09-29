@@ -73,24 +73,31 @@ public class GameTaskService {
         //  Similar mechanism is applied inside a single sublist but
         //  additionally we need to guarantee a player will have his turn
         if (perPlayerTasksSize != 0) {
-            int sublistSize = createdTasks.size() / perPlayerTasksSize;
+            int sublistWithoutSize = createdTasks.size() / perPlayerTasksSize;
             for (int sublistIndex = 0; sublistIndex < perPlayerTasksSize; sublistIndex++) {
-                // spread between 2 PER_PLAYER tasks in a single sublist
-                //  Note: we need to adjust this to match index for the current player
-                int perPlayerTasksInterval = sublistSize + players.size();
-                int currentIndex = sublistIndex * (sublistSize + players.size());
+                // size of sublist with non PER_PLAYER tasks with to-be-added PER_PLAYER tasks
+                int sublistWithSize = sublistWithoutSize + players.size();
+                // start of the sublist with offset for player's turn
+                int currentIndex = sublistIndex * sublistWithSize;
+                int currentIndexOffset = (players.size() - currentIndex % players.size()) % players.size();
 
                 // Each GameTask has some positions it can position itself to be applied
                 //  for assigned player in coherence with current player
                 Map<Integer, GameTask> indexedPerPlayerTasks = new TreeMap<>();
                 for (int playerIndex = 0; playerIndex < players.size(); playerIndex++) {
-                    int possiblePositions = perPlayerTasksInterval / players.size();
-                    if (perPlayerTasksInterval % players.size() > playerIndex) {
+                    // how many possible positions a PER_PLAYER task with the assigned player
+                    //  the task has to be in coherence with current player, Note the offset
+                    int possiblePositions = sublistWithSize / players.size();
+                    if (sublistWithSize % players.size() > (playerIndex + currentIndexOffset) % players.size()) {
                         possiblePositions++;
                     }
+                    // index within the sublist accounting for the offset and overflowing (modulo sublistWithSize + 1)
+                    int inSublistIndex = (currentIndexOffset + random.nextInt(possiblePositions) * players.size() + playerIndex) % (sublistWithSize + 1);
+
                     String realPlayer = players.get(playerIndex);
                     GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
-                    indexedPerPlayerTasks.put(random.nextInt(possiblePositions) * 6 + playerIndex, realPerPlayerGameTask);
+                    // and finally we add the task to corresponding index
+                    indexedPerPlayerTasks.put(currentIndex + inSublistIndex, realPerPlayerGameTask);
                 }
                 indexedPerPlayerTasks.forEach(createdTasks::add);
             }
