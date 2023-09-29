@@ -68,7 +68,7 @@ public class GameTaskService {
         //      tasks for each player one
         //  Similar mechanism is applied inside a single sublist but
         //  additionally we need to guarantee a player will have his turn
-        if (perPlayerTasksSize != 0){
+        if (perPlayerTasksSize != 0) {
             int sublistSize = createdTasks.size() / perPlayerTasksSize;
             for (int sublistIndex = 0; sublistIndex < perPlayerTasksSize; sublistIndex++) {
                 // spread between 2 PER_PLAYER tasks in a single sublist
