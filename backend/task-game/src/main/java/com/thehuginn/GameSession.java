@@ -90,7 +90,7 @@ public class GameSession extends PanacheEntityBase {
             return Uni.createFrom().item(Boolean.FALSE);
         }
 
-        this.currentPlayer = resolutionContext.getPlayers().get(0);
+        this.currentPlayer = resolutionContext.getPlayers().get(resolutionContext.getPlayers().size() - 1);
         resolutionContext = resolutionContext.player(this.currentPlayer);
 
         ResolutionContext context = resolutionContext.build();
@@ -193,7 +193,8 @@ public class GameSession extends PanacheEntityBase {
                 .onItem().ifNull()
                 .switchTo(() -> {
                     Log.info("Unable to find next task, getting a \"random\" one");
-                    return GameTask.find("game.id = :game", Parameters.with("game", gameId)).firstResult();
+                    return GameTask.find("game.id = :game AND assignedPlayer is NULL", Parameters.with("game", gameId))
+                            .firstResult();
                 })
                 .chain(gameTask -> {
                     Log.infof("Chosen task to potentially play: %d %s", gameTask.id, gameTask.unresolvedTask.task.content);
