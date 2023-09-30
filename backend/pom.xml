@@ -224,8 +224,8 @@
     </profile>
   </profiles>
   <modules>
+    <module>common-game</module>
     <module>game-service</module>
     <module>task-game</module>
-    <module>notice-game</module>
   </modules>
 </project>
