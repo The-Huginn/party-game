@@ -64,7 +64,7 @@ public class TaskText extends PanacheEntityBase implements Translatable {
     public String locale = "en";
 
     @JsonProperty
-    @Column(updatable = false, unique = true)
+    @Column(unique = true)
     public String content = "<missing_value>";
 
     public TaskText() {
@@ -87,7 +87,7 @@ public class TaskText extends PanacheEntityBase implements Translatable {
                 .replaceIfNullWith(this)
                 // we will receive either LocaleTaskText or a fallback of TaskText, both are Translatable
                 .map(panacheEntityBase -> (Translatable) panacheEntityBase);
-        return Map.entry(CONTENT_TAG, localeTextUni.map(translatable -> translatable.getContent().get(CONTENT_TAG)));
+        return Map.entry(task.getKey(), localeTextUni.map(translatable -> translatable.getContent().get(CONTENT_TAG)));
     }
 
     @Override
