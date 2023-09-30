@@ -3,6 +3,12 @@
 
 git pull origin
 
+echo -e '\033[1mInstalling common modules for microservices...\033[0m'
+for common in common-game
+do
+	cd ~/party-game/backend/$common && mvn clean install
+done
+
 echo -e '\033[1mCreating backend resources for kubernetes...\033[0m'
 for microservice in game-service task-game
 do
