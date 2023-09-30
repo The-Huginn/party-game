@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequestScoped
 public class GameTaskService {
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     // TODO update this in correspondence with GameSession#start
     public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
@@ -60,24 +60,61 @@ public class GameTaskService {
         }
 
         Collections.shuffle(createdTasks);
+        addPerPlayerTasks(createdTasks, perPlayerTasks, resolutionContext.getPlayers());
+
+        return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                Parameters.with("id", resolutionContext.getGameId())).firstResult()
+                .<GameSession> chain(gameSession -> {
+                    gameSession.tasks.clear();
+                    gameSession.tasks.addAll(createdTasks);
+                    return gameSession.persist();
+                })
+                .chain(gameSession -> {
+                    if (createdTasks.isEmpty()) {
+                        return Uni.createFrom().voidItem();
+                    }
+                    return Uni.combine()
+                            .all()
+                            .unis(createdTasks.stream()
+                                    .peek(gameTask -> gameTask.game = gameSession)
+                                    .map(gameTask -> gameTask.persist())
+                                    .collect(Collectors.toList()))
+                            .usingConcurrencyOf(1)
+                            .discardItems();
+                });
+    }
+
+    /**
+     * We cut the List into equal parts and in each part
+     *  every player will have one random task assigned to him
+     * <p>
+     *  Furthermore, the added tasks might not have similar spread between them
+     *  resulting in more random order of tasks. However, the order
+     *  of players is critical and skipping some tasks might result in
+     *  unexpected behavior, i.e. if players change mid-game or one
+     *  of th tasks has to get skipped
+     *  Example:
+     *        Non PER_PLAYER tasks: 103
+     *        PER_PLAYER tasks: 5
+     *        players: 4
+     *        in each 20 tasks we should add 4 PER_PLAYER tasks, for each player one
+     *    Note we can receive all 4 PER_PLAYER tasks in the beginning
+     *    followed by 20 Non PER_PLAYER tasks.
+     * @param collectTo         List to which we add PER_PLAYER tasks
+     * @param perPlayerTasks    Map of players and tasks for each player
+     * @param players           Ordered List of players
+     * @implSpec each player in perPlayerTasks has to have the same amount of tasks assigned
+     */
+    private void addPerPlayerTasks(List<GameTask> collectTo, Map<String, List<GameTask>> perPlayerTasks, List<String> players) {
         int perPlayerTasksSize = 0;
         for (Map.Entry<String, List<GameTask>> playerTasks : perPlayerTasks.entrySet()) {
             perPlayerTasksSize = playerTasks.getValue().size();
             Collections.shuffle(playerTasks.getValue());
         }
 
-        // We want to cut the List into equal parts and in each part
-        //  every player will have one random task assigned to him
-        //  Example:
-        //      Non PER_PLAYER tasks: 103   -- createdTasks.size()
-        //      PER_PLAYER tasks: 5         -- perPlayerTasksSize
-        //      players: 4                  -- resolutionContext.getPlayers().size()
-        //      in each 20 tasks we should add 4 PER_PLAYER -- createdTasks.size() / perPlayerTasksSize
-        //      tasks for each player one
-        //  Similar mechanism is applied inside a single sublist but
-        //  additionally we need to guarantee a player will have his turn
+
         if (perPlayerTasksSize != 0) {
-            int sublistWithoutSize = createdTasks.size() / perPlayerTasksSize;
+            int sublistWithoutSize = collectTo.size() / perPlayerTasksSize;
             for (int sublistIndex = 0; sublistIndex < perPlayerTasksSize; sublistIndex++) {
                 // size of sublist with non PER_PLAYER tasks with to-be-added PER_PLAYER tasks
                 int sublistWithSize = sublistWithoutSize + players.size();
@@ -104,29 +141,8 @@ public class GameTaskService {
                     // and finally we add the task to corresponding index
                     indexedPerPlayerTasks.put(currentIndex + inSublistIndex, realPerPlayerGameTask);
                 }
-                indexedPerPlayerTasks.forEach(createdTasks::add);
+                indexedPerPlayerTasks.forEach(collectTo::add);
             }
         }
-
-        return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
-                Parameters.with("id", resolutionContext.getGameId())).firstResult()
-                .<GameSession> chain(gameSession -> {
-                    gameSession.tasks.clear();
-                    gameSession.tasks.addAll(createdTasks);
-                    return gameSession.persist();
-                })
-                .chain(gameSession -> {
-                    if (createdTasks.isEmpty()) {
-                        return Uni.createFrom().voidItem();
-                    }
-                    return Uni.combine()
-                            .all()
-                            .unis(createdTasks.stream()
-                                    .peek(gameTask -> gameTask.game = gameSession)
-                                    .map(gameTask -> gameTask.persist())
-                                    .collect(Collectors.toList()))
-                            .usingConcurrencyOf(1)
-                            .discardItems();
-                });
     }
 }

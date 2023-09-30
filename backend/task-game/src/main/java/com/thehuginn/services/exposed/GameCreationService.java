@@ -37,12 +37,12 @@ public class GameCreationService {
     @Path("/category")
     @WithTransaction
     public Uni<List<CategoryText.CategoryDto>> getCategories(@RestCookie @DefaultValue("en") String locale) {
-        Uni<List<Uni<CategoryText.CategoryDto>>> localeCategories = Category.<Category> listAll().map(
+        //noinspection unchecked
+        return Category.<Category> listAll().map(
                 categories -> categories.stream()
                         .map(category -> category.categoryText.resolve(ResolutionContext.locale(locale)))
-                        .toList());
-        //noinspection unchecked
-        return localeCategories.chain(unis -> Uni.combine().all().<List<CategoryText.CategoryDto>> unis(unis)
+                        .toList())
+                .chain(unis -> Uni.combine().all().<List<CategoryText.CategoryDto>> unis(unis)
                 .usingConcurrencyOf(1)
                 .combinedWith(objects -> (List<CategoryText.CategoryDto>) objects));
     }
