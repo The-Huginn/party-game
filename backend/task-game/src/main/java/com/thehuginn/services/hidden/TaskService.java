@@ -59,11 +59,12 @@ public class TaskService {
                 .item(task)
                 .call(task1 -> {
                     task1.task = new TaskText(task1, task.task.locale, task.task.content);
-                    if (TokenResolver.translateTask(task1.task.content).isEmpty()) {
+                    List<UnresolvedToken> tokens = TokenResolver.translateTask(task1.task.content);
+                    if (tokens.isEmpty()) {
                         return Uni.createFrom().voidItem();
                     }
                     //noinspection unchecked
-                    return findOrCreateTokens.apply(TokenResolver.translateTask(task1.task.content))
+                    return findOrCreateTokens.apply(tokens)
                             .combinedWith(objects -> task1.tokens = (List<UnresolvedToken>) objects);
                 })
                 .chain(task1 -> task1.persist());
@@ -100,6 +101,9 @@ public class TaskService {
     public Uni<Task> updateTask(@RestPath Long id, @Valid Task updatedTask) {
         return Task.<Task> findById(id)
                 .<Task> chain(task -> {
+                    if (updatedTask.task != null && updatedTask.task.content != null) {
+                        preservesTokens(task.task, updatedTask.task.content);
+                    }
                     task.type = updatedTask.type != null ? updatedTask.type : task.type;
                     task.repeat = updatedTask.repeat != null ? updatedTask.repeat : task.repeat;
                     task.frequency = updatedTask.frequency != null ? updatedTask.frequency : task.frequency;
