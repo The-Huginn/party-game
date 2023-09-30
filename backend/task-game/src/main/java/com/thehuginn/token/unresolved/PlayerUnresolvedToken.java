@@ -34,7 +34,7 @@ public class PlayerUnresolvedToken extends AbstractUnresolvedToken {
     public boolean isResolvable(ResolutionContext context) {
         try {
             Integer index = getPlayerIndex();
-            return index.compareTo(0) > 0 && index.compareTo(context.getPlayers().size()) < 0;
+            return index.compareTo(0) >= 0 && index.compareTo(context.getPlayers().size()) < 0;
         } catch (Exception ignored) {
             return false;
         }

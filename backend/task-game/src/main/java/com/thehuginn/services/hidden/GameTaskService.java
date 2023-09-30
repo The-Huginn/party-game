@@ -47,6 +47,10 @@ public class GameTaskService {
         }
         Set<Task> tasks = new HashSet<>(allTasks);
         for (Task task : tasks) {
+            if (!task.isResolvable(resolutionContext)) {
+                continue;
+            }
+
             if (task.repeat.equals(Task.Repeat.PER_PLAYER)) {
                 List<GameTask> tasks1 = task.resolve(resolutionContext);
                 tasks1.forEach(gameTask -> perPlayerTasks.get(gameTask.assignedPlayer).add(gameTask));
