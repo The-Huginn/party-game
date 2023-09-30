@@ -1,6 +1,7 @@
 . ~/.configs/registry.config
 . ~/.configs/github.config
 
+git reset --hard origin/master
 git pull origin
 
 echo -e '\033[1mInstalling common modules for microservices...\033[0m'
