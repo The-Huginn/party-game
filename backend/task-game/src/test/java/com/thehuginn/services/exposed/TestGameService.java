@@ -92,15 +92,15 @@ public class TestGameService extends AbstractResolutionTaskTest {
         });
 
         asserter.execute(() -> given()
-                    .cookie(new Cookie.Builder("gameId", GAME).build())
-                    .cookie(new Cookie.Builder("locale", "en").build())
-                    .queryParam("resolutionContext", resolutionContext)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .when()
-                    .get("/task/current")
-                    .then()
-                    .statusCode(RestResponse.StatusCode.OK)
-                    .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task")));
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .get("/task/current")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
