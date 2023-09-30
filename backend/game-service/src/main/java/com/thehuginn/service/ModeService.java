@@ -39,7 +39,7 @@ public class ModeService {
     @DELETE
     @Path("/delete")
     public Uni<Boolean> deleteGameMode(@RestCookie String gameId) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game -> switch (game.type) {
                     case TASK -> taskRestClient.deleteGame(gameId);
                     case NONE -> Uni.createFrom().nullItem();
