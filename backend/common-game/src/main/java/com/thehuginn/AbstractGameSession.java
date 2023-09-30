@@ -3,10 +3,10 @@ package com.thehuginn;
 import com.thehuginn.resolution.ResolutionContext;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
-@Entity
+@MappedSuperclass
 public abstract class AbstractGameSession extends PanacheEntityBase {
 
     @Id
