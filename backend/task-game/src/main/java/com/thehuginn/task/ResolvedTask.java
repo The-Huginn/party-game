@@ -57,7 +57,7 @@ public class ResolvedTask extends PanacheEntity implements Resolvable<Unresolved
 
     @Override
     public UnresolvedResult resolve(ResolutionContext context) {
-        UnresolvedResult unresolvedResult = gameTask.unresolvedTask.task.resolve(context);
+        UnresolvedResult unresolvedResult = new UnresolvedResult().task(gameTask.unresolvedTask.task.translate(context));
         for (ResolvedToken token : tokens) {
             unresolvedResult.addResolvedResult(token.resolve(context));
         }

@@ -120,7 +120,7 @@ public class TaskService {
         ResolutionContext resolutionContext = ResolutionContext.locale(locale);
         return Task.<Task> findById(id)
                 .call(task -> {
-                    UnresolvedResult unresolvedResult = task.task.resolve(resolutionContext);
+                    UnresolvedResult unresolvedResult = new UnresolvedResult().task(task.task.translate(resolutionContext));
                     return unresolvedResult.resolve()
                             .onItem()
                             .invoke(resolvedResult1 -> {

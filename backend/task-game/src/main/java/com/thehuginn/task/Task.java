@@ -9,18 +9,17 @@ import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.token.translation.TaskText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.token.unresolved.UnresolvedToken;
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,7 +28,8 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
+@DiscriminatorValue("1")
+public class Task extends AbstractTask implements Resolvable<List<GameTask>> {
 
     public enum Repeat {
         ALWAYS,
@@ -53,10 +53,6 @@ public class Task extends PanacheEntity implements Resolvable<List<GameTask>> {
 
     @JsonProperty
     public Price price = new Price();
-
-    @JsonProperty
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "task")
-    public TaskText task;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

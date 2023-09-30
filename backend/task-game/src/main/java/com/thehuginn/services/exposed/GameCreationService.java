@@ -40,11 +40,11 @@ public class GameCreationService {
         //noinspection unchecked
         return Category.<Category> listAll().map(
                 categories -> categories.stream()
-                        .map(category -> category.categoryText.resolve(ResolutionContext.locale(locale)))
+                        .map(category -> category.categoryText.translate(ResolutionContext.locale(locale)))
                         .toList())
                 .chain(unis -> Uni.combine().all().<List<CategoryText.CategoryDto>> unis(unis)
-                .usingConcurrencyOf(1)
-                .combinedWith(objects -> (List<CategoryText.CategoryDto>) objects));
+                        .usingConcurrencyOf(1)
+                        .combinedWith(objects -> (List<CategoryText.CategoryDto>) objects));
     }
 
     @GET
@@ -60,7 +60,7 @@ public class GameCreationService {
     @Path("/category/translation/{id}/{locale}")
     public Uni<CategoryText.CategoryDto> getTranslation(@RestPath long id, @RestPath @DefaultValue("en") String locale) {
         return Category.<Category> findById(id)
-                .flatMap(category -> category.categoryText.resolve(ResolutionContext.locale(locale)));
+                .flatMap(category -> category.categoryText.translate(ResolutionContext.locale(locale)));
     }
 
     @PUT

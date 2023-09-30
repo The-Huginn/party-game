@@ -2,19 +2,16 @@ package com.thehuginn.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.thehuginn.GameSession;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.CategoryText;
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -26,11 +23,8 @@ import java.util.Set;
  * assigned to any Category fall under this `special` Category.
  */
 @Entity
-public class Category extends PanacheEntity {
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "category")
-    @JsonUnwrapped
-    public CategoryText categoryText;
+@DiscriminatorValue("1")
+public class Category extends AbstractCategory {
 
     @JsonProperty
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.MERGE)

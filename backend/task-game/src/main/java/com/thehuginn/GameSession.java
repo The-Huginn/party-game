@@ -10,14 +10,12 @@ import com.thehuginn.services.hidden.GameTaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.ResolvedTask;
 import com.thehuginn.task.Task;
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -35,10 +33,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
-public class GameSession extends PanacheEntityBase {
-
-    @Id
-    public String gameId;
+public class GameSession extends AbstractGameSession {
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -61,6 +56,7 @@ public class GameSession extends PanacheEntityBase {
     public GameSession() {
     }
 
+    @Override
     public Uni<Boolean> addCategory(Long categoryId) {
         return Category.<Category> findById(categoryId)
                 .chain(category -> {
@@ -73,6 +69,7 @@ public class GameSession extends PanacheEntityBase {
                 });
     }
 
+    @Override
     public Uni<Boolean> removeCategory(Long categoryId) {
         return Category.<Category> findById(categoryId)
                 .chain(category -> {
@@ -85,6 +82,7 @@ public class GameSession extends PanacheEntityBase {
                 });
     }
 
+    @Override
     public Uni<Boolean> start(ResolutionContext.Builder resolutionContext) {
         if (this.categories.isEmpty()) {
             return Uni.createFrom().item(Boolean.FALSE);
@@ -119,6 +117,8 @@ public class GameSession extends PanacheEntityBase {
                 .replaceWith(Boolean.TRUE);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
     public Uni<ResolvedTask> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
         resolutionContextBuilder = resolutionContextBuilder.player(this.currentPlayer);
         ResolutionContext.Builder finalResolutionContextBuilder = resolutionContextBuilder;
@@ -133,6 +133,8 @@ public class GameSession extends PanacheEntityBase {
                 });
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
     public Uni<ResolvedTask> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
         List<String> players = resolutionContextBuilder.getPlayers();
         if (this.currentPlayer == null) {

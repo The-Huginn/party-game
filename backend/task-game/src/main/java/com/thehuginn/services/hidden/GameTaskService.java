@@ -86,23 +86,24 @@ public class GameTaskService {
 
     /**
      * We cut the List into equal parts and in each part
-     *  every player will have one random task assigned to him
+     * every player will have one random task assigned to him
      * <p>
-     *  Furthermore, the added tasks might not have similar spread between them
-     *  resulting in more random order of tasks. However, the order
-     *  of players is critical and skipping some tasks might result in
-     *  unexpected behavior, i.e. if players change mid-game or one
-     *  of th tasks has to get skipped
-     *  Example:
-     *        Non PER_PLAYER tasks: 103
-     *        PER_PLAYER tasks: 5
-     *        players: 4
-     *        in each 20 tasks we should add 4 PER_PLAYER tasks, for each player one
-     *    Note we can receive all 4 PER_PLAYER tasks in the beginning
-     *    followed by 20 Non PER_PLAYER tasks.
-     * @param collectTo         List to which we add PER_PLAYER tasks
-     * @param perPlayerTasks    Map of players and tasks for each player
-     * @param players           Ordered List of players
+     * Furthermore, the added tasks might not have similar spread between them
+     * resulting in more random order of tasks. However, the order
+     * of players is critical and skipping some tasks might result in
+     * unexpected behavior, i.e. if players change mid-game or one
+     * of th tasks has to get skipped
+     * Example:
+     * Non PER_PLAYER tasks: 103
+     * PER_PLAYER tasks: 5
+     * players: 4
+     * in each 20 tasks we should add 4 PER_PLAYER tasks, for each player one
+     * Note we can receive all 4 PER_PLAYER tasks in the beginning
+     * followed by 20 Non PER_PLAYER tasks.
+     *
+     * @param collectTo List to which we add PER_PLAYER tasks
+     * @param perPlayerTasks Map of players and tasks for each player
+     * @param players Ordered List of players
      * @implSpec each player in perPlayerTasks has to have the same amount of tasks assigned
      */
     private void addPerPlayerTasks(List<GameTask> collectTo, Map<String, List<GameTask>> perPlayerTasks, List<String> players) {
@@ -111,7 +112,6 @@ public class GameTaskService {
             perPlayerTasksSize = playerTasks.getValue().size();
             Collections.shuffle(playerTasks.getValue());
         }
-
 
         if (perPlayerTasksSize != 0) {
             int sublistWithoutSize = collectTo.size() / perPlayerTasksSize;
