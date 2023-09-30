@@ -6,11 +6,14 @@ import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.ResolvedTask;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestCookie;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -31,6 +34,13 @@ public class GameService {
         gameSession.gameId = gameId;
         return GameSession.deleteById(gameId)
                 .chain(gameSession::persist);
+    }
+
+    @DELETE
+    @WithTransaction
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Boolean> deleteGame(@RestCookie String gameId) {
+        return GameSession.deleteById(gameId);
     }
 
     @PUT

@@ -770,11 +770,41 @@ public class TestGameService extends AbstractResolutionTaskTest {
     @Order(16)
     void testOmitUnresolvableTasks(UniAsserter asserter) {
         asserter.execute(() -> taskService.createTask(new Task.Builder("unresolvable task {player_4}")
+                .repeat(Task.Repeat.NEVER)
+                .type(Task.Type.SINGLE)
+                .build())
+                .invoke(task1 -> asserter.putData("task1", task1)));
+        asserter.execute(() -> taskService.createTask(new Task.Builder("resolvable task {player_2}")
+                .repeat(Task.Repeat.NEVER)
+                .type(Task.Type.SINGLE)
+                .build())
+                .invoke(task1 -> asserter.putData("task2", task1)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of(
+                    (Task) asserter.getData("task1"),
+                    (Task) asserter.getData("task2")));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(1, aLong));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    @Order(17)
+    void testDeletingGameSession(UniAsserter asserter) {
+        asserter.execute(() -> taskService.createTask(new Task.Builder("task 1")
                         .repeat(Task.Repeat.NEVER)
                         .type(Task.Type.SINGLE)
                         .build())
                 .invoke(task1 -> asserter.putData("task1", task1)));
-        asserter.execute(() -> taskService.createTask(new Task.Builder("resolvable task {player_2}")
+        asserter.execute(() -> taskService.createTask(new Task.Builder("task 2")
                         .repeat(Task.Repeat.NEVER)
                         .type(Task.Type.SINGLE)
                         .build())
@@ -784,15 +814,27 @@ public class TestGameService extends AbstractResolutionTaskTest {
         asserter.execute(() -> {
             List<Task> tasks = new ArrayList<>(List.of(
                     (Task) asserter.getData("task1"),
-                    (Task) asserter.getData("task2")
-            ));
+                    (Task) asserter.getData("task2")));
             try {
                 return gameTaskService.generateGameTasks(tasks, resolutionContext);
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(e);
             }
         });
-        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(1, aLong));
+
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(2, aLong));
+
+        asserter.execute(() ->
+                Assertions.assertEquals(Boolean.TRUE, given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .when()
+                .delete()
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .extract()
+                .as(Boolean.class)));
+
+        asserter.assertThat(() -> GameTask.count("game = " + GAME), aLong -> Assertions.assertEquals(0, aLong));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
