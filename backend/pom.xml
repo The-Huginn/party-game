@@ -11,6 +11,7 @@
   <packaging>pom</packaging>
 
   <properties>
+    <project-version>1.0.0-SNAPSHOT</project-version>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -225,5 +226,6 @@
   <modules>
     <module>game-service</module>
     <module>task-game</module>
+    <module>notice-game</module>
   </modules>
 </project>
