@@ -9,7 +9,6 @@ import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import com.thehuginn.util.JsonAsserter;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.quarkus.logging.Log;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
@@ -92,8 +91,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
             }
         });
 
-        asserter.execute(() -> {
-            String result = given()
+        asserter.execute(() -> given()
                     .cookie(new Cookie.Builder("gameId", GAME).build())
                     .cookie(new Cookie.Builder("locale", "en").build())
                     .queryParam("resolutionContext", resolutionContext)
@@ -102,12 +100,7 @@ public class TestGameService extends AbstractResolutionTaskTest {
                     .get("/task/current")
                     .then()
                     .statusCode(RestResponse.StatusCode.OK)
-                    //                    .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task"))
-                    .extract()
-                    .asPrettyString();
-            Task expected = ((Task) asserter.getData("task"));
-            Log.info(result);
-        });
+                    .body("data." + ((Task) asserter.getData("task")).getKey(), is("simple task")));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
