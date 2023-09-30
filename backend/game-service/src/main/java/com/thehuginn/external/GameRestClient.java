@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.thehuginn.entities.GameContext;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -23,6 +24,9 @@ public interface GameRestClient {
 
     @POST
     Uni<JsonNode> createGame(@RestCookie String gameId);
+
+    @DELETE
+    Uni<Boolean> deleteGame(@RestCookie String gameId);
 
     @PUT
     @Path("/start")

@@ -6,6 +6,7 @@ import com.thehuginn.external.GameRestClientTask;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -31,6 +32,16 @@ public class ModeService {
         return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game -> switch (game.type) {
                     case TASK -> taskRestClient.getGame(gameId);
+                    case NONE -> Uni.createFrom().nullItem();
+                });
+    }
+
+    @DELETE
+    @Path("/delete")
+    public Uni<Boolean> deleteGameMode(@RestCookie String gameId) {
+        return Game.<Game>findById(gameId)
+                .onItem().ifNotNull().transformToUni(game -> switch (game.type) {
+                    case TASK -> taskRestClient.deleteGame(gameId);
                     case NONE -> Uni.createFrom().nullItem();
                 });
     }
