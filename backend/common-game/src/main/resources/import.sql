@@ -1,0 +1,3 @@
+INSERT INTO Category(id) VALUES(0);
+INSERT INTO CategoryText(id, locale, name, description) VALUES(0, 'en', 'Miscellaneous', 'Tasks that have not been assigned to any concrete category however the better they are');
+INSERT INTO LocaleCategoryText(categoryText_id, categoryText_locale, locale, name, description) VALUES(0, 'en', 'sk', 'Nezaraditeľné', 'Úlohy, ktoré sa ťažko presne zaraďujú do určitej kategórie, ale zato sú o to lepšie');

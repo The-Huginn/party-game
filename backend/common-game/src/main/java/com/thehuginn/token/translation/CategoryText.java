@@ -1,9 +1,8 @@
 package com.thehuginn.token.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.thehuginn.category.Category;
+import com.thehuginn.category.AbstractCategory;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.Resolvable;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.smallrye.mutiny.Uni;
@@ -21,7 +20,7 @@ import java.util.Objects;
 
 @Entity
 @IdClass(CategoryText.CategoryTextPK.class)
-public class CategoryText extends PanacheEntityBase implements Resolvable<Uni<CategoryText.CategoryDto>>, TranslatableCategory {
+public class CategoryText extends PanacheEntityBase implements TranslatableCategory {
 
     public static class CategoryTextPK {
         public Long category;
@@ -56,7 +55,7 @@ public class CategoryText extends PanacheEntityBase implements Resolvable<Uni<Ca
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id")
     @JsonIgnore
-    public Category category;
+    public AbstractCategory category;
 
     @Id
     public String locale = "en";
@@ -68,26 +67,20 @@ public class CategoryText extends PanacheEntityBase implements Resolvable<Uni<Ca
     public CategoryText() {
     }
 
-    public CategoryText(Category category, CategoryText categoryText) {
+    public CategoryText(AbstractCategory category, CategoryText categoryText) {
         this.category = category;
         this.locale = categoryText.locale;
         this.name = categoryText.name;
         this.description = categoryText.description;
     }
 
-    @Override
-    public Uni<CategoryDto> resolve(ResolutionContext context) {
+    public Uni<CategoryDto> translate(ResolutionContext context) {
         return LocaleCategoryText
                 .findById(new LocaleCategoryText.LocaleCategoryTextPK(this, context.getLocale()))
                 .replaceIfNullWith(this)
                 .map(translatable -> (TranslatableCategory) translatable)
                 .map(translatableCategory -> new CategoryDto(category.id, translatableCategory.getName(),
                         translatableCategory.getDescription()));
-    }
-
-    @Override
-    public boolean isResolvable(ResolutionContext context) {
-        return true;
     }
 
     @Override
@@ -113,7 +106,7 @@ public class CategoryText extends PanacheEntityBase implements Resolvable<Uni<Ca
             this.description = description;
         }
 
-        public CategoryDto(Category category) {
+        public CategoryDto(AbstractCategory category) {
             this.id = category.id;
             this.name = category.categoryText.getName();
             this.description = category.categoryText.getDescription();

@@ -3,9 +3,7 @@ package com.thehuginn.token.translation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.resolution.UnresolvedResult;
-import com.thehuginn.task.ResolvedToken;
-import com.thehuginn.task.Task;
+import com.thehuginn.task.AbstractTask;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Column;
@@ -23,7 +21,7 @@ import java.util.Objects;
 
 @Entity
 @IdClass(TaskText.TaskTextPK.class)
-public class TaskText extends PanacheEntityBase implements ResolvedToken, Translatable {
+public class TaskText extends PanacheEntityBase implements Translatable {
 
     public static final String CONTENT_TAG = "content";
 
@@ -59,7 +57,7 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id")
     @JsonIgnore
-    public Task task;
+    public AbstractTask task;
 
     @Id
     @JsonProperty
@@ -77,10 +75,19 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
         this.content = content;
     }
 
-    public TaskText(Task task, String locale, String content) {
+    public TaskText(AbstractTask task, String locale, String content) {
         this.task = task;
         this.locale = locale;
         this.content = content;
+    }
+
+    public Map.Entry<String, Uni<String>> translate(ResolutionContext context) {
+        Uni<? extends Translatable> localeTextUni = LocaleTaskText
+                .findById(new LocaleTaskText.LocaleTaskTextPK(this, context.getLocale()))
+                .replaceIfNullWith(this)
+                // we will receive either LocaleTaskText or a fallback of TaskText, both are Translatable
+                .map(panacheEntityBase -> (Translatable) panacheEntityBase);
+        return Map.entry(CONTENT_TAG, localeTextUni.map(translatable -> translatable.getContent().get(CONTENT_TAG)));
     }
 
     @Override
@@ -91,22 +98,5 @@ public class TaskText extends PanacheEntityBase implements ResolvedToken, Transl
     @Override
     public String getLocale() {
         return this.locale;
-    }
-
-    @Override
-    public UnresolvedResult resolve(ResolutionContext context) {
-        Uni<? extends Translatable> localeTextUni = LocaleTaskText
-                .findById(new LocaleTaskText.LocaleTaskTextPK(this, context.getLocale()))
-                .replaceIfNullWith(this)
-                // we will receive either LocaleTaskText or a fallback of TaskText, both are Translatable
-                .map(panacheEntityBase -> (Translatable) panacheEntityBase);
-        return new UnresolvedResult().task(Map.entry(task.getKey(),
-                localeTextUni
-                        .map(translatable -> translatable.getContent().get(CONTENT_TAG))));
-    }
-
-    @Override
-    public boolean isResolvable(ResolutionContext context) {
-        return true;
     }
 }
