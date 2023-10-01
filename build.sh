@@ -4,20 +4,9 @@
 git reset --hard origin/master
 git pull origin
 
-echo -e '\033[1mInstalling common modules for microservices...\033[0m'
-for common in common-game common-exposed-service
-do
-	cd ~/party-game/backend/$common && mvn clean install
-done
+echo -e '\033[1mCreating and installing backend resources for kubernetes...\033[0m'
 
-echo -e '\033[1mCreating backend resources for kubernetes...\033[0m'
-for microservice in game-service task-game
-do
-	cd ~/party-game/backend/$microservice && \
-	mvn clean install -DskipTests && \
-	sed -i 's/thehuginn.com/localhost/g' target/kubernetes/kubernetes.yml && \
-	kubectl apply -f target/kubernetes/kubernetes.yml
-done
+mvn clean install -DskipTests -Dquarkus.kubernetes.deploy=true && \
 
 echo -e '\033[1mRolling out update for frontend...\033[0m'
 kubectl rollout restart deployment svelte-frontend
