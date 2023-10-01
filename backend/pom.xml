@@ -224,6 +224,7 @@
     </profile>
   </profiles>
   <modules>
+    <module>common-exposed-service</module>
     <module>common-game</module>
     <module>game-service</module>
     <module>task-game</module>
