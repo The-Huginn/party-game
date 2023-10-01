@@ -106,6 +106,7 @@
         <extensions>true</extensions>
         <executions>
           <execution>
+            <id>image</id>
             <goals>
               <goal>build</goal>
               <goal>generate-code</goal>
