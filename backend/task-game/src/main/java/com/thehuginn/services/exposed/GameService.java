@@ -20,15 +20,17 @@ import org.jboss.resteasy.reactive.RestQuery;
 import java.util.function.Function;
 
 @Path("/game")
-public class GameService {
+public class GameService implements com.thehuginn.common.services.exposed.GameService<ResolutionContext.Builder> {
 
     @GET
+    @Override
     public Uni<GameSession> getGame(@RestCookie String gameId) {
         return GameSession.findById(gameId);
     }
 
     @POST
     @WithTransaction
+    @Override
     public Uni<GameSession> createGame(@RestCookie String gameId) {
         GameSession gameSession = new GameSession();
         gameSession.gameId = gameId;
@@ -39,6 +41,7 @@ public class GameService {
     @DELETE
     @WithTransaction
     @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public Uni<Boolean> deleteGame(@RestCookie String gameId) {
         return GameSession.deleteById(gameId);
     }
@@ -46,6 +49,7 @@ public class GameService {
     @PUT
     @Path("/start")
     @WithTransaction
+    @Override
     public Uni<Boolean> startGame(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext) {
         return findGameSession(gameId)
                 .chain(gameSession -> gameSession.start(resolutionContext));
@@ -54,7 +58,8 @@ public class GameService {
     @GET
     @WithTransaction
     @Path("/task/current")
-    public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId,
+    @Override
+    public Uni<UnresolvedResult.ResolvedResult> currentTask(@RestCookie String gameId, @RestCookie String locale,
             @RestQuery ResolutionContext.Builder resolutionContext) {
         return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.currentTask(resolutionContext));
     }
@@ -62,7 +67,8 @@ public class GameService {
     @PUT
     @WithTransaction
     @Path("/task/next")
-    public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId,
+    @Override
+    public Uni<UnresolvedResult.ResolvedResult> nextTask(@RestCookie String gameId, @RestCookie String locale,
             @RestQuery ResolutionContext.Builder resolutionContext) {
         return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.nextTask(resolutionContext));
     }
