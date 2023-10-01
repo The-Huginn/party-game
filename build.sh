@@ -5,7 +5,7 @@ git reset --hard origin/master
 git pull origin
 
 echo -e '\033[1mInstalling common modules for microservices...\033[0m'
-for common in common-game
+for common in common-game common-exposed-service
 do
 	cd ~/party-game/backend/$common && mvn clean install
 done
