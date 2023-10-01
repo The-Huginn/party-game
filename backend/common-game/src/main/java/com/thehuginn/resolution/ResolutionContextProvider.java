@@ -56,9 +56,9 @@ public class ResolutionContextProvider implements ParamConverterProvider {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
-        if (rawType.equals(ResolutionContext.Builder.class)) {
-            //noinspection unchecked
+        if (rawType.equals(ResolutionContext.Builder.class) || rawType.equals(Object.class)) {
             return (ParamConverter<T>) new ResolutionContextConverter(containerRequestContext);
         }
         return null;
