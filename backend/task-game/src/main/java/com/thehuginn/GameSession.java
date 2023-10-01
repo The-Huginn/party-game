@@ -56,7 +56,6 @@ public class GameSession extends AbstractGameSession {
     public GameSession() {
     }
 
-    @Override
     public Uni<Boolean> addCategory(Long categoryId) {
         return Category.<Category> findById(categoryId)
                 .chain(category -> {
@@ -69,7 +68,6 @@ public class GameSession extends AbstractGameSession {
                 });
     }
 
-    @Override
     public Uni<Boolean> removeCategory(Long categoryId) {
         return Category.<Category> findById(categoryId)
                 .chain(category -> {

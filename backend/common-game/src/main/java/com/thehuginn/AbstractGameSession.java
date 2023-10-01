@@ -15,9 +15,9 @@ public abstract class AbstractGameSession extends PanacheEntityBase {
     public AbstractGameSession() {
     }
 
-    public abstract Uni<Boolean> addCategory(Long categoryId);
-
-    public abstract Uni<Boolean> removeCategory(Long categoryId);
+    public AbstractGameSession(String gameId) {
+        this.gameId = gameId;
+    }
 
     public abstract Uni<Boolean> start(ResolutionContext.Builder resolutionContext);
 
