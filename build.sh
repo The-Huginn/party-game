@@ -6,6 +6,7 @@ git pull origin
 
 echo -e '\033[1mCreating and installing backend resources for kubernetes...\033[0m'
 
+cd ~/party-game/backend && \
 mvn -U clean install -DskipTests -Dquarkus.kubernetes.deploy=true && \
 
 echo -e '\033[1mRolling out update for frontend...\033[0m'
