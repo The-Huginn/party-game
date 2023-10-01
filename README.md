@@ -47,3 +47,10 @@ Please note, you will need to rewrite a bit more things especially domain name, 
 * Follow the instructions in the repo
 * You can use kubernetes/certificates/yaml
 * Add new entries to ingress if needed.
+
+## Creating token for quarkus
+
+1. `kubectl create sa quarkus`
+2. `kubectl create clusterrolebinding quarkus-binding --clusterrole quarkus-cluster --serviceaccount default:quarkus`
+
+Then for getting a token run the following `kubectl create token quarkus`
