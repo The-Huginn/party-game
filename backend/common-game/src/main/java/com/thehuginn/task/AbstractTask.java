@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "unimportant", discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorColumn(name = "taskType", discriminatorType = DiscriminatorType.INTEGER)
 public class AbstractTask extends PanacheEntity {
 
     @JsonProperty
