@@ -3,7 +3,22 @@ podman login -u ${REGISTRY_USERNAME} -p ${REGISTRY_PASSWORD} registry.thehuginn.
 
 cd frontend && \
 podman build -t registry.thehuginn.com/party-game/svelte-frontend . && \
-podman push registry.thehuginn.com/party-game/svelte-frontend:latest
+podman push registry.thehuginn.com/party-game/svelte-frontend:latest && \
+cd ../
 
-cd ../backend/ && \
-mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true
+# for common in common-game common-exposed-service
+# do
+# 	cd backend/$common && mvn clean install && \
+#     cd ../../
+# done
+
+# for microservice in game-service task-game
+# do
+# 	cd backend/$microservice && \
+#     mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true && \
+#     cd ../../
+# done
+
+cd backend && \
+mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true && \
+cd ../
