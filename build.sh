@@ -6,7 +6,7 @@ git pull origin
 
 echo -e '\033[1mCreating and installing backend resources for kubernetes...\033[0m'
 
-mvn clean install -DskipTests -Dquarkus.kubernetes.deploy=true && \
+mvn -U clean install -DskipTests -Dquarkus.kubernetes.deploy=true && \
 
 echo -e '\033[1mRolling out update for frontend...\033[0m'
 kubectl rollout restart deployment svelte-frontend
