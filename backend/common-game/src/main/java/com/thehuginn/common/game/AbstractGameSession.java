@@ -1,6 +1,6 @@
-package com.thehuginn;
+package com.thehuginn.common.game;
 
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Id;

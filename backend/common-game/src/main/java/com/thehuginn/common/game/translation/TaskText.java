@@ -1,9 +1,9 @@
-package com.thehuginn.token.translation;
+package com.thehuginn.common.game.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thehuginn.resolution.ResolutionContext;
-import com.thehuginn.task.AbstractTask;
+import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.game.task.AbstractTask;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Column;

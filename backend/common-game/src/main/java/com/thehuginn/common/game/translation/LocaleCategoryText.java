@@ -1,4 +1,4 @@
-package com.thehuginn.token.translation;
+package com.thehuginn.common.game.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

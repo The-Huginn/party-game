@@ -1,4 +1,4 @@
-package com.thehuginn.resolution;
+package com.thehuginn.common.game.resolution;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nonnull;

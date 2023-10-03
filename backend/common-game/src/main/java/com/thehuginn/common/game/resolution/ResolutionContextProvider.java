@@ -1,4 +1,4 @@
-package com.thehuginn.resolution;
+package com.thehuginn.common.game.resolution;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

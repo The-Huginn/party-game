@@ -1,4 +1,4 @@
-package com.thehuginn.util;
+package com.thehuginn.common.game.util;
 
 import jakarta.ws.rs.WebApplicationException;
 import org.jboss.resteasy.reactive.RestResponse;

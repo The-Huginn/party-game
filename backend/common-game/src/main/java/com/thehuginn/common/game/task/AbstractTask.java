@@ -1,8 +1,8 @@
-package com.thehuginn.task;
+package com.thehuginn.common.game.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thehuginn.token.translation.TaskText;
+import com.thehuginn.common.game.translation.TaskText;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorColumn;

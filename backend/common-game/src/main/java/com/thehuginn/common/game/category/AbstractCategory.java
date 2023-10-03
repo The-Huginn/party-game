@@ -1,7 +1,7 @@
-package com.thehuginn.category;
+package com.thehuginn.common.game.category;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.thehuginn.token.translation.CategoryText;
+import com.thehuginn.common.game.translation.CategoryText;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorColumn;

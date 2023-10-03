@@ -1,8 +1,8 @@
-package com.thehuginn.token.translation;
+package com.thehuginn.common.game.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.thehuginn.category.AbstractCategory;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.category.AbstractCategory;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.smallrye.mutiny.Uni;

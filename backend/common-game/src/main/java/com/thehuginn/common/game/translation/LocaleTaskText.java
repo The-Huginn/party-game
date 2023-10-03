@@ -1,4 +1,4 @@
-package com.thehuginn.token.translation;
+package com.thehuginn.common.game.translation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.thehuginn.token.translation.TaskText.CONTENT_TAG;
+import static com.thehuginn.common.game.translation.TaskText.CONTENT_TAG;
 
 @Entity
 @IdClass(LocaleTaskText.LocaleTaskTextPK.class)

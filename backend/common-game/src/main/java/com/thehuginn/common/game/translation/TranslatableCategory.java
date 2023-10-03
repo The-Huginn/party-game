@@ -1,4 +1,4 @@
-package com.thehuginn.token.translation;
+package com.thehuginn.common.game.translation;
 
 public interface TranslatableCategory extends Translatable {
     static final String NAME_TAG = "name";
