@@ -1,10 +1,10 @@
 package com.thehuginn.services.hidden;
 
 import com.thehuginn.category.Category;
+import com.thehuginn.common.game.translation.CategoryText;
+import com.thehuginn.common.game.translation.LocaleCategoryText;
+import com.thehuginn.common.game.translation.TranslatableCategory;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.CategoryText;
-import com.thehuginn.token.translation.LocaleCategoryText;
-import com.thehuginn.token.translation.TranslatableCategory;
 import com.thehuginn.util.Helper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;

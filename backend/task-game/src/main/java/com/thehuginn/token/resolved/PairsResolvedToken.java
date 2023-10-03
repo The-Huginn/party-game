@@ -1,6 +1,6 @@
 package com.thehuginn.token.resolved;
 
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;

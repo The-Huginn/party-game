@@ -1,13 +1,13 @@
 package com.thehuginn.services.hidden;
 
 import com.thehuginn.category.Category;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.game.translation.LocaleTaskText;
+import com.thehuginn.common.game.translation.TaskText;
+import com.thehuginn.common.game.translation.Translatable;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.LocaleTaskText;
-import com.thehuginn.token.translation.TaskText;
-import com.thehuginn.token.translation.Translatable;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import com.thehuginn.token.unresolved.UnresolvedToken;
 import com.thehuginn.util.Helper;

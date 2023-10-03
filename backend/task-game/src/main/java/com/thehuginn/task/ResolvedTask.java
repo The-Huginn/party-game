@@ -1,7 +1,7 @@
 package com.thehuginn.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.token.resolved.AbstractResolvedToken;

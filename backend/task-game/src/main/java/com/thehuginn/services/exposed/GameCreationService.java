@@ -2,11 +2,11 @@ package com.thehuginn.services.exposed;
 
 import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.game.translation.CategoryText;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.token.resolved.AbstractResolvedToken;
-import com.thehuginn.token.translation.CategoryText;
 import com.thehuginn.token.unresolved.AbstractUnresolvedToken;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;

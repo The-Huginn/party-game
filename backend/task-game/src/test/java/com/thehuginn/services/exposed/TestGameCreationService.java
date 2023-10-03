@@ -2,11 +2,11 @@ package com.thehuginn.services.exposed;
 
 import com.thehuginn.AbstractTest;
 import com.thehuginn.category.Category;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.game.translation.LocaleCategoryText;
 import com.thehuginn.services.hidden.CategoryService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.LocaleCategoryText;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.panache.common.Parameters;

@@ -2,8 +2,8 @@ package com.thehuginn.services.hidden;
 
 import com.thehuginn.AbstractTest;
 import com.thehuginn.category.Category;
+import com.thehuginn.common.game.translation.LocaleCategoryText;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.LocaleCategoryText;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;

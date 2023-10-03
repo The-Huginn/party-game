@@ -2,9 +2,9 @@ package com.thehuginn.util;
 
 import com.thehuginn.GameSession;
 import com.thehuginn.category.Category;
+import com.thehuginn.common.game.translation.CategoryText;
+import com.thehuginn.common.game.translation.LocaleCategoryText;
 import com.thehuginn.task.Task;
-import com.thehuginn.token.translation.CategoryText;
-import com.thehuginn.token.translation.LocaleCategoryText;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

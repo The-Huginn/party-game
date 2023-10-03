@@ -1,7 +1,7 @@
 package com.thehuginn.token.resolved;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.resolution.UnresolvedResult;
 import io.quarkus.logging.Log;

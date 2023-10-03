@@ -1,6 +1,6 @@
 package com.thehuginn;
 
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.services.hidden.GameTaskService;
 import com.thehuginn.services.hidden.TaskService;
 import io.quarkus.test.junit.QuarkusTest;

@@ -3,6 +3,7 @@ package com.thehuginn.category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thehuginn.GameSession;
+import com.thehuginn.common.game.category.AbstractCategory;
 import com.thehuginn.task.Task;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;

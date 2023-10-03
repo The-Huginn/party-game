@@ -1,7 +1,7 @@
 package com.thehuginn.task;
 
 import com.thehuginn.GameSession;
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.resolution.Resolvable;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.Entity;

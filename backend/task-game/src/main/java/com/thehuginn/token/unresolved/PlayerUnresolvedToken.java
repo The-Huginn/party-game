@@ -1,6 +1,6 @@
 package com.thehuginn.token.unresolved;
 
-import com.thehuginn.resolution.ResolutionContext;
+import com.thehuginn.common.game.resolution.ResolutionContext;
 import com.thehuginn.resolution.TokenResolver;
 import com.thehuginn.task.ResolvedToken;
 import com.thehuginn.token.resolved.PlayerResolvedToken;
