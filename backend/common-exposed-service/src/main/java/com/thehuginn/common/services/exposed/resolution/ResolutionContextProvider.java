@@ -1,4 +1,4 @@
-package com.thehuginn.common.game.resolution;
+package com.thehuginn.common.services.exposed.resolution;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -58,7 +58,7 @@ public class ResolutionContextProvider implements ParamConverterProvider {
     @Override
     @SuppressWarnings("unchecked")
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
-        if (rawType.equals(ResolutionContext.Builder.class) || rawType.equals(Object.class)) {
+        if (rawType.equals(ResolutionContext.Builder.class)) {
             return (ParamConverter<T>) new ResolutionContextConverter(containerRequestContext);
         }
         return null;

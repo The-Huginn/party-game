@@ -12,6 +12,14 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <dependencies>
+      <dependency>
+          <groupId>com.thehuginn</groupId>
+          <artifactId>common-exposed-service</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+  </dependencies>
+
   <build>
       <plugins>
           <plugin>

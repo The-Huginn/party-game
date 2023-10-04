@@ -1,5 +1,6 @@
 package com.thehuginn.common.services.exposed;
 
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -15,7 +16,7 @@ import org.jboss.resteasy.reactive.RestQuery;
 @Path("/game")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public interface GameService<T> {
+public interface GameService {
 
     @GET
     Uni<?> getGame(@RestCookie String gameId);
@@ -28,13 +29,15 @@ public interface GameService<T> {
 
     @PUT
     @Path("/start")
-    Uni<Boolean> startGame(@RestCookie String gameId, @RestQuery T resolutionContext);
+    Uni<Boolean> startGame(@RestCookie String gameId, @RestQuery ResolutionContext.Builder resolutionContext);
 
     @GET
     @Path("/task/current")
-    Uni<?> currentTask(@RestCookie String gameId, @RestCookie String locale, @RestQuery T resolutionContext);
+    Uni<?> currentTask(@RestCookie String gameId, @RestCookie String locale,
+            @RestQuery ResolutionContext.Builder resolutionContext);
 
     @PUT
     @Path("/task/next")
-    Uni<?> nextTask(@RestCookie String gameId, @RestCookie String locale, @RestQuery T resolutionContext);
+    Uni<?> nextTask(@RestCookie String gameId, @RestCookie String locale,
+            @RestQuery ResolutionContext.Builder resolutionContext);
 }
