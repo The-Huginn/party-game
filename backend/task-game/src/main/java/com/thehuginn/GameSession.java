@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.thehuginn.category.Category;
 import com.thehuginn.common.game.AbstractGameSession;
-import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.services.hidden.GameTaskService;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.ResolvedTask;

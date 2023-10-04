@@ -1,7 +1,7 @@
 package com.thehuginn.services.hidden;
 
 import com.thehuginn.GameSession;
-import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;

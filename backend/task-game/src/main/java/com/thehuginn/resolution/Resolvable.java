@@ -1,6 +1,6 @@
 package com.thehuginn.resolution;
 
-import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 
 public interface Resolvable<T> {
 

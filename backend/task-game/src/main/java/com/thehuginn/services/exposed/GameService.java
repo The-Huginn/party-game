@@ -1,7 +1,7 @@
 package com.thehuginn.services.exposed;
 
 import com.thehuginn.GameSession;
-import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.resolution.UnresolvedResult;
 import com.thehuginn.task.ResolvedTask;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -20,7 +20,7 @@ import org.jboss.resteasy.reactive.RestQuery;
 import java.util.function.Function;
 
 @Path("/game")
-public class GameService implements com.thehuginn.common.services.exposed.GameService<ResolutionContext.Builder> {
+public class GameService implements com.thehuginn.common.services.exposed.GameService {
 
     @GET
     @Override

@@ -1,7 +1,7 @@
 package com.thehuginn.services.hidden;
 
 import com.thehuginn.AbstractTest;
-import com.thehuginn.common.game.resolution.ResolutionContext;
+import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
