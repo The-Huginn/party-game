@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thehuginn.common.game.AbstractGameSession;
 import com.thehuginn.common.game.task.AbstractTask;
 import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
-import com.thehuginn.task.NeverEverTask;
 import com.thehuginn.task.PubTask;
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.Entity;
@@ -19,7 +17,10 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 @Entity
 public class GameSession extends AbstractGameSession {
@@ -37,7 +38,7 @@ public class GameSession extends AbstractGameSession {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @Cascade(CascadeType.DELETE_ORPHAN)
     @JoinTable(name = "gameSession_tasks", joinColumns = @JoinColumn(name = "gameSession_id", referencedColumnName = "gameId"), inverseJoinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id"))
-    public List<? super AbstractTask> tasks;
+    public List<? super AbstractTask> tasks = new ArrayList<>();
 
     public GameSession() {
     }
@@ -49,40 +50,57 @@ public class GameSession extends AbstractGameSession {
 
     @Override
     public Uni<Boolean> start(ResolutionContext.Builder resolutionContext) {
-        tasks.clear();
-        return switch (this.type) {
-            case PUB_MODE -> {
-                tasks.addAll(PubTask.generateTasks());
-                yield this.persist()
-                        .replaceWith(Boolean.TRUE);
-            }
-            case NEVER_EVER_MODE -> {
-                tasks.addAll(NeverEverTask.generateTasks());
-                yield this.persist()
-                        .replaceWith(Boolean.TRUE);
-            }
-            case NONE -> Uni.createFrom().item(Boolean.FALSE);
+        Function<GameSession, Uni<List<? extends AbstractTask>>> resolveTasks = gameSession -> switch (gameSession.type) {
+            case PUB_MODE -> PubTask.generateTasks();
+            case NEVER_EVER_MODE, NONE -> Uni.createFrom().item(List.of());
         };
+
+        return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :gameId",
+                Parameters.with("gameId", this.gameId))
+                .firstResult().chain(gameSession -> {
+                    gameSession.tasks.clear();
+                    return resolveTasks.apply(gameSession)
+                            .chain(abstractTasks -> {
+                                if (abstractTasks.isEmpty()) {
+                                    return Uni.createFrom().item(Boolean.FALSE);
+                                }
+                                gameSession.tasks.addAll(abstractTasks);
+                                return gameSession.persist()
+                                        .replaceWith(Boolean.TRUE);
+                            });
+                });
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Uni<? extends AbstractTask> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
-        return GameSession.find("from GameSession g left fetch g.tasks where g.id = :id", Parameters.with("id", this.gameId))
-                .project(AbstractTask.class)
-                .page(0, 1)
-                .firstResult();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Uni<? extends AbstractTask> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
-        return GameSession.find("from GameSession g left fetch g.tasks where g.id = :id", Parameters.with("id", this.gameId))
-                .project(AbstractTask.class)
+    public Uni<Map.Entry<String, String>> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
+        return GameSession
+                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                        Parameters.with("id", this.gameId))
                 .page(0, 1)
                 .firstResult()
-                .call(task -> PanacheEntity.delete(
-                        "from gameSession_tasks cross where cross.gameSession_id = :gameId and cross.task_id = :id",
-                        Parameters.with("gameId", this.gameId).and("id", task.id)));
+                .map(gameSession -> (AbstractTask) gameSession.tasks.get(0))
+                .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
+                        .getValue()
+                        .map(content -> Map.entry(abstractTask.getKey(), content)));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Uni<Map.Entry<String, String>> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
+        return GameSession
+                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                        Parameters.with("id", this.gameId))
+                .page(0, 1)
+                .firstResult()
+                .chain(gameSession -> {
+                    AbstractTask task = (AbstractTask) gameSession.tasks.get(0);
+                    gameSession.tasks.remove(0);
+                    return gameSession.persist()
+                            .replaceWith(task);
+                })
+                .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
+                        .getValue()
+                        .map(content -> Map.entry(abstractTask.getKey(), content)));
     }
 }
