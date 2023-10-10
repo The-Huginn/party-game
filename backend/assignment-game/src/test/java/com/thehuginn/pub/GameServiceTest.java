@@ -8,21 +8,28 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
 import io.restassured.http.Cookie;
+import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 @RunOnVertxContext
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameServiceTest extends AbstractTest {
 
     @Override
     protected void additionalSetup(UniAsserter asserter) {
-        asserter.execute(() -> new GameSession(GAME, GameSession.GameType.PUB_MODE).persist());
+//        asserter.execute(() -> new GameSession(GAME, GameSession.GameType.PUB_MODE).persist());
     }
 
     @Test
@@ -40,11 +47,13 @@ public class GameServiceTest extends AbstractTest {
                 .body("gameId", is(GAME),
                         "type", is(GameSession.GameType.PUB_MODE.toString())));
 
-        asserter.surroundWith(uni -> Panache.withTransaction(() -> uni));
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
     void testGettingRulesAsFirstTaskWithCurrent(UniAsserter asserter) {
+        asserter.execute(() -> new GameSession(GAME, GameSession.GameType.PUB_MODE).persistAndFlush());
+        asserter.execute(this::createPubTasks);
         asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -55,7 +64,7 @@ public class GameServiceTest extends AbstractTest {
                 .put("/pub/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("data." + ((PubTask) asserter.getData("task")).getKey(), is("simple task")));
+                .body(is("true")));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
@@ -65,16 +74,18 @@ public class GameServiceTest extends AbstractTest {
                 .get("/pub/task/current")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("data." + ((PubTask) asserter.getData("task")).getKey(), is("simple task")));
+                .body(((PubTask) asserter.getData("task")).getKey(), is(((PubTask) asserter.getData("task")).task.content)));
 
-        asserter.surroundWith(uni -> Panache.withTransaction(() -> uni));
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
     void testGettingRulesAsFirstTaskWithNext(UniAsserter asserter) {
+        asserter.execute(() -> new GameSession(GAME, GameSession.GameType.PUB_MODE).persistAndFlush());
+        asserter.execute(this::createPubTasks);
         asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
-                .cookie(new Cookie.Builder("gameId", "newGame").build())
+                .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -82,18 +93,28 @@ public class GameServiceTest extends AbstractTest {
                 .put("/pub/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body(is(new GameSession("newGame", GameSession.GameType.PUB_MODE))));
+                .body(is("true")));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .get("/pub/task/next")
+                .put("/pub/task/next")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body("data." + ((PubTask) asserter.getData("task")).getKey(), is("simple task")));
+                .body(((PubTask) asserter.getData("task")).getKey(), is(((PubTask) asserter.getData("task")).task.content)));
 
-        asserter.surroundWith(uni -> Panache.withTransaction(() -> uni));
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    private Uni<List<PubTask>> createPubTasks() {
+        List<Uni<PubTask>> pubTasks = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            pubTasks.add(PubTask.createPubTask(String.valueOf(i), Map.of()));
+        }
+        //noinspection unchecked
+        return Uni.combine().all().unis(pubTasks).usingConcurrencyOf(1)
+                .combinedWith(objects -> (List<PubTask>) objects);
     }
 }
