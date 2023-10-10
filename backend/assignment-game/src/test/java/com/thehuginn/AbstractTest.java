@@ -1,7 +1,6 @@
 package com.thehuginn;
 
 import com.thehuginn.common.game.AbstractGameSession;
-import com.thehuginn.common.game.category.AbstractCategory;
 import com.thehuginn.common.game.task.AbstractTask;
 import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import io.quarkus.hibernate.reactive.panache.Panache;
@@ -27,8 +26,9 @@ public class AbstractTest {
     @BeforeEach
     void setup(UniAsserter asserter) {
         asserter.execute(() -> AbstractGameSession.deleteAll());
+        asserter.execute(() -> AbstractTask.delete("id > 0"));
         additionalSetup(asserter);
-        asserter.surroundWith(uni -> Panache.withTransaction(() -> uni));
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     protected void additionalSetup(UniAsserter asserter) {}
