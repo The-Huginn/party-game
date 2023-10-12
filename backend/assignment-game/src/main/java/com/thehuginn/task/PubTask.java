@@ -32,10 +32,10 @@ public class PubTask extends AbstractTask {
             return pubTask.persistAndFlush();
         }
 
-        return Uni.combine().all().unis(localeTaskTexts)
+        return pubTask.<PubTask>persistAndFlush()
+                .call(() -> Uni.combine().all().unis(localeTaskTexts)
                 .usingConcurrencyOf(1)
-                .discardItems()
-                .replaceWith(pubTask.persistAndFlush());
+                .discardItems());
     }
 
     public static Uni<List<? extends AbstractTask>> generateTasks() {
