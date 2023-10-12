@@ -31,5 +31,6 @@ public class AbstractTest {
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
-    protected void additionalSetup(UniAsserter asserter) {}
+    protected void additionalSetup(UniAsserter asserter) {
+    }
 }

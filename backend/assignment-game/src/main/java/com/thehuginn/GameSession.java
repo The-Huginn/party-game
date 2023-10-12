@@ -56,7 +56,8 @@ public class GameSession extends AbstractGameSession {
                     case PUB_MODE -> PubTask.generateTasks();
                     case NEVER_EVER_MODE, NONE -> Uni.createFrom().item(List.of());
                 };
-            } catch (IllegalStateException ignored) {}
+            } catch (IllegalStateException ignored) {
+            }
             return Uni.createFrom().item(List.of());
         };
 
@@ -99,8 +100,8 @@ public class GameSession extends AbstractGameSession {
                 .page(0, 1)
                 .firstResult()
                 .chain(gameSession -> {
-                    AbstractTask task = (AbstractTask) gameSession.tasks.get(0);
                     gameSession.tasks.remove(0);
+                    AbstractTask task = !gameSession.tasks.isEmpty() ? (AbstractTask) gameSession.tasks.get(0) : null;
                     return gameSession.persist()
                             .replaceWith(task);
                 })
