@@ -26,7 +26,7 @@
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.platform.version}</version>
         <configuration>
-          <debug>5006</debug>
+          <debug>5005</debug>
         </configuration>
         <extensions>true</extensions>
         <executions>
