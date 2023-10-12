@@ -41,6 +41,9 @@ public class PubTask extends AbstractTask {
     public static Uni<List<? extends AbstractTask>> generateTasks() {
         return PubTask.<PubTask> listAll(Sort.ascending("id"))
                 .map(pubTasks -> {
+                    if (pubTasks.size() < 13) {
+                        throw new IllegalStateException("Not enough Pub Tasks in the database");
+                    }
                     List<PubTask> rules = new ArrayList<>(List.of(pubTasks.get(0)));
                     Collections.shuffle(pubTasks);
                     rules.addAll(pubTasks.subList(0, 12));

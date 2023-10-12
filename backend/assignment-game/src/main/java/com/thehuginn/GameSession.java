@@ -50,9 +50,14 @@ public class GameSession extends AbstractGameSession {
 
     @Override
     public Uni<Boolean> start(ResolutionContext.Builder resolutionContext) {
-        Function<GameSession, Uni<List<? extends AbstractTask>>> resolveTasks = gameSession -> switch (gameSession.type) {
-            case PUB_MODE -> PubTask.generateTasks();
-            case NEVER_EVER_MODE, NONE -> Uni.createFrom().item(List.of());
+        Function<GameSession, Uni<List<? extends AbstractTask>>> resolveTasks = gameSession -> {
+            try {
+                return switch (gameSession.type) {
+                    case PUB_MODE -> PubTask.generateTasks();
+                    case NEVER_EVER_MODE, NONE -> Uni.createFrom().item(List.of());
+                };
+            } catch (IllegalStateException ignored) {}
+            return Uni.createFrom().item(List.of());
         };
 
         return GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :gameId",
