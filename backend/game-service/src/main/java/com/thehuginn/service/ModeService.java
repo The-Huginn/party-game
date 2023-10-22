@@ -39,10 +39,10 @@ public class ModeService {
     @Path("/exists")
     public Uni<JsonNode> getGame(@RestCookie String gameId) {
         return callbackUni(gameId, game -> switch (game.type) {
-                    case TASK -> taskRestClient.getGame(gameId);
-                    case PUB -> pubRestClient.getGame(gameId);
-                    case NONE -> Uni.createFrom().nullItem();
-                });
+            case TASK -> taskRestClient.getGame(gameId);
+            case PUB -> pubRestClient.getGame(gameId);
+            case NONE -> Uni.createFrom().nullItem();
+        });
     }
 
     @DELETE
@@ -61,14 +61,14 @@ public class ModeService {
     @WithTransaction
     public Uni<JsonNode> createGameMode(@RestCookie String gameId, @RestPath Game.Type type) {
         return callbackUni(gameId, game -> {
-                    game.type = type;
-                    return game.<Game> persist()
-                            .<JsonNode>chain(game1 -> switch (game1.type) {
-                                case TASK -> taskRestClient.createGame(gameId);
-                                case PUB -> pubRestClient.createGame(gameId);
-                                case NONE -> Uni.createFrom().nullItem();
-                            });
-                });
+            game.type = type;
+            return game.<Game> persist()
+                    .<JsonNode> chain(game1 -> switch (game1.type) {
+                        case TASK -> taskRestClient.createGame(gameId);
+                        case PUB -> pubRestClient.createGame(gameId);
+                        case NONE -> Uni.createFrom().nullItem();
+                    });
+        });
     }
 
     @PUT
@@ -87,25 +87,25 @@ public class ModeService {
     @Path("/current")
     public Uni<JsonNode> currentTask(@RestCookie String gameId, @RestCookie @DefaultValue("en") String locale) {
         return callbackUni(gameId, game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
-                    case PUB -> pubRestClient.currentTask(gameId, locale, game1.gameContext());
-                    case NONE -> Uni.createFrom().nullItem();
-                });
+            case TASK -> taskRestClient.currentTask(gameId, locale, game1.gameContext());
+            case PUB -> pubRestClient.currentTask(gameId, locale, game1.gameContext());
+            case NONE -> Uni.createFrom().nullItem();
+        });
     }
 
     @PUT
     @Path("/next")
     public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie @DefaultValue("en") String locale) {
         return callbackUni(gameId, game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
-                    case PUB -> pubRestClient.nextTask(gameId, locale, game1.gameContext());
-                    case NONE -> Uni.createFrom().nullItem();
-                });
+            case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
+            case PUB -> pubRestClient.nextTask(gameId, locale, game1.gameContext());
+            case NONE -> Uni.createFrom().nullItem();
+        });
     }
 
     private Uni<JsonNode> callbackUni(String gameId, Function<Game, Uni<JsonNode>> callback) {
-        return Game.<Game>findById(gameId)
+        return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game -> callback.apply(game)
-                        .invoke(jsonNode -> ((ObjectNode)jsonNode).put("type", game.type.toString())));
+                        .invoke(jsonNode -> ((ObjectNode) jsonNode).put("type", game.type.toString())));
     }
 }
