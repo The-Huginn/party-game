@@ -1,28 +1,28 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name:  pub-game-postgresql
+  name:  assignment-game-postgresql
   labels:
     app: party-game
 spec:
-  storageClassName:  pub-game-postgresql
+  storageClassName:  assignment-game-postgresql
   capacity:
     storage: 25Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/bifrost/k3s-volumes/pub-game/postgresql
+    path: /home/bifrost/k3s-volumes/assignment-game/postgresql
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name:  pub-game-postgresql
+  name:  assignment-game-postgresql
   labels:
     app: party-game
 spec:
-  storageClassName:  pub-game-postgresql
+  storageClassName:  assignment-game-postgresql
   accessModes:
     - ReadWriteOnce
   resources:
@@ -34,23 +34,23 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: pub-game-postgres
+  name: assignment-game-postgres
   labels:
     app: party-game
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: pub-game-postgres
+      service: assignment-game-postgres
   template:
     metadata:
       labels:
-        service: pub-game-postgres
+        service: assignment-game-postgres
     spec:
       volumes:
         - name: storage
           persistentVolumeClaim:
-            claimName: pub-game-postgresql
+            claimName: assignment-game-postgresql
 
       containers:
         - name: postgres
@@ -61,17 +61,17 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: pub-game-postgresql
+                  name: assignment-game-postgresql
                   key: database-name
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: pub-game-postgresql
+                  name: assignment-game-postgresql
                   key: database-username
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: pub-game-postgresql
+                  name: assignment-game-postgresql
                   key: database-password
           
           resources:
@@ -89,10 +89,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pub-game-postgres
+  name: assignment-game-postgres
 spec:
   type: ClusterIP
   ports:
     - port: 5432
   selector:
-    service: pub-game-postgres
+    service: assignment-game-postgres
