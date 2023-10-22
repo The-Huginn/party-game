@@ -17,7 +17,7 @@
 }
 
 body {
-	min-height: 100dvh;
+	min-height: 100svh;
 	margin: 0;
 	background-attachment: fixed;
 	background-color: var(--color-bg-1);
