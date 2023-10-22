@@ -229,5 +229,6 @@
     <module>common-game</module>
     <module>game-service</module>
     <module>task-game</module>
+    <module>assignment-game</module>
   </modules>
 </project>
