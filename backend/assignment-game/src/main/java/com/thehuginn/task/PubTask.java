@@ -45,6 +45,8 @@ public class PubTask extends AbstractTask {
                         throw new IllegalStateException("Not enough Pub Tasks in the database");
                     }
                     List<PubTask> rules = new ArrayList<>(List.of(pubTasks.get(0)));
+                    pubTasks.remove(0);
+
                     Collections.shuffle(pubTasks);
                     rules.addAll(pubTasks.subList(0, 12));
                     return rules;

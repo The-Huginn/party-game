@@ -19,11 +19,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -42,14 +41,14 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testCreatingGame(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .post("/pub")
+                .post("/pub/game")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body("gameId", is(GAME),
@@ -62,7 +61,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testNoPubTasksInDatabase(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> PubTask.delete("id > 0"));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -70,7 +69,7 @@ public class GameServiceTest extends AbstractTest {
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .put("/pub/start")
+                .put("/pub/game/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(is("false")));
@@ -80,14 +79,14 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testGettingRulesAsFirstTaskWithCurrent(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .put("/pub/start")
+                .put("/pub/game/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(is("true")));
@@ -97,24 +96,25 @@ public class GameServiceTest extends AbstractTest {
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .get("/pub/task/current")
+                .get("/pub/game/task/current")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
-                .body(((PubTask) asserter.getData("task")).getKey(), is(((PubTask) asserter.getData("task")).task.content)));
+                .body("data." + ((PubTask) asserter.getData("task")).getKey(),
+                        is(((PubTask) asserter.getData("task")).task.content)));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     @Test
     void testGettingFirstTaskWithNext(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .put("/pub/start")
+                .put("/pub/game/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(is("true")));
@@ -124,13 +124,13 @@ public class GameServiceTest extends AbstractTest {
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .put("/pub/task/next")
+                .put("/pub/game/task/next")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(containsString("EN ")));
         asserter.assertThat(() -> GameSession
-                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
-                .page(0, 1).firstResult(),
+                        .<GameSession>find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
+                        .page(0, 1).firstResult(),
                 gameSession -> Assertions.assertEquals(12, gameSession.tasks.size()));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -138,16 +138,14 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testGettingAllTasks(UniAsserter asserter) {
-        Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-
-        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
                 .queryParam("resolutionContext", resolutionContext)
                 .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .put("/pub/start")
+                .put("/pub/game/start")
                 .then()
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(is("true")));
@@ -155,20 +153,18 @@ public class GameServiceTest extends AbstractTest {
 
             Set<String> tasks = new HashSet<>();
             for (int i = 0; i < 12; i++) {
-                String task = given()
+                LinkedHashMap<String, String> response = given()
                         .cookie(new Cookie.Builder("gameId", GAME).build())
                         .cookie(new Cookie.Builder("locale", "en").build())
                         .queryParam("resolutionContext", resolutionContext)
                         .contentType(MediaType.APPLICATION_JSON)
                         .when()
-                        .put("/pub/task/next")
+                        .put("/pub/game/task/next")
                         .then()
                         .statusCode(RestResponse.StatusCode.OK)
                         .extract()
-                        .asPrettyString();
-                Matcher matcher = pattern.matcher(task);
-                matcher.find();
-                tasks.add(matcher.group(1));
+                        .path("data");
+                tasks.add(response.get(response.get("task")));
             }
 
             Assertions.assertEquals(12, tasks.size());
@@ -179,21 +175,58 @@ public class GameServiceTest extends AbstractTest {
                     .queryParam("resolutionContext", resolutionContext)
                     .contentType(MediaType.APPLICATION_JSON)
                     .when()
-                    .put("/pub/task/next")
+                    .put("/pub/game/task/next")
                     .then()
                     .statusCode(RestResponse.StatusCode.NO_CONTENT);
         });
         asserter.assertThat(() -> GameSession
-                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
-                .page(0, 1).firstResult(),
+                        .<GameSession>find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
+                        .page(0, 1).firstResult(),
                 gameSession -> Assertions.assertEquals(0, gameSession.tasks.size()));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
+    void testNotGettingRules(UniAsserter asserter) {
+        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .put("/pub/game/start")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body(is("true")));
+        asserter.execute(() -> {
+
+            Set<String> tasks = new HashSet<>();
+            for (int i = 0; i < 12; i++) {
+                LinkedHashMap<String, String> response = given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("/pub/game/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .extract()
+                        .path("data");
+                tasks.add(response.get(response.get("task")));
+            }
+
+            Assertions.assertFalse(tasks.contains(((PubTask) asserter.getData("task")).task.content));
+        });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
     private Uni<List<PubTask>> createPubTasks() {
         List<Uni<PubTask>> pubTasks = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 12; i++) {
             pubTasks.add(PubTask.createPubTask("EN %d".formatted(i), Map.of("sk", "SK %d".formatted(i))));
         }
         //noinspection unchecked
