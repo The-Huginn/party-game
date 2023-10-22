@@ -1,3 +1,4 @@
+import type { Mode } from "$lib/common/mode";
 import { game_url } from "../../../store";
 import type { PageLoad } from "./$types";
 
@@ -7,8 +8,9 @@ export const load: PageLoad = async ({ fetch }) => {
         credentials: 'include'
     });
 
+    const reply = await response.json();
     return { 
-        data: (await response.json()).data,
-        initialLoad: true satisfies boolean
+        data: reply.data,
+        type: reply.type satisfies Mode,
     };
 }
