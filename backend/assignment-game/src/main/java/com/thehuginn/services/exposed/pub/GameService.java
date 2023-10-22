@@ -10,7 +10,7 @@ import jakarta.ws.rs.WebApplicationException;
 import java.util.Map;
 import java.util.function.Function;
 
-@Path("/pub")
+@Path("/pub/game")
 @WithTransaction
 public class GameService implements com.thehuginn.common.services.exposed.GameService {
     @Override
@@ -38,7 +38,7 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     }
 
     @Override
-    public Uni<Map.Entry<String, String>> currentTask(String gameId, String locale,
+    public Uni<Map.Entry<String, Map<String, String>>> currentTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
         resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
         ResolutionContext.Builder finalResolutionContext = resolutionContext;
@@ -47,7 +47,8 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     }
 
     @Override
-    public Uni<?> nextTask(String gameId, String locale, ResolutionContext.Builder resolutionContext) {
+    public Uni<Map.Entry<String, Map<String, String>>> nextTask(String gameId, String locale,
+            ResolutionContext.Builder resolutionContext) {
         resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
         ResolutionContext.Builder finalResolutionContext = resolutionContext;
         return execute(gameId, gameSession -> gameSession.nextTask(finalResolutionContext))

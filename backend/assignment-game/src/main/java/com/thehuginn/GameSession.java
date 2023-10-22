@@ -79,7 +79,7 @@ public class GameSession extends AbstractGameSession {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Uni<Map.Entry<String, String>> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
+    public Uni<Map.Entry<String, Map<String, String>>> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
         return GameSession
                 .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
                         Parameters.with("id", this.gameId))
@@ -88,12 +88,14 @@ public class GameSession extends AbstractGameSession {
                 .map(gameSession -> (AbstractTask) gameSession.tasks.get(0))
                 .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
                         .getValue()
-                        .map(content -> Map.entry(abstractTask.getKey(), content)));
+                        .map(content -> Map.entry("data", Map.of(
+                                "task", abstractTask.getKey(),
+                                abstractTask.getKey(), content))));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Uni<Map.Entry<String, String>> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
+    public Uni<Map.Entry<String, Map<String, String>>> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
         return GameSession
                 .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
                         Parameters.with("id", this.gameId))
@@ -107,6 +109,8 @@ public class GameSession extends AbstractGameSession {
                 })
                 .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
                         .getValue()
-                        .map(content -> Map.entry(abstractTask.getKey(), content)));
+                        .map(content -> Map.entry("data", Map.of(
+                                "task", abstractTask.getKey(),
+                                abstractTask.getKey(), content))));
     }
 }
