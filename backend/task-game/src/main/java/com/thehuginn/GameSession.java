@@ -188,13 +188,15 @@ public class GameSession extends AbstractGameSession {
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long id) {
         return GameTask
-                .<GameTask> find("game.id = :game AND id > :id", Parameters.with("game", gameId).and("id", id))
+                .<GameTask> find("game.id = :game AND id > :id ORDER BY game.id", Parameters.with("game", gameId).and("id", id))
                 .page(0, 1)
                 .firstResult()
                 .onItem().ifNull()
                 .switchTo(() -> {
                     Log.info("Unable to find next task, getting a \"random\" one");
-                    return GameTask.find("game.id = :game AND assignedPlayer is NULL", Parameters.with("game", gameId))
+                    return GameTask
+                            .find("game.id = :game AND assignedPlayer is NULL ORDER BY game.id",
+                                    Parameters.with("game", gameId))
                             .firstResult();
                 })
                 .chain(gameTask -> {
