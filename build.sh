@@ -11,7 +11,7 @@ do
 done
 
 echo -e '\033[1mCreating backend resources for kubernetes...\033[0m'
-for microservice in game-service task-game
+for microservice in game-service task-game assignment-game
 do
 	cd ~/party-game/backend/$microservice && \
 	mvn clean install -DskipTests && \

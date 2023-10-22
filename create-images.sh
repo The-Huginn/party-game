@@ -20,5 +20,5 @@ cd ../
 # done
 
 cd backend && \
-mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true && \
+mvn clean install -Dquarkus.container-image.username=${REGISTRY_USERNAME} -Dquarkus.container-image.password=${REGISTRY_PASSWORD} -Dquarkus.container-image.push=true -Dquarkus.container-image.insecure=true -Djib.httpTimeout=60000 && \
 cd ../
