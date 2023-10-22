@@ -41,7 +41,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testCreatingGame(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
@@ -61,7 +61,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testNoPubTasksInDatabase(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> PubTask.delete("id > 0"));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
@@ -79,7 +79,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testGettingRulesAsFirstTaskWithCurrent(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
@@ -107,7 +107,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testGettingFirstTaskWithNext(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
@@ -129,8 +129,8 @@ public class GameServiceTest extends AbstractTest {
                 .statusCode(RestResponse.StatusCode.OK)
                 .body(containsString("EN ")));
         asserter.assertThat(() -> GameSession
-                        .<GameSession>find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
-                        .page(0, 1).firstResult(),
+                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
+                .page(0, 1).firstResult(),
                 gameSession -> Assertions.assertEquals(12, gameSession.tasks.size()));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -138,7 +138,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testGettingAllTasks(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
@@ -180,8 +180,8 @@ public class GameServiceTest extends AbstractTest {
                     .statusCode(RestResponse.StatusCode.NO_CONTENT);
         });
         asserter.assertThat(() -> GameSession
-                        .<GameSession>find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
-                        .page(0, 1).firstResult(),
+                .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME))
+                .page(0, 1).firstResult(),
                 gameSession -> Assertions.assertEquals(0, gameSession.tasks.size()));
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
@@ -189,7 +189,7 @@ public class GameServiceTest extends AbstractTest {
 
     @Test
     void testNotGettingRules(UniAsserter asserter) {
-        asserter.execute(() -> PubTask.<PubTask>findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()
                 .cookie(new Cookie.Builder("gameId", GAME).build())
                 .cookie(new Cookie.Builder("locale", "en").build())
