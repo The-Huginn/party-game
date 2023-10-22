@@ -1,4 +1,7 @@
 package com.thehuginn.external;
 
-public interface GameRestClientPub {
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient(configKey = "pub-api")
+public interface GameRestClientPub extends GameRestClient {
 }

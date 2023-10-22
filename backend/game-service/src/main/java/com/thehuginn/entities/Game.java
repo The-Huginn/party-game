@@ -26,14 +26,15 @@ public class Game extends PanacheEntityBase {
 
     public enum Type {
         NONE,
-        TASK
+        TASK,
+        PUB
     }
 
     @Id
     public String gameId;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<Player> team;
+    public List<Player> team = new ArrayList<>();
 
     public State state;
 

@@ -73,15 +73,4 @@ public class GameService {
                     return game.persist();
                 }).replaceWithVoid();
     }
-
-    @PUT
-    @WithTransaction
-    @Path("/type")
-    public Uni<Void> updateType(@RestCookie String gameId, Game.Type newType) {
-        return Game.<Game> findById(gameId)
-                .onItem().ifNotNull().call(game -> {
-                    game.type = newType;
-                    return game.persist();
-                }).replaceWithVoid();
-    }
 }

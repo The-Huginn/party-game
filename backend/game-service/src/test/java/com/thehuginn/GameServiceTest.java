@@ -75,25 +75,6 @@ public class GameServiceTest extends AbstractTest {
     }
 
     @Test
-    @Order(3)
-    void testMissingCookie(UniAsserter asserter) {
-        asserter.assertThat(() -> Game.count("type = TASK"), game -> Assertions.assertEquals(1L, (long) game));
-
-        asserter.execute(() -> given()
-                .cookie(new Cookie.Builder("gameId", ID).build())
-                .contentType(ContentType.JSON)
-                .body("\"NONE\"")
-                .when()
-                .put("/game/type")
-                .then()
-                .statusCode(RestResponse.StatusCode.NO_CONTENT));
-
-        asserter.assertThat(() -> Game.count("type = NONE"), game -> Assertions.assertEquals(1L, (long) game));
-
-        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
-    }
-
-    @Test
     @Order(4)
     public void testEmptyTeamGame(UniAsserter asserter) {
         asserter.execute(() -> {
