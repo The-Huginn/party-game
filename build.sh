@@ -28,4 +28,5 @@ cd ~/party-game/population/tasks && git clone https://The-Huginn:${GITHUB_TOKEN}
 echo -e '\033[1mWaiting for pods to activate for 20 seconds...\033[0m'
 sleep 20
 echo -e '\033[1mPopulating tasks...\033[0m'
+cp ~/party-game-tasks/task-mode/* ~/party-game/population/tasks/
 cd ~/party-game/population && python3.11 populate.py
