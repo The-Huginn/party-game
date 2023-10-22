@@ -26,7 +26,8 @@
             },
             "mode-selection": {
                 "title": "Choose game mode",
-                "task": "Task Mode",
+                "task": "Tasks for everybody",
+                "pub": "Exploring pubs",
                 "game_continue": "Would you like to continue previous game?"
             },
             "task": {
