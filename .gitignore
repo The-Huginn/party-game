@@ -5,3 +5,4 @@ __pycache__
 
 # valuable resources
 population/tasks/
+backend/assignment-game/src/main/resources/import.sql
