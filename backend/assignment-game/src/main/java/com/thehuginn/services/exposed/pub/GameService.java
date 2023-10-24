@@ -27,17 +27,20 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     }
 
     @Override
+    @WithTransaction
     public Uni<Boolean> deleteGame(String gameId) {
         return GameSession.deleteById(gameId);
     }
 
     @Override
+    @WithTransaction
     public Uni<Boolean> startGame(String gameId, ResolutionContext.Builder resolutionContext) {
         return execute(gameId, gameSession -> gameSession.start(resolutionContext))
                 .onFailure().recoverWithItem(Boolean.FALSE);
     }
 
     @Override
+    @WithTransaction
     public Uni<Map.Entry<String, Map<String, String>>> currentTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
         resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
@@ -47,6 +50,7 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     }
 
     @Override
+    @WithTransaction
     public Uni<Map.Entry<String, Map<String, String>>> nextTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
         resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
