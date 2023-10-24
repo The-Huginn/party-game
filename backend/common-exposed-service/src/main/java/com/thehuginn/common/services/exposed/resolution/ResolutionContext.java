@@ -2,7 +2,6 @@ package com.thehuginn.common.services.exposed.resolution;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nonnull;
-import jakarta.ws.rs.WebApplicationException;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +38,9 @@ public class ResolutionContext {
             String player,
             List<String> players) {
         if (!players.contains(player)) {
-            throw new IllegalArgumentException("Player can not be found between all players.");
+            if (player != null || !players.isEmpty()) {
+                throw new IllegalArgumentException("Player can not be found between all players.");
+            }
         }
         this.locale = locale;
         this.gameId = gameId;
@@ -80,9 +81,6 @@ public class ResolutionContext {
         }
 
         public Builder players(@Nonnull List<String> players) {
-            if (players.isEmpty()) {
-                throw new WebApplicationException("Received no players for this game");
-            }
             this.players = players;
             return this;
         }

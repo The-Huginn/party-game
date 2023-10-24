@@ -43,7 +43,9 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     @WithTransaction
     public Uni<Map.Entry<String, Map<String, String>>> currentTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
-        resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
+        if (!resolutionContext.getPlayers().isEmpty()) {
+            resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
+        }
         ResolutionContext.Builder finalResolutionContext = resolutionContext;
         return execute(gameId, gameSession -> gameSession.currentTask(finalResolutionContext))
                 .onFailure().recoverWithNull();
@@ -53,7 +55,9 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
     @WithTransaction
     public Uni<Map.Entry<String, Map<String, String>>> nextTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
-        resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
+        if (!resolutionContext.getPlayers().isEmpty()) {
+            resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
+        }
         ResolutionContext.Builder finalResolutionContext = resolutionContext;
         return execute(gameId, gameSession -> gameSession.nextTask(finalResolutionContext))
                 .onFailure().recoverWithNull();

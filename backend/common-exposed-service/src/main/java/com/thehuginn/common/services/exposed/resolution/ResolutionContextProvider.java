@@ -8,6 +8,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
 import jakarta.ws.rs.ext.Provider;
+import org.jboss.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -19,6 +20,8 @@ public class ResolutionContextProvider implements ParamConverterProvider {
 
     @Inject
     ContainerRequestContext containerRequestContext;
+
+    static final Logger LOGGER = Logger.getLogger(ResolutionContextProvider.class);
 
     public static class ResolutionContextConverter implements ParamConverter<ResolutionContext.Builder> {
         private final ContainerRequestContext containerRequestContext;
@@ -41,6 +44,11 @@ public class ResolutionContextProvider implements ParamConverterProvider {
                 List<String> players = new ArrayList<>();
                 root.get("players").elements().forEachRemaining(
                         jsonNode -> players.add(jsonNode.asText()));
+
+                if (players.isEmpty()) {
+                    LOGGER.warn("Received no players for this game");
+                }
+
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
                         .players(players);
