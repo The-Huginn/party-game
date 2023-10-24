@@ -111,7 +111,7 @@ public class ModeService {
                     case TASK -> taskRestClient.requiresTeam();
                     case PUB -> pubRestClient.requiresTeam();
                     case NONE -> Uni.createFrom().nullItem();
-        });
+                });
     }
 
     private Uni<JsonNode> callbackUni(String gameId, Function<Game, Uni<JsonNode>> callback) {
