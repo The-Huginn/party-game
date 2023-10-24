@@ -40,4 +40,8 @@ public interface GameService {
     @Path("/task/next")
     Uni<?> nextTask(@RestCookie String gameId, @RestCookie String locale,
             @RestQuery ResolutionContext.Builder resolutionContext);
+
+    @GET
+    @Path("/require/team")
+    Uni<Boolean> requiresTeam();
 }

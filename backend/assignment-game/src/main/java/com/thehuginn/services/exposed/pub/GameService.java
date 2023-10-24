@@ -55,6 +55,11 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
                 .onFailure().recoverWithNull();
     }
 
+    @Override
+    public Uni<Boolean> requiresTeam() {
+        return Uni.createFrom().item(Boolean.FALSE);
+    }
+
     private <T> Uni<T> execute(String gameId, Function<GameSession, Uni<T>> callback) {
         return GameSession.<GameSession> findById(gameId)
                 .onItem().ifNull().failWith(new WebApplicationException("Unable to find game session"))

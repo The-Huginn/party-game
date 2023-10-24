@@ -103,6 +103,17 @@ public class ModeService {
         });
     }
 
+    @GET
+    @Path("/require/team")
+    Uni<Boolean> requiresTeam(@RestCookie String gameId) {
+        return Game.<Game> findById(gameId)
+                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
+                    case TASK -> taskRestClient.requiresTeam();
+                    case PUB -> pubRestClient.requiresTeam();
+                    case NONE -> Uni.createFrom().nullItem();
+        });
+    }
+
     private Uni<JsonNode> callbackUni(String gameId, Function<Game, Uni<JsonNode>> callback) {
         return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game -> callback.apply(game)

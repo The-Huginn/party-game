@@ -39,4 +39,8 @@ public interface GameRestClient {
     @PUT
     @Path("/task/next")
     Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie String locale, @RestQuery GameContext resolutionContext);
+
+    @GET
+    @Path("/require/team")
+    Uni<Boolean> requiresTeam();
 }

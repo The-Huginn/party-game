@@ -73,6 +73,11 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
         return getTaskUni(resolutionContext, gameId, gameSession -> gameSession.nextTask(resolutionContext));
     }
 
+    @Override
+    public Uni<Boolean> requiresTeam() {
+        return Uni.createFrom().item(Boolean.TRUE);
+    }
+
     private Uni<UnresolvedResult.ResolvedResult> getTaskUni(ResolutionContext.Builder resolutionContext,
             String gameId, Function<? super GameSession, Uni<? extends ResolvedTask>> taskUni) {
         return findGameSession(gameId)
