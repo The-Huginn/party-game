@@ -46,7 +46,7 @@
 	</div>
 	<div class="h-16 flex items-center justify-center hover:shadow-lg z-20">
 		<div class="dropdown dropdown-hover dropdown-end">
-			<button><img class="object-contain w-12 h-12 button" src={settings} alt="Settings" /></button>
+			<label for="" tabindex="0" class="cursor-pointer"><img class="object-contain w-12 h-12 button" src={settings} alt="Settings" /></label>
 			<ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40 space-y-3">
 				<li>
 					{#if $isLoading}
