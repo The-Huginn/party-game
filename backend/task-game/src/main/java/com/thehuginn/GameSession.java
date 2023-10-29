@@ -188,22 +188,34 @@ public class GameSession extends AbstractGameSession {
 
     private Uni<ResolvedTask> nextTaskUni(ResolutionContext resolutionContext, long id) {
         return GameTask
-                .<GameTask> find("game.id = :game AND id > :id ORDER BY game.id", Parameters.with("game", gameId).and("id", id))
+                .<GameTask> find("game.id = :game AND id > :id ORDER BY id", Parameters.with("game", gameId).and("id", id))
                 .page(0, 1)
                 .firstResult()
+                .onItem().ifNotNull().transformToUni(gameTask -> {
+                    Log.infof("Chosen task to potentially play: %d %s", gameTask.id, gameTask.unresolvedTask.task.content);
+                    if (!gameTask.isResolvable(resolutionContext)) {
+                        Log.infof("New task is required, we will try new assign task for player %s",
+                                resolutionContext.getPlayer());
+                        return GameTask
+                                .<GameTask> find("game.id = :game AND assignedPlayer = :player ORDER BY id",
+                                        Parameters.with("game", gameId).and("player", resolutionContext.getPlayer()))
+                                .page(0, 1).firstResult();
+                    }
+
+                    return Uni.createFrom().item(gameTask);
+                })
                 .onItem().ifNull()
                 .switchTo(() -> {
                     Log.info("Unable to find next task, getting a \"random\" one");
                     return GameTask
-                            .find("game.id = :game AND assignedPlayer is NULL ORDER BY game.id",
+                            .find("game.id = :game AND assignedPlayer is NULL ORDER BY id",
                                     Parameters.with("game", gameId))
                             .firstResult();
                 })
                 .chain(gameTask -> {
-                    Log.infof("Chosen task to potentially play: %d %s", gameTask.id, gameTask.unresolvedTask.task.content);
-                    if (!gameTask.isResolvable(resolutionContext)) {
-                        Log.infof("New task is required");
-                        return nextTaskUni(resolutionContext, id + 1);
+                    if (gameTask == null) {
+                        Log.errorf("Unable to find any suitable task for game %s", gameId);
+                        return Uni.createFrom().nullItem();
                     }
 
                     return Uni.createFrom().item(gameTask.resolve(resolutionContext));

@@ -1,10 +1,12 @@
 package com.thehuginn.tasks;
 
 import com.thehuginn.AbstractResolutionTaskTest;
+import com.thehuginn.GameSession;
 import com.thehuginn.task.ResolvedTask;
 import com.thehuginn.task.Task;
 import com.thehuginn.util.EntityCreator;
 import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.vertx.RunOnVertxContext;
@@ -172,6 +174,155 @@ public class ResolvedTaskTest extends AbstractResolutionTaskTest {
                 })
                 .subscribe().with(x -> {
                 }));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    /**
+     * This test verifies that when our game is in inconsistent
+     * state, i.e. assignedPlayer is not the same as currentPlayer
+     * we will find next game, where assignedPlayer == currentPlayer
+     */
+    @Test
+    @Order(3)
+    @RunOnVertxContext
+    void testWithDifferentCurrentAndAssignedPlayerTaskNext(UniAsserter asserter) {
+        String FIRST = "first";
+        String SECOND = "second";
+        asserter.execute(() -> (new Task.Builder(FIRST).repeat(Task.Repeat.PER_PLAYER)).build().<Task> persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData(FIRST, task)));
+        asserter.execute(() -> (new Task.Builder(SECOND).repeat(Task.Repeat.PER_PLAYER)).build().<Task> persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData(SECOND, task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData(FIRST),
+                    (Task) asserter.getData(SECOND)));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        asserter.execute(() -> {
+            String currentTask = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asPrettyString();
+
+            if (currentTask.contains(FIRST)) {
+                asserter.putData("next", SECOND);
+            } else {
+                asserter.putData("next", FIRST);
+            }
+        });
+
+        // Set we expect first player's turn again
+        asserter.execute(() -> GameSession.update("currentPlayer = NULL"));
+        asserter.execute(() -> {
+            String currentTask = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asPrettyString();
+
+            Assertions.assertTrue(currentTask.contains((String) asserter.getData("next")));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    /**
+     * This test verifies that when our game is in inconsistent
+     * state, i.e. assignedPlayer is not the same as currentPlayer
+     * and no more tasks for currentPlayer exist, we will find next
+     * task, which is resolvable
+     */
+    @Test
+    @Order(3)
+    @RunOnVertxContext
+    void testWithDifferentCurrentAndAssignedPlayerNoMoreAssignedPlayerTaskNext(UniAsserter asserter) {
+        String FIRST = "first";
+        String SECOND = "second";
+        asserter.execute(() -> (new Task.Builder(FIRST).repeat(Task.Repeat.PER_PLAYER)).build().<Task> persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData(FIRST, task)));
+        asserter.execute(() -> (new Task.Builder(SECOND).repeat(Task.Repeat.ALWAYS)).build().<Task> persistAndFlush()
+                .onItem()
+                .invoke(task -> asserter.putData(SECOND, task)));
+
+        asserter.execute(() -> EntityCreator.createGameSession(GAME).persistAndFlush());
+        asserter.execute(() -> {
+            List<Task> tasks = new ArrayList<>(List.of((Task) asserter.getData(FIRST),
+                    (Task) asserter.getData(SECOND)));
+            try {
+                return gameTaskService.generateGameTasks(tasks, resolutionContext);
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        asserter.execute(() -> {
+            // skip first players task
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK);
+
+            String currentTask = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asPrettyString();
+
+            Assertions.assertTrue(currentTask.contains(FIRST));
+        });
+
+        // Set we expect second player's turn again (as our first task might be also SECOND)
+        //  thus we can't use first player in this example
+        asserter.execute(() -> GameSession.update("currentPlayer = :player", Parameters.with("player", PLAYERS.get(0))));
+        asserter.execute(() -> {
+            String currentTask = given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .put("game/task/next")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .extract()
+                    .asPrettyString();
+
+            Assertions.assertTrue(currentTask.contains(SECOND));
+        });
 
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
