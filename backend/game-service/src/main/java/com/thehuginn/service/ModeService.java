@@ -105,7 +105,7 @@ public class ModeService {
 
     @GET
     @Path("/require/team")
-    Uni<Boolean> requiresTeam(@RestCookie String gameId) {
+    public Uni<Boolean> requiresTeam(@RestCookie String gameId) {
         return Game.<Game> findById(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.requiresTeam();
