@@ -16,26 +16,26 @@
 	$: categories = data.categories;
 	$: selected = data.selected;
 
-	async function handleSubmit(event: SubmitEvent) {
-		const formDatam = new FormData(this);
+	// async function handleSubmit(event: SubmitEvent) {
+	// 	const formDatam = new FormData(this);
 
-		const response = await fetch(`${game_url}/mode/start`, {
-			method: 'PUT',
-			headers: {
-				'Content-type': 'application/json'
-			},
-			credentials: 'include'
-		});
+		// const response = await fetch(`${game_url}/mode/start`, {
+		// 	method: 'PUT',
+		// 	headers: {
+		// 		'Content-type': 'application/json'
+		// 	},
+		// 	credentials: 'include'
+		// });
 
-		if (response.status == 200) {
-			const success = (await response.json()) as Boolean;
-			if (success == true) {
-				goto('/game/task');
-			} else {
-				formSuccess = 'page.task.category.missing_category';
-			}
-		}
-	}
+		// if (response.status == 200) {
+		// 	const success = (await response.json()) as Boolean;
+		// 	if (success == true) {
+		// 		goto('/game/lobby');
+		// 	} else {
+		// 		formSuccess = 'page.task.category.missing_category';
+		// 	}
+		// }
+	// }
 
 	$: subscription = locale.subscribe(async (newLocale) => {
 		if (newLocale == null) {
@@ -67,7 +67,8 @@
 		<span class="font-bold text-3xl">{$_(`page.task.category.table_name`)}</span>
 		<CategoryTable bind:categories {selected} />
 	</div>
-	<form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}>
+	<!-- <form class="w-full flex flex-col max-w-xs space-y-5" on:submit|preventDefault={handleSubmit}> -->
+	<form class="w-full flex flex-col max-w-xs space-y-5" method="get" action="/game/lobby">
 		<button class="btn btn-primary transition duration-300 min-h-16 text-xl">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />

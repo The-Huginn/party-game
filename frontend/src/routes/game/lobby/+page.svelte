@@ -7,6 +7,7 @@
 	import type { PageData } from './$types';
 	import LobbyTable from './LobbyTable.svelte';
 	import Player from './Player';
+	import { goto } from '$app/navigation';
 
 	export let data: PageData;
 	export let formSuccess: boolean = true;
@@ -34,6 +35,25 @@
 			formSuccess = true;
 		} else {
 			formSuccess = false;
+		}
+	}
+
+	async function handleStart(event:SubmitEvent) {
+		const response = await fetch(`${game_url}/mode/start`, {
+			method: 'PUT',
+			headers: {
+				'Content-type': 'application/json'
+			},
+			credentials: 'include'
+		});
+
+		if (response.status == 200) {
+			const success = (await response.json()) as Boolean;
+			if (success == true) {
+				goto('/game/task');
+			} else {
+				formSuccess = false;
+			}
 		}
 	}
 </script>
@@ -65,7 +85,7 @@
 		</form>
 	</div>
 
-	<form method="GET" action="/game/mode-selection">
+	<form on:submit|preventDefault={handleStart}>
 		<button class="btn btn-primary transition duration-300 min-h-16 text-xl">
 			{#if $isLoading}
 				<span class="loading loading-spinner text-info" />

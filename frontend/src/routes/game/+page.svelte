@@ -46,7 +46,7 @@
 		});
 
 		if (response.status == 201) {
-			goto('/game/lobby');
+			goto('/game/mode-selection');
 		} else if (response.status == 409) {
 			cookie = gameId;
 			formSuccess = 'page.game.create.conflict';
@@ -69,7 +69,7 @@
 		setCookie('gameId', cookie);
 		switch (gameState) {
 			case 'CREATED':
-				goto('/game/lobby');
+				goto('/game/mode-selection');
 				break;
 			case 'LOBBY':
 			case 'READY':
