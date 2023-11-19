@@ -224,6 +224,79 @@ public class GameServiceTest extends AbstractTest {
         asserter.surroundWith(uni -> Panache.withSession(() -> uni));
     }
 
+    @Test
+    void testRecreatingNewGame(UniAsserter asserter) {
+        asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .post("/pub/game")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("gameId", is(GAME),
+                        "type", is(GameSession.GameType.PUB_MODE.toString())));
+
+        //        asserter.assertThat(() -> GameSession.<GameSession>find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME)).firstResult(), gameSession -> Assertions.assertEquals(0, gameSession.tasks.size()));
+
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .put("/pub/game/start")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body(is("true")));
+
+        //        asserter.assertThat(() -> GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id", Parameters.with("id", GAME)).firstResult(), gameSession -> Assertions.assertEquals(13, gameSession.tasks.size()));
+
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .get("/pub/game/task/current")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("data." + ((PubTask) asserter.getData("task")).getKey(),
+                        is(((PubTask) asserter.getData("task")).task.content)));
+
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .post("/pub/game")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body("gameId", is(GAME),
+                        "type", is(GameSession.GameType.PUB_MODE.toString())));
+
+        asserter.assertThat(
+                () -> GameSession.<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
+                        Parameters.with("id", GAME)).firstResult(),
+                gameSession -> Assertions.assertEquals(0, gameSession.tasks.size()));
+
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .put("/pub/game/start")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body(is("true")));
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
     private Uni<List<PubTask>> createPubTasks() {
         List<Uni<PubTask>> pubTasks = new ArrayList<>();
         for (int i = 0; i < 12; i++) {

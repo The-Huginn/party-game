@@ -7,15 +7,12 @@ import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.task.PubTask;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +31,8 @@ public class GameSession extends AbstractGameSession {
     }
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, targetEntity = AbstractTask.class)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @Cascade(CascadeType.DELETE_ORPHAN)
+    @ManyToMany(fetch = FetchType.LAZY, targetEntity = AbstractTask.class, cascade = { CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.REFRESH })
     @JoinTable(name = "gameSession_tasks", joinColumns = @JoinColumn(name = "gameSession_id", referencedColumnName = "gameId"), inverseJoinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id"))
     public List<? super AbstractTask> tasks = new ArrayList<>();
 
