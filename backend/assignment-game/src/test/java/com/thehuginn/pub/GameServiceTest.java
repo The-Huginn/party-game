@@ -304,6 +304,6 @@ public class GameServiceTest extends AbstractTest {
         }
         //noinspection unchecked
         return Uni.combine().all().unis(pubTasks).usingConcurrencyOf(1)
-                .combinedWith(objects -> (List<PubTask>) objects);
+                .with(objects -> (List<PubTask>) objects);
     }
 }

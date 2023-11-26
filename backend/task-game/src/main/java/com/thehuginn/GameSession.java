@@ -98,7 +98,7 @@ public class GameSession extends AbstractGameSession {
         Uni<Set<Task>> tasksUni = Uni.combine().all()
                 .<Set<Task>> unis(tasks)
                 .usingConcurrencyOf(1)
-                .combinedWith(objects -> objects.stream()
+                .with(objects -> objects.stream()
                         .flatMap(collectedTasks -> ((Set<Task>) collectedTasks).stream())
                         .collect(Collectors.toSet()));
 

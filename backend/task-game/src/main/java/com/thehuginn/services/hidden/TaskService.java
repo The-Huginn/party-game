@@ -65,7 +65,7 @@ public class TaskService {
                     }
                     //noinspection unchecked
                     return findOrCreateTokens.apply(tokens)
-                            .combinedWith(objects -> task1.tokens = (List<UnresolvedToken>) objects);
+                            .with(objects -> task1.tokens = (List<UnresolvedToken>) objects);
                 })
                 .chain(task1 -> task1.persist());
     }

@@ -44,7 +44,7 @@ public class GameCreationService {
                         .toList())
                 .chain(unis -> Uni.combine().all().<List<CategoryText.CategoryDto>> unis(unis)
                         .usingConcurrencyOf(1)
-                        .combinedWith(objects -> (List<CategoryText.CategoryDto>) objects));
+                        .with(objects -> (List<CategoryText.CategoryDto>) objects));
     }
 
     @GET
