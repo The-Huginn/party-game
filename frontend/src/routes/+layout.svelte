@@ -13,13 +13,13 @@
 	<li class="bg-primary" />
 	<li class="bg-secondary" />
 	<li class="bg-accent" />
-	<li class="bg-neutral" />
 	<li class="bg-primary" />
 	<li class="bg-secondary" />
 	<li class="bg-accent" />
-	<li class="bg-neutral" />
 	<li class="bg-primary" />
 	<li class="bg-secondary" />
+	<li class="bg-accent" />
+	<li class="bg-primary" />
 </ul>
 <div class="flex flex-col min-h-screen">
 	<App />
