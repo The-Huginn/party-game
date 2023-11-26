@@ -1,7 +1,7 @@
 export function getCookie(cname: string) {
     if (typeof window === 'undefined') {
         console.log('unable to get cookie');
-        return;
+        return '';
     }
     
     let name = cname + "=";
@@ -17,8 +17,7 @@ export function getCookie(cname: string) {
         }
     }
 
-    console.log('here');
-    return null;
+    return '';
 }
 
 export function setCookie(name: string, value: any, options = {}) {
