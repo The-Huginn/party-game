@@ -6,8 +6,8 @@
 	import shot from '$lib/images/shot.svg';
 
     const params = new URLSearchParams({
-        gameId: getCookie(GAME_ID),
-        locale: getCookie(LOCALE),
+        gameId: getCookie(GAME_ID) ?? '',
+        locale: getCookie(LOCALE) ?? 'en',
         })
     const shareCallbackUrl = $page.url.origin + "/share?" + params;
 </script>
