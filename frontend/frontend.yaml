@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: svelte-frontend
-        image: registry.localhost/party-game/svelte-frontend
+        image: registry.thehuginn.com/party-game/svelte-frontend
         imagePullPolicy: Always
         
         resources:

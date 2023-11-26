@@ -15,7 +15,7 @@ for microservice in game-service task-game assignment-game
 do
 	cd ~/party-game/backend/$microservice && \
 	mvn clean install -DskipTests && \
-	sed -i 's/thehuginn.com/localhost/g' target/kubernetes/kubernetes.yml && \
+	# sed -i 's/thehuginn.com/localhost/g' target/kubernetes/kubernetes.yml && \
 	kubectl apply -f target/kubernetes/kubernetes.yml
 done
 
