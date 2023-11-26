@@ -48,7 +48,7 @@ public class ModeService {
     @DELETE
     @Path("/delete")
     public Uni<Boolean> deleteGameMode(@RestCookie String gameId) {
-        return Game.<Game> findById(gameId)
+        return Game.<Game> findByIdUpdateTimestamp(gameId)
                 .onItem().ifNotNull().transformToUni(game -> switch (game.type) {
                     case TASK -> taskRestClient.deleteGame(gameId);
                     case PUB -> pubRestClient.deleteGame(gameId);
@@ -74,7 +74,7 @@ public class ModeService {
     @PUT
     @Path("/start")
     public Uni<Boolean> startGame(@RestCookie String gameId) {
-        return Game.<Game> findById(gameId)
+        return Game.<Game> findByIdUpdateTimestamp(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
                     case PUB -> pubRestClient.startGame(gameId, game1.gameContext());
@@ -106,7 +106,7 @@ public class ModeService {
     @GET
     @Path("/require/team")
     public Uni<Boolean> requiresTeam(@RestCookie String gameId) {
-        return Game.<Game> findById(gameId)
+        return Game.<Game> findByIdUpdateTimestamp(gameId)
                 .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
                     case TASK -> taskRestClient.requiresTeam();
                     case PUB -> pubRestClient.requiresTeam();
@@ -115,7 +115,7 @@ public class ModeService {
     }
 
     private Uni<JsonNode> callbackUni(String gameId, Function<Game, Uni<JsonNode>> callback) {
-        return Game.<Game> findById(gameId)
+        return Game.findByIdUpdateTimestamp(gameId)
                 .onItem().ifNotNull().transformToUni(game -> callback.apply(game)
                         .invoke(jsonNode -> ((ObjectNode) jsonNode).put("type", game.type.toString())));
     }

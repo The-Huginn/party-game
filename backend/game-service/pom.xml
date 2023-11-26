@@ -2,32 +2,29 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.thehuginn</groupId>
+    <artifactId>backend-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
   <artifactId>game-service</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-
-  <parent>
-    <artifactId>backend-parent</artifactId>
-    <groupId>com.thehuginn</groupId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-scheduler</artifactId>
+    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.platform.version}</version>
-        <configuration>
-          <debug>5005</debug>
-        </configuration>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -38,6 +35,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <debug>5005</debug>
+        </configuration>
       </plugin>
     </plugins>
   </build>

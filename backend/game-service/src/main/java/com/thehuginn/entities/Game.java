@@ -1,12 +1,14 @@
 package com.thehuginn.entities;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +42,8 @@ public class Game extends PanacheEntityBase {
 
     public Type type;
 
+    public LocalDateTime lastAccess;
+
     public Game() {
     }
 
@@ -48,6 +52,14 @@ public class Game extends PanacheEntityBase {
         team = new ArrayList<>();
         state = State.CREATED;
         type = Type.TASK;
+    }
+
+    public static Uni<Game> findByIdUpdateTimestamp(String id) {
+        return Game.<Game> findById(id)
+                .onItem().ifNotNull().call(game -> {
+                    game.lastAccess = LocalDateTime.now();
+                    return game.persist();
+                });
     }
 
     public Player addPlayer(Player player) {
