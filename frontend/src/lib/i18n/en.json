@@ -50,6 +50,9 @@
             "game": {
                 "missing_tasks": "Game does not have any tasks associated"
             }
+        },
+        "share": {
+            "message": "Code to share"
         }
     },
     "button": {

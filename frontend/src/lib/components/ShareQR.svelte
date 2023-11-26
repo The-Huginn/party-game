@@ -4,6 +4,7 @@
 	import { GAME_ID, LOCALE } from '$lib/common/contants';
 	import { getCookie } from '$lib/common/cookies';
 	import shot from '$lib/images/shot.svg';
+	import { _ } from 'svelte-i18n';
 
     const params = new URLSearchParams({
         gameId: getCookie(GAME_ID) ?? '',
@@ -17,7 +18,7 @@
         <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
     {/if}
 </svelte:head>
-
+<p class="text-xl font-bold">{$_('page.share.message')} : {getCookie(GAME_ID)}</p>
 <qr-code
 	id="qr1"
 	contents={shareCallbackUrl}

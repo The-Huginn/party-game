@@ -50,6 +50,9 @@
             "game": {
                 "missing_tasks": "V hre neboli nájdené žiadne úlohy"
             }
+        },
+        "share": {
+            "message": "Kód na zazdieľanie"
         }
     },
     "button": {
