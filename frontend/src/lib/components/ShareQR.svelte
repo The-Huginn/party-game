@@ -17,7 +17,7 @@
         <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
     {/if}
 </svelte:head>
-{shareCallbackUrl}
+
 <qr-code
 	id="qr1"
 	contents={shareCallbackUrl}
