@@ -21,7 +21,7 @@
                 "table_name": "Lobby",
                 "add_player": "Add",
                 "delete_player": "Delete",
-                "submit_error": "Player already exists",
+                "submit_error": "Player already exists or no categories were previously selected",
                 "confirm": "Confirm lobby"
             },
             "mode-selection": {

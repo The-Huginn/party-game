@@ -21,7 +21,7 @@
                 "table_name": "Lobby",
                 "add_player": "Pridať",
                 "delete_player": "Odstrániť",
-                "submit_error": "Hráč už existuje",
+                "submit_error": "Hráč už existuje alebo neboli predtým zvolené žiadne kategórie",
                 "confirm": "Potvrdzujem Lobby"
             },
             "mode-selection": {
