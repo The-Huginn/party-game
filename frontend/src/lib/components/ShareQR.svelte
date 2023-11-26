@@ -4,13 +4,22 @@
 	import { GAME_ID, LOCALE } from '$lib/common/contants';
 	import { getCookie } from '$lib/common/cookies';
 	import shot from '$lib/images/shot.svg';
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
+    const code = getCookie(GAME_ID)
     const params = new URLSearchParams({
-        gameId: getCookie(GAME_ID) ?? '',
+        gameId: code ?? '',
         locale: getCookie(LOCALE) ?? 'en',
         })
     const shareCallbackUrl = $page.url.origin + "/share?" + params;
+    onMount(() => {
+        if (document != null) {
+            document.getElementById('qr1').addEventListener('codeRendered', () => {
+                document.getElementById('qr1').animateQRCode('RadialRippleIn');
+            });
+        }
+    })
 </script>
 
 <svelte:head>
@@ -18,7 +27,9 @@
         <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
     {/if}
 </svelte:head>
-<p class="text-xl font-bold">{$_('page.share.message')} : {getCookie(GAME_ID)}</p>
+{#if code != null}
+    <p class="text-xl font-bold text-center">{$_('page.share.message')} : {code}</p>
+{/if}
 <qr-code
 	id="qr1"
 	contents={shareCallbackUrl}
