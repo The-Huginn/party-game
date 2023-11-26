@@ -205,7 +205,6 @@
           <cachedir>.cache/formatter-maven-plugin-${formatter-maven-plugin.version}</cachedir>
           <configFile>eclipse-format.xml</configFile>
           <lineEnding>LF</lineEnding>
-          <skip>${format.skip}</skip>
         </configuration>
       </plugin>
     </plugins>
