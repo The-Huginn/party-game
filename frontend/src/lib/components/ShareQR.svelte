@@ -7,28 +7,29 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
-    const code = getCookie(GAME_ID)
-    const params = new URLSearchParams({
-        gameId: code ?? '',
-        locale: getCookie(LOCALE) ?? 'en',
-        })
-    const shareCallbackUrl = $page.url.origin + "/share?" + params;
-    onMount(() => {
-        if (document != null) {
-            document.getElementById('qr1').addEventListener('codeRendered', () => {
-                document.getElementById('qr1').animateQRCode('RadialRippleIn');
-            });
-        }
-    })
+	const code = getCookie(GAME_ID);
+	const params = new URLSearchParams({
+		gameId: code ?? '',
+		locale: getCookie(LOCALE) ?? 'en',
+	});
+
+	const shareCallbackUrl = $page.url.origin + (code == null ? '' : '/share?' + params);
+	onMount(() => {
+		if (document != null) {
+			document.getElementById('qr1').addEventListener('codeRendered', () => {
+				document.getElementById('qr1').animateQRCode('RadialRippleIn');
+			});
+		}
+	});
 </script>
 
 <svelte:head>
-    {#if browser}
-        <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
-    {/if}
+	{#if browser}
+		<script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
+	{/if}
 </svelte:head>
 {#if code != null}
-    <p class="text-xl font-bold text-center">{$_('page.share.message')} : {code}</p>
+	<p class="text-xl font-bold text-center">{$_('page.share.message')} : {code}</p>
 {/if}
 <qr-code
 	id="qr1"
