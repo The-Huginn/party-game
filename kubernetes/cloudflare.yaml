@@ -19,5 +19,14 @@ spec:
         # image: ghcr.io/maggie0002/cloudflared:2022.3.0
         imagePullPolicy: Always
         args: ["tunnel", "--no-autoupdate", "run", "--token=${token}"]
+
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 150m
+          limits:
+            memory: 384Mi
+            cpu: 300m
+            
       restartPolicy: Always
       terminationGracePeriodSeconds: 60
