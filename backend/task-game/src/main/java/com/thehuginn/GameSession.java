@@ -198,7 +198,8 @@ public class GameSession extends AbstractGameSession {
                                 resolutionContext.getPlayer());
                         return GameTask
                                 .<GameTask> find("game.id = :game AND assignedPlayer = :player AND id > :id ORDER BY id",
-                                        Parameters.with("game", gameId).and("player", resolutionContext.getPlayer()).and("id", id))
+                                        Parameters.with("game", gameId).and("player", resolutionContext.getPlayer()).and("id",
+                                                id))
                                 .page(0, 1).firstResult();
                     }
 
@@ -208,13 +209,13 @@ public class GameSession extends AbstractGameSession {
                 .switchTo(() -> {
                     Log.infof("Unable to find next task, getting a random one from higher than id %d", id);
                     return GameTask
-                            .<GameTask>find("game.id = :game AND assignedPlayer is NULL AND id > :id ORDER BY id",
+                            .<GameTask> find("game.id = :game AND assignedPlayer is NULL AND id > :id ORDER BY id",
                                     Parameters.with("game", gameId).and("id", id))
                             .firstResult()
                             .onItem().ifNull().switchTo(() -> {
                                 Log.info("Unable to find next task, starting from the beginning with a random one");
                                 return GameTask
-                                        .<GameTask>find("game.id = :game AND assignedPlayer is NULL ORDER BY id",
+                                        .<GameTask> find("game.id = :game AND assignedPlayer is NULL ORDER BY id",
                                                 Parameters.with("game", gameId))
                                         .firstResult();
                             });

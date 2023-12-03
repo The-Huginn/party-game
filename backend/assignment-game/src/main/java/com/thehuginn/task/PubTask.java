@@ -44,11 +44,12 @@ public class PubTask extends AbstractTask {
                     if (pubTasks.size() < 13) {
                         throw new IllegalStateException("Not enough Pub Tasks in the database");
                     }
-                    List<PubTask> rules = new ArrayList<>(List.of(pubTasks.get(0)));
-                    pubTasks.remove(0);
+                    List<PubTask> rules = new ArrayList<>(List.of(pubTasks.get(0), pubTasks.get(1)));
+                    pubTasks.removeAll(rules);
 
                     Collections.shuffle(pubTasks);
-                    rules.addAll(pubTasks.subList(0, 12));
+                    rules.addAll(pubTasks.subList(0, 11));
+                    Collections.swap(rules, 1, 7);
                     return rules;
                 });
     }
