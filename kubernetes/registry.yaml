@@ -89,7 +89,7 @@ spec:
             claimName:  registry-auth
       containers:
       - name: registry
-        image: docker.io/library/registry:2
+        image: docker.io/library/registry:2.8.2
         imagePullPolicy: Always
         
         env:
