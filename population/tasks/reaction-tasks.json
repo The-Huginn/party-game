@@ -1,0 +1,101 @@
+{
+    "category": {
+        "payload": {
+            "name": "Reaction Tasks",
+            "description": "Fast-paced reaction tasks that test player reflexes and speed"
+        },
+        "translations": [
+            {
+                "locale": "sk",
+                "name": "Reakčné úlohy",
+                "description": "Rýchle reakčné úlohy, ktoré testujú reflexy a rýchlosť hráčov"
+            }
+        ]
+    },
+    "tasks": [
+        {
+            "payload": {
+                "repeat": "NEVER",
+                "type": "ALL",
+                "frequency": 1,
+                "task": {
+                    "locale": "en",
+                    "content": "When the beep sounds, stand up! Last one to stand drinks {timer_5_0}"
+                },
+                "price": {
+                    "enabled": true,
+                    "price": 1
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Keď zaznie pípnutie, postavte sa! Posledný, kto sa postaví, pije {timer_5_0}"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "NEVER",
+                "type": "ALL",
+                "frequency": 1,
+                "task": {
+                    "locale": "en",
+                    "content": "Touch your nose! Last one to do it drinks {timer_4_0}"
+                },
+                "price": {
+                    "enabled": true,
+                    "price": 1
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Dotknite sa nosa! Posledný, kto to urobí, pije {timer_4_0}"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "NEVER",
+                "type": "ALL",
+                "frequency": 1,
+                "task": {
+                    "locale": "en",
+                    "content": "Raise your hand! Last one up drinks {timer_3_0}"
+                },
+                "price": {
+                    "enabled": true,
+                    "price": 1
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Zodvihnite ruku! Posledný hore pije {timer_3_0}"
+                }
+            ]
+        },
+        {
+            "payload": {
+                "repeat": "NEVER",
+                "type": "ALL",
+                "frequency": 1,
+                "task": {
+                    "locale": "en",
+                    "content": "Point at the ceiling! Last one to point drinks {timer_4_0}"
+                },
+                "price": {
+                    "enabled": true,
+                    "price": 1
+                }
+            },
+            "translations": [
+                {
+                    "locale": "sk",
+                    "translation": "Ukážte na strop! Posledný, kto ukáže, pije {timer_4_0}"
+                }
+            ]
+        }
+    ]
+}

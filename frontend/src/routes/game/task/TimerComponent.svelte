@@ -18,6 +18,8 @@
 	function startTimer() {
 		// remove the button
 		timer.autostart = true;
+		// Play beep sound when timer starts
+		beepSound.play();
 		timerInterval = setInterval(() => {
 			if (timer.duration > 0) timer.duration--;
 		}, 10);
