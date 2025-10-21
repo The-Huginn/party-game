@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Make all buttons red */
+@layer components {
+  .btn {
+    @apply bg-red-600 text-white border-red-600;
+  }
+
+  .btn:hover {
+    @apply bg-red-700 border-red-700;
+  }
+
+  .btn:active {
+    @apply bg-red-800 border-red-800;
+  }
+
+  .btn:focus-visible {
+    @apply outline-red-600;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-error,
+  .btn-ghost {
+    @apply bg-red-600 text-white border-red-600;
+  }
+
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-error:hover,
+  .btn-ghost:hover {
+    @apply bg-red-700 border-red-700;
+  }
+
+  .btn-ghost {
+    @apply bg-red-600 bg-opacity-20 border-red-600;
+  }
+
+  .btn-ghost:hover {
+    @apply bg-red-600 bg-opacity-30;
+  }
+}
