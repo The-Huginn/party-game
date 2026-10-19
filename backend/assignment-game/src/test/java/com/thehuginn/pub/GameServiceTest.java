@@ -188,6 +188,59 @@ public class GameServiceTest extends AbstractTest {
     }
 
     @Test
+    void testTaskNumberIsSentAsHeaderTitle(UniAsserter asserter) {
+        asserter.execute(() -> given()
+                .cookie(new Cookie.Builder("gameId", GAME).build())
+                .cookie(new Cookie.Builder("locale", "en").build())
+                .queryParam("resolutionContext", resolutionContext)
+                .contentType(MediaType.APPLICATION_JSON)
+                .when()
+                .put("/pub/game/start")
+                .then()
+                .statusCode(RestResponse.StatusCode.OK)
+                .body(is("true")));
+        asserter.execute(() -> {
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("/pub/game/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("data." + GameSession.HEADER_TITLE, is(1));
+
+            for (int i = 2; i <= 13; i++) {
+                given()
+                        .cookie(new Cookie.Builder("gameId", GAME).build())
+                        .cookie(new Cookie.Builder("locale", "en").build())
+                        .queryParam("resolutionContext", resolutionContext)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .when()
+                        .put("/pub/game/task/next")
+                        .then()
+                        .statusCode(RestResponse.StatusCode.OK)
+                        .body("data." + GameSession.HEADER_TITLE, is(i));
+            }
+
+            // current task does not move the counter
+            given()
+                    .cookie(new Cookie.Builder("gameId", GAME).build())
+                    .cookie(new Cookie.Builder("locale", "en").build())
+                    .queryParam("resolutionContext", resolutionContext)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .when()
+                    .get("/pub/game/task/current")
+                    .then()
+                    .statusCode(RestResponse.StatusCode.OK)
+                    .body("data." + GameSession.HEADER_TITLE, is(13));
+        });
+
+        asserter.surroundWith(uni -> Panache.withSession(() -> uni));
+    }
+
+    @Test
     void testNotGettingRules(UniAsserter asserter) {
         asserter.execute(() -> PubTask.<PubTask> findById(0L).invoke(pubTask -> asserter.putData("task", pubTask)));
         asserter.execute(() -> given()

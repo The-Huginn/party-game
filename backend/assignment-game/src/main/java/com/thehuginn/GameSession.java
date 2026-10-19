@@ -22,7 +22,14 @@ import java.util.function.Function;
 @Entity
 public class GameSession extends AbstractGameSession {
 
+    public static final String HEADER_TITLE = "header_title";
+
     public GameType type = GameType.NONE;
+
+    /**
+     * Order of the currently played task, starting from 1
+     */
+    public int taskNumber = 0;
 
     public enum GameType {
         NONE,
@@ -67,6 +74,7 @@ public class GameSession extends AbstractGameSession {
                                     return Uni.createFrom().item(Boolean.FALSE);
                                 }
                                 gameSession.tasks.addAll(abstractTasks);
+                                gameSession.taskNumber = 1;
                                 return gameSession.persist()
                                         .replaceWith(Boolean.TRUE);
                             });
@@ -75,38 +83,42 @@ public class GameSession extends AbstractGameSession {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Uni<Map.Entry<String, Map<String, String>>> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
+    public Uni<Map.Entry<String, Map<String, Object>>> currentTask(ResolutionContext.Builder resolutionContextBuilder) {
         return GameSession
                 .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
                         Parameters.with("id", this.gameId))
                 .page(0, 1)
                 .firstResult()
-                .map(gameSession -> (AbstractTask) gameSession.tasks.get(0))
-                .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
-                        .getValue()
-                        .map(content -> Map.entry("data", Map.of(
-                                "task", abstractTask.getKey(),
-                                abstractTask.getKey(), content))));
+                .chain(gameSession -> resolveTask((AbstractTask) gameSession.tasks.get(0), gameSession.taskNumber,
+                        resolutionContextBuilder));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Uni<Map.Entry<String, Map<String, String>>> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
+    public Uni<Map.Entry<String, Map<String, Object>>> nextTask(ResolutionContext.Builder resolutionContextBuilder) {
         return GameSession
                 .<GameSession> find("from GameSession g left join fetch g.tasks where g.id = :id",
                         Parameters.with("id", this.gameId))
                 .page(0, 1)
-                .firstResult()
-                .chain(gameSession -> {
+                .firstResult().<Map.Entry<String, Map<String, Object>>> chain(gameSession -> {
                     gameSession.tasks.remove(0);
-                    AbstractTask task = !gameSession.tasks.isEmpty() ? (AbstractTask) gameSession.tasks.get(0) : null;
-                    return gameSession.persist()
-                            .replaceWith(task);
-                })
-                .chain(abstractTask -> abstractTask.task.translate(resolutionContextBuilder.build())
-                        .getValue()
-                        .map(content -> Map.entry("data", Map.of(
-                                "task", abstractTask.getKey(),
-                                abstractTask.getKey(), content))));
+                    gameSession.taskNumber++;
+                    Uni<GameSession> persisted = gameSession.persist();
+                    if (gameSession.tasks.isEmpty()) {
+                        return persisted.map(ignored -> null);
+                    }
+                    return persisted.chain(() -> resolveTask((AbstractTask) gameSession.tasks.get(0),
+                            gameSession.taskNumber, resolutionContextBuilder));
+                });
+    }
+
+    private static Uni<Map.Entry<String, Map<String, Object>>> resolveTask(AbstractTask abstractTask, int taskNumber,
+            ResolutionContext.Builder resolutionContextBuilder) {
+        return abstractTask.task.translate(resolutionContextBuilder.build())
+                .getValue()
+                .map(content -> Map.entry("data", Map.of(
+                        "task", abstractTask.getKey(),
+                        abstractTask.getKey(), content,
+                        HEADER_TITLE, taskNumber)));
     }
 }

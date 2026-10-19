@@ -39,7 +39,11 @@
 	});
 
 	$: onDestroy(subscription);
-	$: $header.text = 'page.game.task.title';
+	$: headerTitle = (rawTask as { header_title?: number })?.header_title;
+	$: $header = {
+		text: 'page.game.task.title',
+		append: headerTitle != null ? `${headerTitle}` : ''
+	};
 </script>
 
 <div class="flex flex-col w-full items-center justify-center space-y-5">
