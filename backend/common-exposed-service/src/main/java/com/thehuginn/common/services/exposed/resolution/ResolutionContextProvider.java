@@ -51,7 +51,8 @@ public class ResolutionContextProvider implements ParamConverterProvider {
 
                 return ResolutionContext.builder(gameId)
                         .locale(locale)
-                        .players(players);
+                        .players(players)
+                        .playersChanged(root.path("playersChanged").asBoolean(false));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

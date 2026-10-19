@@ -15,6 +15,7 @@ import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -22,6 +23,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderColumn;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -49,6 +51,14 @@ public class GameSession extends AbstractGameSession {
     public Set<Category> categories = new HashSet<>();
 
     public String currentPlayer = null;
+
+    /**
+     * Players for whom the current tasks were generated
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    @JsonIgnore
+    public List<String> players = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "game", orphanRemoval = true)
     @JsonIgnore
@@ -177,7 +187,11 @@ public class GameSession extends AbstractGameSession {
                     if (gameSession.currentTask != null && gameSession.currentTask.gameTask != null) {
                         id = gameSession.currentTask.gameTask.id;
                     }
-                    return nextTaskUni(resolutionContext, id);
+                    final long currentId = id;
+                    Uni<Void> updatePlayers = resolutionContext.isPlayersChanged()
+                            ? GameTaskService.updatePlayers(gameSession, currentId, resolutionContext)
+                            : Uni.createFrom().voidItem();
+                    return updatePlayers.chain(() -> nextTaskUni(resolutionContext, currentId));
                 })
                 .call(updateResolvedTask)
                 .onFailure().recoverWithNull();

@@ -73,12 +73,18 @@ public class ModeService {
 
     @PUT
     @Path("/start")
+    @WithTransaction
     public Uni<Boolean> startGame(@RestCookie String gameId) {
         return Game.<Game> findByIdUpdateTimestamp(gameId)
-                .onItem().ifNotNull().transformToUni(game1 -> switch (game1.type) {
-                    case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
-                    case PUB -> pubRestClient.startGame(gameId, game1.gameContext());
-                    case NONE -> Uni.createFrom().item(Boolean.FALSE);
+                .onItem().ifNotNull().transformToUni(game1 -> {
+                    Uni<Boolean> started = switch (game1.type) {
+                        case TASK -> taskRestClient.startGame(gameId, game1.gameContext());
+                        case PUB -> pubRestClient.startGame(gameId, game1.gameContext());
+                        case NONE -> Uni.createFrom().item(Boolean.FALSE);
+                    };
+                    // all tasks were generated for the current team
+                    return started.call(success -> Boolean.TRUE.equals(success) ? game1.clearPlayersChanged()
+                            : Uni.createFrom().voidItem());
                 })
                 .onItem().ifNull().continueWith(Boolean.FALSE);
     }
@@ -95,11 +101,16 @@ public class ModeService {
 
     @PUT
     @Path("/next")
+    @WithTransaction
     public Uni<JsonNode> nextTask(@RestCookie String gameId, @RestCookie @DefaultValue("en") String locale) {
-        return callbackUni(gameId, game1 -> switch (game1.type) {
-            case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
-            case PUB -> pubRestClient.nextTask(gameId, locale, game1.gameContext());
-            case NONE -> Uni.createFrom().nullItem();
+        return callbackUni(gameId, game1 -> {
+            Uni<JsonNode> task = switch (game1.type) {
+                case TASK -> taskRestClient.nextTask(gameId, locale, game1.gameContext());
+                case PUB -> pubRestClient.nextTask(gameId, locale, game1.gameContext());
+                case NONE -> Uni.createFrom().nullItem();
+            };
+            // game mode has been informed about the team change, once it served a task
+            return task.call(jsonNode -> jsonNode != null ? game1.clearPlayersChanged() : Uni.createFrom().voidItem());
         });
     }
 
