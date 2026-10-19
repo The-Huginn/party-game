@@ -4,7 +4,9 @@ import com.thehuginn.GameSession;
 import com.thehuginn.common.services.exposed.resolution.ResolutionContext;
 import com.thehuginn.task.GameTask;
 import com.thehuginn.task.Task;
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.logging.Log;
 import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
@@ -12,10 +14,12 @@ import jakarta.enterprise.context.RequestScoped;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,6 +34,10 @@ public class GameTaskService {
     public static Uni<Void> gameTasks(Collection<Task> allTasks, ResolutionContext resolutionContext)
             throws CloneNotSupportedException {
         return new GameTaskService().generateGameTasks(allTasks, resolutionContext);
+    }
+
+    public static Uni<Void> updatePlayers(GameSession gameSession, long currentTaskId, ResolutionContext resolutionContext) {
+        return new GameTaskService().regenerateGameTasks(gameSession, currentTaskId, resolutionContext);
     }
 
     /**
@@ -67,6 +75,7 @@ public class GameTaskService {
                 .<GameSession> chain(gameSession -> {
                     gameSession.tasks.clear();
                     gameSession.tasks.addAll(createdTasks);
+                    gameSession.players = new ArrayList<>(players);
                     return gameSession.persist();
                 })
                 .chain(gameSession -> {
@@ -82,6 +91,104 @@ public class GameTaskService {
                             .usingConcurrencyOf(1)
                             .discardItems();
                 });
+    }
+
+    /**
+     * Rebuilds the remaining tasks of a running game after its players have changed.
+     * Non {@link Task.Repeat#PER_PLAYER} tasks keep their order, while {@link Task.Repeat#PER_PLAYER}
+     * tasks of removed players are dropped and new players receive as many of each
+     * {@link Task.Repeat#PER_PLAYER} task as the other players still have left to play.
+     * Afterward, all {@link Task.Repeat#PER_PLAYER} tasks are again spread between the rest of the tasks.
+     * All rebuilt tasks are persisted as new {@link GameTask}s so their ids follow the current task.
+     *
+     * @param gameSession game session with fetched tasks
+     * @param currentTaskId id of the currently played {@link GameTask}, which is kept as is
+     * @param resolutionContext context with the new players
+     */
+    public Uni<Void> regenerateGameTasks(GameSession gameSession, long currentTaskId, ResolutionContext resolutionContext) {
+        List<String> players = resolutionContext.getPlayers();
+        List<String> previousPlayers = gameSession.players.isEmpty() ? players : gameSession.players;
+        if (previousPlayers.equals(players)) {
+            return Uni.createFrom().voidItem();
+        }
+        Log.infof("Players of game %s changed from %s to %s", gameSession.gameId, previousPlayers, players);
+
+        List<GameTask> remainingTasks = gameSession.tasks.stream()
+                .filter(gameTask -> !Objects.equals(gameTask.id, currentTaskId))
+                .sorted(Comparator.comparingLong(gameTask -> gameTask.id))
+                .toList();
+
+        List<GameTask> createdTasks = new ArrayList<>();
+        // how many of each PER_PLAYER task (by id) does any previous player still have to play
+        Map<Long, Integer> perPlayerTaskCount = new TreeMap<>();
+        Map<Long, Task> perPlayerTaskById = new HashMap<>();
+        Map<String, Map<Long, Integer>> previousPerPlayerTaskCount = new HashMap<>();
+        Map<String, List<GameTask>> perPlayerTasks = new HashMap<>();
+        for (String player : players) {
+            perPlayerTasks.put(player, new ArrayList<>());
+        }
+        for (GameTask gameTask : remainingTasks) {
+            if (gameTask.assignedPlayer == null) {
+                createdTasks.add(copyOf(gameTask, null));
+                continue;
+            }
+
+            Long taskId = gameTask.unresolvedTask.id;
+            int count = previousPerPlayerTaskCount.computeIfAbsent(gameTask.assignedPlayer, player -> new HashMap<>())
+                    .merge(taskId, 1, Integer::sum);
+            perPlayerTaskCount.merge(taskId, count, Math::max);
+            perPlayerTaskById.put(taskId, gameTask.unresolvedTask);
+            // tasks of removed players are dropped
+            if (perPlayerTasks.containsKey(gameTask.assignedPlayer)) {
+                perPlayerTasks.get(gameTask.assignedPlayer).add(copyOf(gameTask, gameTask.assignedPlayer));
+            }
+        }
+
+        for (String player : players) {
+            if (previousPlayers.contains(player)) {
+                continue;
+            }
+            perPlayerTaskCount.forEach((taskId, count) -> {
+                for (int i = 0; i < count; i++) {
+                    perPlayerTasks.get(player).add(copyOf(perPlayerTaskById.get(taskId), player));
+                }
+            });
+        }
+
+        // the first rebuilt task will be played by the current player
+        List<String> orderedPlayers = new ArrayList<>(players);
+        int currentPlayerIndex = players.indexOf(resolutionContext.getPlayer());
+        Collections.rotate(orderedPlayers, -Math.max(currentPlayerIndex, 0));
+        addPerPlayerTasks(createdTasks, perPlayerTasks, orderedPlayers);
+
+        gameSession.tasks.removeAll(remainingTasks);
+        gameSession.tasks.addAll(createdTasks);
+        gameSession.players = new ArrayList<>(players);
+        if (createdTasks.isEmpty()) {
+            return gameSession.persist()
+                    .chain(() -> Panache.flush());
+        }
+        return Uni.combine()
+                .all()
+                .unis(createdTasks.stream()
+                        .peek(gameTask -> gameTask.game = gameSession)
+                        .map(gameTask -> gameTask.persist())
+                        .collect(Collectors.toList()))
+                .usingConcurrencyOf(1)
+                .discardItems()
+                .chain(() -> gameSession.persist())
+                .chain(() -> Panache.flush());
+    }
+
+    private static GameTask copyOf(GameTask gameTask, String assignedPlayer) {
+        return copyOf(gameTask.unresolvedTask, assignedPlayer);
+    }
+
+    private static GameTask copyOf(Task task, String assignedPlayer) {
+        GameTask copy = new GameTask();
+        copy.unresolvedTask = task;
+        copy.assignedPlayer = assignedPlayer;
+        return copy;
     }
 
     /**
@@ -104,12 +211,13 @@ public class GameTaskService {
      * @param collectTo List to which we add PER_PLAYER tasks
      * @param perPlayerTasks Map of players and tasks for each player
      * @param players Ordered List of players
-     * @implSpec each player in perPlayerTasks has to have the same amount of tasks assigned
+     * @implNote players might have different amount of tasks assigned, i.e. after players have changed mid-game,
+     *           in such case a player without any task left is skipped in the remaining parts
      */
     private void addPerPlayerTasks(List<GameTask> collectTo, Map<String, List<GameTask>> perPlayerTasks, List<String> players) {
         int perPlayerTasksSize = 0;
         for (Map.Entry<String, List<GameTask>> playerTasks : perPlayerTasks.entrySet()) {
-            perPlayerTasksSize = playerTasks.getValue().size();
+            perPlayerTasksSize = Math.max(perPlayerTasksSize, playerTasks.getValue().size());
             Collections.shuffle(playerTasks.getValue());
         }
 
@@ -137,11 +245,16 @@ public class GameTaskService {
                             % (sublistWithSize + 1);
 
                     String realPlayer = players.get(playerIndex);
-                    GameTask realPerPlayerGameTask = perPlayerTasks.get(realPlayer).get(sublistIndex);
+                    List<GameTask> realPlayerTasks = perPlayerTasks.get(realPlayer);
+                    if (sublistIndex >= realPlayerTasks.size()) {
+                        continue;
+                    }
+                    GameTask realPerPlayerGameTask = realPlayerTasks.get(sublistIndex);
                     // and finally we add the task to corresponding index
                     indexedPerPlayerTasks.put(currentIndex + inSublistIndex, realPerPlayerGameTask);
                 }
-                indexedPerPlayerTasks.forEach(collectTo::add);
+                // skipped players might shift the remaining positions beyond the end of the List
+                indexedPerPlayerTasks.forEach((index, gameTask) -> collectTo.add(Math.min(index, collectTo.size()), gameTask));
             }
         }
     }

@@ -44,6 +44,12 @@ public class Game extends PanacheEntityBase {
 
     public LocalDateTime lastAccess;
 
+    /**
+     * Set whenever the team changes, so the game mode can adjust already generated tasks.
+     * Cleared once the game mode has been informed. Nullable for compatibility with existing rows.
+     */
+    public Boolean playersChanged = false;
+
     public Game() {
     }
 
@@ -68,14 +74,31 @@ public class Game extends PanacheEntityBase {
         }
 
         team.add(player);
+        playersChanged = true;
         return player;
     }
 
     public boolean removePlayer(Long playerId) {
-        return team.removeIf(player -> Objects.equals(player.id, playerId));
+        boolean removed = team.removeIf(player -> Objects.equals(player.id, playerId));
+        if (removed) {
+            playersChanged = true;
+        }
+        return removed;
     }
 
     public GameContext gameContext() {
         return new GameContext(this);
+    }
+
+    public boolean hasPlayersChanged() {
+        return Boolean.TRUE.equals(playersChanged);
+    }
+
+    public Uni<Game> clearPlayersChanged() {
+        if (!hasPlayersChanged()) {
+            return Uni.createFrom().item(this);
+        }
+        playersChanged = false;
+        return persist();
     }
 }

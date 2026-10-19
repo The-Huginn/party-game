@@ -15,6 +15,7 @@ public class ResolutionContext {
     private final String player;
     private final List<String> players;
     private final List<String> shuffledPlayers;
+    private final boolean playersChanged;
 
     private ResolutionContext(String locale) {
         this.locale = locale;
@@ -22,6 +23,7 @@ public class ResolutionContext {
         player = null;
         players = null;
         shuffledPlayers = null;
+        playersChanged = false;
     }
 
     public ResolutionContext() {
@@ -30,13 +32,15 @@ public class ResolutionContext {
         player = null;
         gameId = null;
         locale = null;
+        playersChanged = false;
     }
 
     private ResolutionContext(
             String locale,
             String gameId,
             String player,
-            List<String> players) {
+            List<String> players,
+            boolean playersChanged) {
         if (!players.contains(player)) {
             if (player != null || !players.isEmpty()) {
                 throw new IllegalArgumentException("Player can not be found between all players.");
@@ -46,6 +50,7 @@ public class ResolutionContext {
         this.gameId = gameId;
         this.player = player;
         this.players = Collections.unmodifiableList(players);
+        this.playersChanged = playersChanged;
         this.shuffledPlayers = players.stream()
                 .filter(player1 -> !player1.equals(player))
                 .collect(Collectors.toList());
@@ -65,6 +70,7 @@ public class ResolutionContext {
         private final String gameId;
         private String player = null;
         private List<String> players = null;
+        private boolean playersChanged = false;
 
         private Builder(@Nonnull String gameId) {
             this.gameId = gameId;
@@ -85,12 +91,24 @@ public class ResolutionContext {
             return this;
         }
 
+        /**
+         * @param playersChanged whether players have changed since the last time tasks were played
+         */
+        public Builder playersChanged(boolean playersChanged) {
+            this.playersChanged = playersChanged;
+            return this;
+        }
+
         public List<String> getPlayers() {
             return players;
         }
 
+        public boolean isPlayersChanged() {
+            return playersChanged;
+        }
+
         public ResolutionContext build() {
-            return new ResolutionContext(locale, gameId, player, players);
+            return new ResolutionContext(locale, gameId, player, players, playersChanged);
         }
     }
 
@@ -108,6 +126,10 @@ public class ResolutionContext {
 
     public List<String> getPlayers() {
         return players;
+    }
+
+    public boolean isPlayersChanged() {
+        return playersChanged;
     }
 
     public String getRandomPlayer(Integer index) {
