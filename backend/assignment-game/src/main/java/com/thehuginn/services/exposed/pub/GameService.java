@@ -41,7 +41,7 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
 
     @Override
     @WithTransaction
-    public Uni<Map.Entry<String, Map<String, String>>> currentTask(String gameId, String locale,
+    public Uni<Map.Entry<String, Map<String, Object>>> currentTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
         if (!resolutionContext.getPlayers().isEmpty()) {
             resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
@@ -53,7 +53,7 @@ public class GameService implements com.thehuginn.common.services.exposed.GameSe
 
     @Override
     @WithTransaction
-    public Uni<Map.Entry<String, Map<String, String>>> nextTask(String gameId, String locale,
+    public Uni<Map.Entry<String, Map<String, Object>>> nextTask(String gameId, String locale,
             ResolutionContext.Builder resolutionContext) {
         if (!resolutionContext.getPlayers().isEmpty()) {
             resolutionContext = resolutionContext.player(resolutionContext.getPlayers().get(0));
